@@ -7,23 +7,13 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-  <link rel="manifest" href="manifest.json">
-  <script>
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('sw.js')
-          .then(reg => console.log('Service Worker: Registered'))
-          .catch(err => console.log(`Service Worker: Error: ${err}`));
-      });
-    }
-  </script>
   <style>
     :root {
-      --primary: #1e40af; /* A strong blue for highlights */
-      --secondary: #60a5fa; /* A lighter blue */
-      --text-dark: #1f2937; /* A dark gray for main text */
-      --text-light: #4b5563; /* A medium gray for labels */
-      --bg-light: #f3f4f6; /* A very light gray background */
+      --primary: #1e40af;
+      --secondary: #60a5fa;
+      --text-dark: #1f2937;
+      --text-light: #4b5563;
+      --bg-light: #f3f4f6;
       --white: #ffffff;
       --border: #e5e7eb;
     }
@@ -37,6 +27,10 @@
       margin: 0;
       background-color: var(--bg-light);
       color: var(--text-dark);
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
     }
 
     .wrap {
@@ -58,7 +52,7 @@
       grid-template-columns: 1fr;
       gap: 24px;
     }
-    
+
     @media (min-width: 960px) {
       .grid {
         grid-template-columns: 420px 1fr;
@@ -105,7 +99,13 @@
       transition: border-color 0.3s, box-shadow 0.3s;
     }
     
-    input:focus, textarea:focus, select:focus {
+    input[readonly], textarea[readonly] {
+      background-color: #f0f0f0;
+      cursor: not-allowed;
+      border-color: #e5e7eb;
+    }
+
+    input:not([readonly]):focus, textarea:not([readonly]):focus, select:focus {
       border-color: var(--secondary);
       box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.25);
     }
@@ -120,11 +120,11 @@
       grid-template-columns: 1fr 1fr;
       gap: 16px;
     }
-    
+
     .row .input-container {
       position: relative;
     }
-    
+
     .suggestions {
       position: absolute;
       top: 100%;
@@ -138,13 +138,13 @@
       z-index: 10;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     }
-    
+
     .suggestions div {
       padding: 10px 16px;
       cursor: pointer;
       font-size: 14px;
     }
-    
+
     .suggestions div:hover {
       background-color: var(--bg-light);
     }
@@ -184,17 +184,50 @@
     }
 
     /* A4 preview */
+    .a4-wrapper {
+      padding: 20px;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+    }
+
     .a4 {
       width: 794px;
       min-height: 1123px;
-      margin: auto;
       background-color: var(--white);
       box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
     }
 
     .report-content {
       border: 3px solid #000;
       padding: 30px;
+      width: 100%;
+      height: 100%;
+      box-sizing: border-box;
+    }
+
+    /* Mobile styles for the preview card */
+    @media (max-width: 959px) {
+      .card.preview-card .body {
+        padding: 0;
+      }
+      .a4-wrapper {
+        padding: 16px;
+      }
+      .a4 {
+        margin: 0;
+        min-height: unset;
+        box-shadow: none;
+        width: 100%;
+        overflow-x: hidden;
+        
+        /* Scaling the A4 content to fit the screen */
+        transform-origin: top center;
+        transform: scale(calc((100vw - 32px) / 794)); /* 32px is total horizontal padding */
+      }
     }
 
     .hdr {
@@ -206,7 +239,7 @@
       padding-bottom: 12px;
       margin-bottom: 20px;
     }
-    
+
     .logo {
       width: 70px;
       height: 70px;
@@ -215,24 +248,24 @@
       border-radius: 8px;
       padding: 4px;
     }
-    
+
     .hdr-text {
       flex-grow: 1;
       text-align: left;
     }
-    
+
     .hdr-text div {
       font-size: 14px;
       font-weight: 500;
     }
-    
+
     .hdr-text .title {
       font-weight: bold;
       font-size: 20px;
       margin-top: 6px;
       color: var(--primary);
     }
-    
+
     .hdr-info {
       font-size: 12px;
       border: 1px solid #000;
@@ -240,7 +273,7 @@
       border-radius: 8px;
       text-align: right;
     }
-    
+
     .hdr-info div {
       white-space: nowrap;
     }
@@ -251,20 +284,20 @@
       margin-top: 15px;
       font-size: 13px;
     }
-    
+
     .boxtbl td {
       border: 1px solid #000;
       padding: 10px 8px;
       vertical-align: top;
     }
-    
+
     .boxtbl .lbl {
       font-weight: 600;
       width: 180px;
       text-align: left;
       background-color: #f0f0f0;
     }
-    
+
     .boxtbl td:nth-child(2), .boxtbl td:nth-child(4) {
       font-weight: 500;
       text-align: center;
@@ -272,13 +305,24 @@
 
     .photos {
       display: flex;
+      flex-direction: row;
       justify-content: space-between;
+      align-items: flex-start;
       gap: 20px;
       margin-top: 20px;
     }
-    
+
+    @media (max-width: 767px) {
+        .photos {
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+    }
+
     .ph {
-      width: 320px; 
+      width: 100%;
+      max-width: 350px;
       aspect-ratio: 1.5;
       border: 2px solid #000;
       position: relative;
@@ -288,15 +332,11 @@
     }
     
     .ph img {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%); 
-      max-width: 100%; 
-      max-height: 100%; 
-      object-fit: contain; /* यह सबसे महत्वपूर्ण बदलाव है */
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
     }
-    
+
     .photo-caption {
       text-align: center;
       font-weight: 600;
@@ -311,19 +351,67 @@
       text-align: left;
       font-weight: 500;
     }
-    
+
     .foot {
       display: flex;
       justify-content: space-between;
       margin-top: 40px;
       font-size: 14px;
     }
-    
+
     .foot div {
       border-top: 1px solid #000;
       padding-top: 8px;
       width: 45%;
       text-align: center;
+    }
+
+    .saved-reports {
+      margin-top: 24px;
+    }
+
+    .saved-reports h3 {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+
+    .saved-reports ul {
+      list-style-type: none;
+      padding: 0;
+      max-height: 200px;
+      overflow-y: auto;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+
+    .saved-reports li {
+      padding: 10px 16px;
+      border-bottom: 1px solid var(--border);
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .saved-reports li:last-child {
+      border-bottom: none;
+    }
+
+    .saved-reports li:hover {
+      background-color: var(--bg-light);
+    }
+
+    .saved-reports .delete-btn {
+      color: #ef4444;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      opacity: 0.8;
+    }
+
+    .saved-reports .delete-btn:hover {
+      opacity: 1;
     }
   </style>
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
@@ -339,7 +427,7 @@
           <div class="row">
             <div>
               <label>Company</label>
-              <input id="company" value="WELLCOAT TECH"/>
+              <input id="company" value="WELLCOAT TECH" readonly/>
             </div>
             <div>
               <label>Logo (optional)</label>
@@ -348,17 +436,17 @@
           </div>
 
           <label>Report Title</label>
-          <input id="title" value="NEUTRAL SALT SPRAY TEST REPORT"/>
+          <input id="title" value="NEUTRAL SALT SPRAY TEST REPORT" readonly/>
           <label>Sub‑Title</label>
-          <input id="subtitle" value="(TEST CONDUCTED AS PER ASTM B 117)"/>
+          <input id="subtitle" value="(TEST CONDUCTED AS PER ASTM B 117)" readonly/>
 
           <div class="row">
-            <div><label>DOC NO</label><input id="docNo" value="DOC NO:014"/></div>
-            <div><label>REV NO</label><input id="revNo" value="REV.NO:00"/></div>
+            <div><label>DOC NO</label><input id="docNo" value="DOC NO:014" readonly/></div>
+            <div><label>REV NO</label><input id="revNo" value="REV.NO:00" readonly/></div>
           </div>
           <div class="row">
-            <div><label>REV DATE</label><input id="revDate" value="01.09.2024"/></div>
-            <div><label>TC Date</label><input id="tcDate" value="04.08.2025" readonly/></div>
+            <div><label>REV DATE</label><input id="revDate" type="date" readonly/></div>
+            <div><label>TC Date</label><input id="tcDate" readonly/></div>
           </div>
           
           <div class="row">
@@ -381,7 +469,10 @@
           
           <div class="row">
             <div><label>Coating System</label><input id="coatSys" value="Zinc Al. Flake Coating"/></div>
-            <div><label>Color</label><input id="color" value="SILVER"/></div>
+            <div>
+              <label>Color</label>
+              <input id="color" value="SILVER" />
+            </div>
           </div>
           <div class="row">
             <div><label>Coating Process</label><input id="process" value="Dip spin coating"/></div>
@@ -389,7 +480,7 @@
           </div>
           <div class="row">
             <div><label>Coating Thickness</label><input id="thick" value="8–12 MIC"/></div>
-            <div><label>SST Equipment</label><input id="equip" value="B-TEST APP."/></div>
+            <div><label>SST Equipment</label><input id="equip" value="Salt Spray Chamber"/></div>
           </div>
           <div class="row">
             <div><label>Capacity</label><input id="capacity" value=">= 450 L"/></div>
@@ -397,12 +488,12 @@
           </div>
           <div class="row">
             <div><label>Type of Salt</label><input id="salt" value="Lab, Grade NaCl, 5%"/></div>
-            <div><label>Customer Requirement (Hrs)</label><input id="req" type="number" value="480" min="0" /></div>
+            <div><label>Customer Requirement (Hrs)</label><input id="sstHrs" type="number" value="720" min="0" /></div>
           </div>
           
-          <div class="row">
-            <div><label>SST Hrs</label><input id="sstHrs" type="number" value="720" min="0" /></div>
-            <div><label>Observation for Red Rust</label><input id="obs" value="720 Hrs No red rust" /></div>
+          <div>
+              <label>Observation for Red Rust</label>
+              <input id="obs" value="720 Hrs No red rust" />
           </div>
 
           <div class="row">
@@ -430,23 +521,31 @@
           <input id="after" type="file" accept="image/*"/>
           <br>
           <div class="btn-group">
-            <button class="btn" id="btnPreview">Preview Update</button>
             <button class="btn" id="btnPdf">Download PDF</button>
+            <button class="btn" id="btnSave">Save Report</button>
             <button class="btn" id="btnClear">Clear Form</button>
-            <button class="btn" id="btnSaveLoad">Save / Load Data</button>
           </div>
           <div style="font-size:12px; color:#6b7280; margin-top:10px;">
-            **Save / Load Data:** यह फ़ॉर्म के डाटा को आपके ब्राउज़र में सेव कर देगा। अगली बार जब आप इस पेज को खोलेंगे, तो आप डाटा लोड कर पाएंगे।
+            **PDF डाउनलोड करने पर, रिपोर्ट ऑटोमैटिकली सेव हो जाएगी।**
+          </div>
+        </div>
+        <div class="saved-reports">
+          <h2>सेव्ड रिपोर्ट्स</h2>
+          <div class="body">
+            <ul id="reportsList">
+              </ul>
           </div>
         </div>
       </div>
 
-      <div class="card">
+      <div class="card preview-card">
         <h2>लाइव प्रीव्यू (A4)</h2>
         <div class="body">
-          <div id="preview" class="a4">
-            <div class="report-content">
-              </div>
+          <div id="preview" class="a4-wrapper">
+            <div class="a4">
+              <div class="report-content">
+                </div>
+            </div>
           </div>
         </div>
       </div>
@@ -454,9 +553,20 @@
   </div>
 
 <script>
+  // Right-click and keyboard shortcuts are disabled
+  document.addEventListener('contextmenu', event => event.preventDefault());
+  document.addEventListener('keydown', event => {
+    if (event.ctrlKey || event.metaKey) {
+      if (event.key === 'c' || event.key === 'u' || event.key === 's' || event.key === 'i' || event.key === 'j') {
+        event.preventDefault();
+        alert('This action is disabled.');
+      }
+    }
+  });
+
   const $ = (id) => document.getElementById(id);
   const state = { logo: "", before: "", after: "" };
-  const inputIds = ['company', 'title', 'subtitle', 'docNo', 'revNo', 'revDate', 'tcDate', 'tag', 'batch', 'part', 'customer', 'coatSys', 'color', 'process', 'coats', 'thick', 'equip', 'capacity', 'water', 'salt', 'req', 'sstHrs', 'loadDate', 'loadTime', 'stopDate', 'stopTime', 'obs', 'samples', 'remark', 'checked', 'approved'];
+  const inputIds = ['company', 'title', 'subtitle', 'docNo', 'revNo', 'revDate', 'tcDate', 'tag', 'batch', 'part', 'customer', 'coatSys', 'color', 'process', 'coats', 'thick', 'equip', 'capacity', 'water', 'salt', 'sstHrs', 'loadDate', 'loadTime', 'stopDate', 'stopTime', 'obs', 'samples', 'remark', 'checked', 'approved'];
 
   const defaultValues = {
     company: "WELLCOAT TECH",
@@ -464,8 +574,8 @@
     subtitle: "(TEST CONDUCTED AS PER ASTM B 117)",
     docNo: "DOC NO:014",
     revNo: "REV.NO:00",
-    revDate: "01.09.2024",
-    tcDate: "2025-08-15",
+    revDate: "2025-09-04",
+    tcDate: "04.09.2025",
     tag: "39",
     batch: "250710",
     part: "3871",
@@ -475,11 +585,10 @@
     process: "Dip spin coating",
     coats: "2 Base (GEOPERT500) | 1 Top (AQUAZINC)",
     thick: "8–12 MIC",
-    equip: "B-TEST APP.",
+    equip: "Salt Spray Chamber",
     capacity: ">= 450 L",
     water: "D.I. Water",
     salt: "Lab, Grade NaCl, 5%",
-    req: "480",
     sstHrs: "720",
     loadDate: "2025-07-16",
     loadTime: "11:00",
@@ -492,8 +601,36 @@
     approved: "ABHIJEET DHOKRAT"
   };
 
+  // Set default value for revDate to the current date on load
+  document.addEventListener('DOMContentLoaded', () => {
+    const today = new Date();
+    const formattedDate = `${String(today.getDate()).padStart(2, '0')}.${String(today.getMonth() + 1).padStart(2, '0')}.${today.getFullYear()}`;
+    const formattedDateForInput = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+    $('revDate').value = formattedDateForInput;
+    $('tcDate').value = formattedDate;
+    
+    // Set default values from the object
+    inputIds.forEach(id => {
+      const el = $(id);
+      if (el && defaultValues[id] !== undefined) {
+        if (el.type === 'date' || el.type === 'time') {
+          // Do nothing for date and time as they are handled above or automatically
+        } else {
+          el.value = defaultValues[id];
+        }
+      }
+    });
+
+    loadInitialReports();
+    loadSuggestions();
+    updateSuggestions();
+    calculateStopDate();
+    render();
+  });
+  
   let usedCustomers = new Set();
   let usedParts = new Set();
+  let savedReports = [];
 
   function loadSuggestions() {
     const savedCustomers = JSON.parse(localStorage.getItem('sstCustomers') || '[]');
@@ -542,7 +679,7 @@
     const newStopDate = `${endYear}-${endMonth}-${endDay}`;
     
     $('stopDate').value = newStopDate;
-    $('tcDate').value = newStopDate;
+    $('tcDate').value = formatDate(newStopDate); // Update TC Date as well
   }
 
   function updateObsText() {
@@ -564,7 +701,18 @@
       }
       render();
   }
-  
+
+  function updateCoatInfo() {
+      const color = $('color').value.trim().toUpperCase();
+      const coatsInput = $('coats');
+      if (color === "SILVER") {
+          coatsInput.value = "2 Base (GEOPERT500) | 1 Top (AQUAZINC)";
+      } else if (color === "BLACK") {
+          coatsInput.value = "2 Base (ZINTEC 300 HPA) | 2 Top (TECHDIP HL)";
+      }
+      render();
+  }
+
   function fileToDataURL(file) {
     return new Promise((res, rej) => {
       const reader = new FileReader();
@@ -573,6 +721,100 @@
       reader.readAsDataURL(file);
     });
   }
+  
+  function getFormData() {
+    const data = {};
+    inputIds.forEach(id => {
+      data[id] = $(id).value;
+    });
+    data.logo = state.logo;
+    data.before = state.before;
+    data.after = state.after;
+    return data;
+  }
+
+  function setFormData(data) {
+    inputIds.forEach(id => {
+      const el = $(id);
+      if (el) el.value = data[id] || '';
+    });
+    state.logo = data.logo || "";
+    state.before = data.before || "";
+    state.after = data.after || "";
+    render();
+  }
+
+  function saveReport() {
+    const reportData = getFormData();
+    reportData.id = Date.now();
+    savedReports.push(reportData);
+    localStorage.setItem('sstSavedReports', JSON.stringify(savedReports));
+    alert('Report saved successfully!');
+    renderReportsList();
+  }
+
+  function loadReport(id) {
+    const report = savedReports.find(r => r.id === id);
+    if (report) {
+      setFormData(report);
+      alert('Report loaded successfully!');
+    }
+  }
+
+  function deleteReport(id) {
+    savedReports = savedReports.filter(r => r.id !== id);
+    localStorage.setItem('sstSavedReports', JSON.stringify(savedReports));
+    renderReportsList();
+    alert('Report deleted successfully.');
+  }
+
+  function renderReportsList() {
+    const reportsListEl = $('reportsList');
+    reportsListEl.innerHTML = '';
+    if (savedReports.length === 0) {
+      reportsListEl.innerHTML = '<li style="justify-content:center;color:#6b7280;">कोई सेव्ड रिपोर्ट नहीं है।</li>';
+      return;
+    }
+    savedReports.forEach(report => {
+      const li = document.createElement('li');
+      li.innerHTML = `
+        <span onclick="loadReport(${report.id})">
+          ${report.part || 'No Part'} - ${report.customer || 'No Customer'}
+        </span>
+        <span class="delete-btn" onclick="deleteReport(${report.id})">🗑️</span>
+      `;
+      reportsListEl.appendChild(li);
+    });
+  }
+  
+  function loadInitialReports() {
+    const storedReports = localStorage.getItem('sstSavedReports');
+    if (storedReports) {
+      savedReports = JSON.parse(storedReports);
+    }
+    renderReportsList();
+  }
+
+  function showReminder() {
+      const stopDate = $('stopDate').value;
+      const stopTime = $('stopTime').value;
+      
+      const formattedDate = formatDate(stopDate);
+      const formattedTime = formatTime(stopTime);
+
+      if (formattedDate && formattedTime) {
+          alert(`Reminder: यह पार्ट ${formattedDate} को ${formattedTime} पर पूरा हो जाएगा।`);
+      } else {
+          alert("रिमाइंडर के लिए टेस्ट स्टॉप डेट और टाइम की जानकारी उपलब्ध नहीं है।");
+      }
+  }
+
+  const formElements = document.querySelectorAll('input, textarea');
+  formElements.forEach(el => {
+    if (el.type !== 'file' && !el.readOnly) {
+      el.addEventListener('input', render);
+    }
+  });
 
   $('logo').addEventListener('change', async e => {
     const f = e.target.files?.[0];
@@ -594,14 +836,12 @@
     const P = $('preview').querySelector('.report-content');
     const v = (id) => $(id).value;
     
-    // Convert date format for display
     function formatDate(dateStr) {
       if (!dateStr) return '';
       const [year, month, day] = dateStr.split('-');
       return `${day}.${month}.${year}`;
     }
     
-    // Convert time format for display
     function formatTime(timeStr) {
       if (!timeStr) return '';
       const [hours, minutes] = timeStr.split(':');
@@ -624,19 +864,19 @@
         <table style="font-size:12px;border-collapse:collapse;border:1px solid #000;height:min-content;margin-top:10px;font-weight:500;">
           <tr><td style="border:1px solid #000;padding:5px 8px;">${v('docNo')}</td></tr>
           <tr><td style="border:1px solid #000;padding:5px 8px;">${v('revNo')}</td></tr>
-          <tr><td style="border:1px solid #000;padding:5px 8px;">REV.DATE: ${formatDate(v('revDate'))}</td></tr>
+          <tr><td style="border:1px solid #000;padding:5px 8px;">REV.DATE: ${v('revDate') ? formatDate(v('revDate')) : 'N/A'}</td></tr>
         </table>
       </div>
 
       <table class="boxtbl">
         ${row('SST Tag No', v('tag'), 'PRODUCTION BATCH', v('batch'))}
-        ${row('TC Date', formatDate(v('tcDate')), 'Part No/Name', v('part'))}
+        ${row('TC Date', v('tcDate'), 'Part No/Name', v('part'))}
         ${row('Customer Name', v('customer'), 'Color', v('color'))}
         ${row('Coating System', v('coatSys'), 'Coating Process', v('process'))}
         ${row('No. of Coat', v('coats'), 'Coating Thickness', v('thick'))}
         ${row('SST Equipment', v('equip'), 'Corrosion Test Apparatus Capacity', v('capacity'))}
         ${row('Water type', v('water'), 'Type of salt', v('salt'))}
-        ${row('Component loaded for SST on (Date & time)', formatDate(v('loadDate')) + ' ' + formatTime(v('loadTime')), 'Customer requirement for SST', v('req') + ' Hrs')}
+        ${row('Component loaded for SST on (Date & time)', formatDate(v('loadDate')) + ' ' + formatTime(v('loadTime')), 'Customer requirement for SST', v('sstHrs') + ' Hrs')}
         ${row('Test Stop & Observation Date & Time', formatDate(v('stopDate')) + ' ' + formatTime(v('stopTime')), 'Observation for Red Rust', v('obs'))}
         <tr><td class="lbl">No. of Samples for SST</td><td colspan="3" style="text-align:center;">${v('samples')}</td></tr>
       </table>
@@ -667,7 +907,7 @@
   function clearForm() {
     inputIds.forEach(id => {
       const el = $(id);
-      if (el) {
+      if (el && !el.readOnly) {
         el.value = defaultValues[id] || '';
       }
     });
@@ -675,43 +915,27 @@
     $('before').value = '';
     $('after').value = '';
     state.logo = state.before = state.after = "";
+    
+    // Resetting readonly fields as well, just in case
+    $('company').value = defaultValues.company;
+    $('title').value = defaultValues.title;
+    $('subtitle').value = defaultValues.subtitle;
+    $('docNo').value = defaultValues.docNo;
+    $('revNo').value = defaultValues.revNo;
+    const today = new Date();
+    const formattedDateForInput = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+    const formattedDate = `${String(today.getDate()).padStart(2, '0')}.${String(today.getMonth() + 1).padStart(2, '0')}.${today.getFullYear()}`;
+    $('revDate').value = formattedDateForInput;
+    $('tcDate').value = formattedDate;
+
     render();
   }
-
-  function saveOrLoadData() {
-    if (localStorage.getItem('sstReportData')) {
-      const savedData = JSON.parse(localStorage.getItem('sstReportData'));
-      inputIds.forEach(id => {
-        if (savedData[id]) {
-          $(id).value = savedData[id];
-        }
-      });
-      state.logo = savedData.logo || "";
-      state.before = savedData.before || "";
-      state.after = savedData.after || "";
-      alert('Data loaded successfully!');
-    } else {
-      const dataToSave = {};
-      inputIds.forEach(id => {
-        dataToSave[id] = $(id).value;
-      });
-      dataToSave.logo = state.logo;
-      dataToSave.before = state.before;
-      dataToSave.after = state.after;
-      localStorage.setItem('sstReportData', JSON.stringify(dataToSave));
-      alert('Data saved successfully!');
-    }
-    render();
-  }
-
-  $('btnPreview').addEventListener('click', (e) => {
-    e.preventDefault();
-    render();
-  });
 
   $('btnPdf').addEventListener('click', async (e) => {
     e.preventDefault();
     
+    saveReport();
+
     const customerValue = $('customer').value.trim();
     const partValue = $('part').value.trim();
     if (customerValue) {
@@ -762,23 +986,21 @@
           <table style="font-size:12px;border-collapse:collapse;border:1px solid #000;height:min-content;margin-top:10px;font-weight:500;">
             <tr><td style="border:1px solid #000;padding:5px 8px;">${v('docNo')}</td></tr>
             <tr><td style="border:1px solid #000;padding:5px 8px;">${v('revNo')}</td></tr>
-            <tr><td style="border:1px solid #000;padding:5px 8px;">REV.DATE: ${formatDate(v('revDate'))}</td></tr>
+            <tr><td style="border:1px solid #000;padding:5px 8px;">REV.DATE: ${v('revDate') ? formatDate(v('revDate')) : 'N/A'}</td></tr>
           </table>
         </div>
-
         <table class="boxtbl">
           ${row('SST Tag No', v('tag'), 'PRODUCTION BATCH', v('batch'))}
-          ${row('TC Date', formatDate(v('tcDate')), 'Part No/Name', v('part'))}
+          ${row('TC Date', v('tcDate'), 'Part No/Name', v('part'))}
           ${row('Customer Name', v('customer'), 'Color', v('color'))}
           ${row('Coating System', v('coatSys'), 'Coating Process', v('process'))}
           ${row('No. of Coat', v('coats'), 'Coating Thickness', v('thick'))}
           ${row('SST Equipment', v('equip'), 'Corrosion Test Apparatus Capacity', v('capacity'))}
           ${row('Water type', v('water'), 'Type of salt', v('salt'))}
-          ${row('Component loaded for SST on (Date & time)', formatDate(v('loadDate')) + ' ' + formatTime(v('loadTime')), 'Customer requirement for SST', v('req') + ' Hrs')}
+          ${row('Component loaded for SST on (Date & time)', formatDate(v('loadDate')) + ' ' + formatTime(v('loadTime')), 'Customer requirement for SST', v('sstHrs') + ' Hrs')}
           ${row('Test Stop & Observation Date & Time', formatDate(v('stopDate')) + ' ' + formatTime(v('stopTime')), 'Observation for Red Rust', v('obs'))}
           <tr><td class="lbl">No. of Samples for SST</td><td colspan="3" style="text-align:center;">${v('samples')}</td></tr>
         </table>
-
         <div class="photos">
           <div>
             <div class="photo-caption">SAMPLE PHOTO BEFORE SST</div>
@@ -789,7 +1011,6 @@
             <div class="ph">${state.after ? `<img src="${state.after}" alt="Sample after SST">` : 'No image'}</div>
           </div>
         </div>
-
         <div class="muted">Remark: ${v('remark')}</div>
         <div class="foot">
           <div>Checked by: <br><b>${v('checked')}</b></div>
@@ -803,13 +1024,13 @@
     }
     
     const canvas = await html2canvas(tempEl, {
-      scale: 3,
+      scale: 1.5,
       backgroundColor: '#fff'
     });
     
     document.body.removeChild(tempEl);
 
-    const img = canvas.toDataURL('image/png');
+    const img = canvas.toDataURL('image/jpeg', 0.7);
     const { jsPDF } = window.jspdf;
     
     const pdf = new jsPDF({ 
@@ -828,13 +1049,13 @@
     let heightLeft = imgH;
     let position = margin;
     
-    pdf.addImage(img, 'PNG', margin, position, imgW, imgH);
+    pdf.addImage(img, 'JPEG', margin, position, imgW, imgH);
     heightLeft -= pageH;
     
     while (heightLeft > 0) {
       position = heightLeft - imgH + margin;
       pdf.addPage();
-      pdf.addImage(img, 'PNG', margin, position, imgW, imgH);
+      pdf.addImage(img, 'JPEG', margin, position, imgW, imgH);
       heightLeft -= pageH;
     }
 
@@ -847,71 +1068,30 @@
     alert('PDF report has been downloaded to your default Downloads folder.');
   });
 
-  $('btnClear').addEventListener('click', clearForm);
-  $('btnSaveLoad').click(() => {
-    if (localStorage.getItem('sstReportData')) {
-      const savedData = JSON.parse(localStorage.getItem('sstReportData'));
-      inputIds.forEach(id => {
-        if (savedData[id]) {
-          $(id).value = savedData[id];
-        }
-      });
-      state.logo = savedData.logo || "";
-      state.before = savedData.before || "";
-      state.after = savedData.after || "";
-      alert('Data loaded successfully!');
-    } else {
-      const dataToSave = {};
-      inputIds.forEach(id => {
-        dataToSave[id] = $(id).value;
-      });
-      dataToSave.logo = state.logo;
-      dataToSave.before = state.before;
-      dataToSave.after = state.after;
-      localStorage.setItem('sstReportData', JSON.stringify(dataToSave));
-      alert('Data saved successfully!');
-    }
-    render();
+  $('btnSave').addEventListener('click', (e) => {
+    e.preventDefault();
+    saveReport();
+    showReminder();
   });
+
+  $('btnClear').addEventListener('click', clearForm);
   
+  window.loadReport = loadReport;
+  window.deleteReport = deleteReport;
+
+  loadInitialReports();
   loadSuggestions();
   updateSuggestions();
   
   $('customer').addEventListener('input', updateSuggestions);
   $('part').addEventListener('input', updateSuggestions);
   
-  $('loadDate').addEventListener('change', () => { calculateStopDate(); });
+  $('loadDate').addEventListener('change', () => { calculateStopDate(); render(); });
   $('sstHrs').addEventListener('input', () => { calculateStopDate(); updateObsText(); updateRemarkText(); });
+  $('color').addEventListener('input', updateCoatInfo);
   
   calculateStopDate();
   render();
-
-  document.addEventListener('keydown', (e) => {
-    // Ctrl + Alt + P
-    if (e.ctrlKey && e.altKey && e.key === 'p') {
-      e.preventDefault();
-      $('btnPreview').click();
-    }
-    // Ctrl + Alt + S
-    if (e.ctrlKey && e.altKey && e.key === 's') {
-      e.preventDefault();
-      $('btnSaveLoad').click();
-    }
-    // Ctrl + Alt + L
-    if (e.ctrlKey && e.altKey && e.key === 'l') {
-      e.preventDefault();
-      const today = new Date();
-      const month = String(today.getMonth() + 1).padStart(2, '0');
-      const day = String(today.getDate()).padStart(2, '0');
-      const year = today.getFullYear();
-      const formattedDate = `${year}-${month}-${day}`;
-      
-      $('loadDate').value = formattedDate;
-
-      calculateStopDate();
-      render();
-    }
-  });
 </script>
 </body>
 </html>
