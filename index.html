@@ -8,6 +8,16 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="manifest" href="manifest.json">
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('sw.js')
+        .then(reg => console.log('Service Worker: Registered'))
+        .catch(err => console.log(`Service Worker: Error: ${err}`));
+    });
+  }
+</script>
   <style>
     :root {
       --primary: #1e40af;
@@ -1105,4 +1115,5 @@
   }
 </script>
 </body>
+
 </html>
