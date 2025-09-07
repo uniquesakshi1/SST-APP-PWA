@@ -1,10 +1,10 @@
 const CACHE_NAME = 'sst-app-v1';
 const urlsToCache = [
-  './',
-  './index.html',
-  './manifest.json',
-  './icon-192.png',
-  './icon-512.png'
+  '/SST-APP-PWA/',
+  '/SST-APP-PWA/index.html',
+  '/SST-APP-PWA/manifest.json',
+  '/SST-APP-PWA/icon-192.png',
+  '/SST-APP-PWA/icon-512.png'
 ];
 
 self.addEventListener('install', (event) => {

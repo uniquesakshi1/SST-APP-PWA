@@ -2,7 +2,7 @@
   "name": "SST Report Generator",
   "short_name": "SST App",
   "description": "Generate and manage SST reports easily.",
-  "start_url": "./",
+  "start_url": "/SST-APP-PWA/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#1e40af",
