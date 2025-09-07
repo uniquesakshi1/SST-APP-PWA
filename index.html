@@ -584,8 +584,8 @@
     subtitle: "(TEST CONDUCTED AS PER ASTM B 117)",
     docNo: "DOC NO:014",
     revNo: "REV.NO:00",
-    revDate: "2025-09-04",
-    tcDate: "04.09.2025",
+    revDate: "", // will be set dynamically
+    tcDate: "", // will be set dynamically
     tag: "39",
     batch: "250710",
     part: "3871",
@@ -600,9 +600,9 @@
     water: "D.I. Water",
     salt: "Lab, Grade NaCl, 5%",
     sstHrs: "720",
-    loadDate: "2025-07-16",
+    loadDate: "", // will be set dynamically
     loadTime: "11:00",
-    stopDate: "2025-08-15",
+    stopDate: "", // will be set dynamically
     stopTime: "11:10",
     obs: "720 Hrs No red rust",
     samples: "3",
@@ -611,15 +611,32 @@
     approved: "ABHIJEET DHOKRAT"
   };
 
-  // Set default value for revDate to the current date on load
+  // Helper functions
+  function formatDate(dateStr) {
+    if (!dateStr) return '';
+    const [year, month, day] = dateStr.split('-');
+    return `${day}.${month}.${year}`;
+  }
+  
+  function formatTime(timeStr) {
+    if (!timeStr) return '';
+    const [hours, minutes] = timeStr.split(':');
+    const hour = parseInt(hours, 10);
+    const ampm = hour >= 12 ? 'pm' : 'am';
+    const formattedHour = hour % 12 === 0 ? 12 : hour % 12;
+    return `${String(formattedHour).padStart(2, '0')}:${minutes} ${ampm}`;
+  }
+
   document.addEventListener('DOMContentLoaded', () => {
     const today = new Date();
-    const formattedDate = `${String(today.getDate()).padStart(2, '0')}.${String(today.getMonth() + 1).padStart(2, '0')}.${today.getFullYear()}`;
     const formattedDateForInput = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
-    $('revDate').value = formattedDateForInput;
-    $('tcDate').value = formattedDate;
     
-    // Set default values from the object
+    // Set default values for date/time
+    $('revDate').value = formattedDateForInput;
+    $('tcDate').value = formatDate(formattedDateForInput);
+    $('loadDate').value = formattedDateForInput;
+
+    // Set other default values from the object
     inputIds.forEach(id => {
       const el = $(id);
       if (el && defaultValues[id] !== undefined) {
@@ -669,7 +686,7 @@
   
   function calculateStopDate() {
     const loadDateStr = $('loadDate').value;
-    const loadTimeStr = '11:00';
+    const loadTimeStr = $('loadTime').value;
     const sstHours = parseInt($('sstHrs').value, 10);
 
     if (!loadDateStr || isNaN(sstHours)) {
@@ -688,8 +705,14 @@
     const endDay = String(endDate.getDate()).padStart(2, '0');
     const newStopDate = `${endYear}-${endMonth}-${endDay}`;
     
+    const endHours = String(endDate.getHours()).padStart(2, '0');
+    const endMinutes = String(endDate.getMinutes()).padStart(2, '0');
+    const newStopTime = `${endHours}:${endMinutes}`;
+
     $('stopDate').value = newStopDate;
+    $('stopTime').value = newStopTime;
     $('tcDate').value = formatDate(newStopDate); // Update TC Date as well
+    render(); // Re-render to show updated values
   }
 
   function updateObsText() {
@@ -846,21 +869,6 @@
     const P = $('preview').querySelector('.report-content');
     const v = (id) => $(id).value;
     
-    function formatDate(dateStr) {
-      if (!dateStr) return '';
-      const [year, month, day] = dateStr.split('-');
-      return `${day}.${month}.${year}`;
-    }
-    
-    function formatTime(timeStr) {
-      if (!timeStr) return '';
-      const [hours, minutes] = timeStr.split(':');
-      const hour = parseInt(hours, 10);
-      const ampm = hour >= 12 ? 'pm' : 'am';
-      const formattedHour = hour % 12 === 0 ? 12 : hour % 12;
-      return `${String(formattedHour).padStart(2, '0')}:${minutes} ${ampm}`;
-    }
-    
     P.innerHTML = `
       <div class="hdr">
         <div style="display:flex;gap:15px;align-items:center;">
@@ -967,21 +975,6 @@
 
     const v = (id) => $(id).value;
     
-    function formatDate(dateStr) {
-      if (!dateStr) return '';
-      const [year, month, day] = dateStr.split('-');
-      return `${day}.${month}.${year}`;
-    }
-    
-    function formatTime(timeStr) {
-      if (!timeStr) return '';
-      const [hours, minutes] = timeStr.split(':');
-      const hour = parseInt(hours, 10);
-      const ampm = hour >= 12 ? 'pm' : 'am';
-      const formattedHour = hour % 12 === 0 ? 12 : hour % 12;
-      return `${String(formattedHour).padStart(2, '0')}:${minutes} ${ampm}`;
-    }
-
     tempEl.innerHTML = `
       <div class="report-content">
         <div class="hdr">
@@ -1096,7 +1089,8 @@
   $('customer').addEventListener('input', updateSuggestions);
   $('part').addEventListener('input', updateSuggestions);
   
-  $('loadDate').addEventListener('change', () => { calculateStopDate(); render(); });
+  $('loadDate').addEventListener('change', calculateStopDate);
+  $('loadTime').addEventListener('change', calculateStopDate);
   $('sstHrs').addEventListener('input', () => { calculateStopDate(); updateObsText(); updateRemarkText(); });
   $('color').addEventListener('input', updateCoatInfo);
   
