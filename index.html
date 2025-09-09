@@ -946,7 +946,7 @@
     const formattedDate = `${String(today.getDate()).padStart(2, '0')}.${String(today.getMonth() + 1).padStart(2, '0')}.${today.getFullYear()}`;
     $('tcDate').value = formattedDate;
     $('loadDate').value = formattedDateForInput;
-
+    calculateStopDate();
     render();
   }
 
