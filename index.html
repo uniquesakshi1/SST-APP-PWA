@@ -980,7 +980,7 @@
 
     // Optimized HTML for PDF generation
     tempEl.innerHTML = `
-      <div style="border: 2px solid #000; padding: 15px;">
+      <div style="border: 2px solid #000; padding: 15px; font-size: 10px;">
         <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;border-bottom:1px solid #000;padding-bottom:8px;margin-bottom:12px;">
           <div style="display:flex;gap:8px;align-items:center;">
             ${state.logo ? `<img src="${state.logo}" alt="Company Logo" style="width: 50px; height: 50px; object-fit: contain; border: 1px solid #e5e7eb; border-radius: 6px; padding: 3px;">` : `<div style="width:50px; height:50px; display:flex;align-items:center;justify-content:center;font-size:8px;color:#4b5563;background-color:#f3f4f6;border:1px solid #e5e7eb;border-radius:6px;">LOGO</div>`}
@@ -1029,8 +1029,10 @@
     `;
 
     const canvas = await html2canvas(tempEl, {
-      scale: 2.5, // Increased scale for better resolution and single-page fit
-      backgroundColor: '#fff'
+      scale: 1.5, // Reduced scale for smaller file size
+      backgroundColor: '#fff',
+      allowTaint: true,
+      useCORS: true
     });
     
     document.body.removeChild(tempEl);
@@ -1042,15 +1044,32 @@
       orientation: 'portrait'
     });
     
-    const imgData = canvas.toDataURL('image/jpeg', 1.0); // Maximum quality
+    const imgData = canvas.toDataURL('image/jpeg', 0.8); // Reduced quality for smaller file size
     const imgProps = pdf.getImageProperties(imgData);
     const pdfWidth = pdf.internal.pageSize.getWidth();
     const pdfHeight = pdf.internal.pageSize.getHeight();
-    const margin = 15; // Decreased margin for more content space
-
-    const scaledHeight = (pdfWidth - margin * 2) * imgProps.height / imgProps.width;
     
-    pdf.addImage(imgData, 'JPEG', margin, (pdfHeight - scaledHeight) / 2, pdfWidth - margin * 2, scaledHeight);
+    const imageAspectRatio = imgProps.width / imgProps.height;
+    const pageAspectRatio = pdfWidth / pdfHeight;
+
+    let scaledWidth, scaledHeight, x, y;
+
+    if (imageAspectRatio > pageAspectRatio) {
+        // Image is wider than the page, scale by width
+        scaledWidth = pdfWidth;
+        scaledHeight = scaledWidth / imageAspectRatio;
+        x = 0;
+        y = (pdfHeight - scaledHeight) / 2;
+    } else {
+        // Image is taller or the same as the page, scale by height
+        scaledHeight = pdfHeight;
+        scaledWidth = scaledHeight * imageAspectRatio;
+        x = (pdfWidth - scaledWidth) / 2;
+        y = 0;
+    }
+    
+    // Add image with no margins
+    pdf.addImage(imgData, 'JPEG', x, y, scaledWidth, scaledHeight);
 
     const customerName = $('customer').value.trim() || 'Customer';
     const partNo = $('part').value.trim() || 'PartNo';
