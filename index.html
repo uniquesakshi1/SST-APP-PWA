@@ -464,19 +464,19 @@
           </div>
           
           <div class="row">
-            <div><label>SST Tag No</label><input id="tag" value="39"/></div>
-            <div><label>Production Batch</label><input id="batch" value="250710"/></div>
+            <div><label>SST Tag No</label><input id="tag" value="03"/></div>
+            <div><label>Production Batch</label><input id="batch" value="250819"/></div>
           </div>
           
           <div class="row">
             <div class="input-container">
               <label>Part No/Name</label>
-              <input id="part" value="3871" list="partsList" autocomplete="off"/>
+              <input id="part" value="LAC09170" list="partsList" autocomplete="off"/>
               <datalist id="partsList"></datalist>
             </div>
             <div class="input-container">
               <label>Customer Name</label>
-              <input id="customer" value="BG FASTENING AND ENGINEERING" list="customersList" autocomplete="off"/>
+              <input id="customer" value="Star Engineering" list="customersList" autocomplete="off"/>
               <datalist id="customersList"></datalist>
             </div>
           </div>
@@ -502,32 +502,32 @@
           </div>
           <div class="row">
             <div><label>Type of Salt</label><input id="salt" value="Lab, Grade NaCl, 5%"/></div>
-            <div><label>Customer Requirement (Hrs)</label><input id="sstHrs" type="number" value="720" min="0" /></div>
+            <div><label>Customer Requirement (Hrs)</label><input id="sstHrs" type="number" value="480" min="0" /></div>
           </div>
           
           <div>
               <label>Observation for Red Rust</label>
-              <input id="obs" value="720 Hrs No red rust" />
+              <input id="obs" value="480 Hrs No red rust" />
           </div>
 
           <div class="row">
-            <div><label>Loaded Date</label><input id="loadDate" value="2025-07-16" type="date"/></div>
-            <div><label>Loaded Time</label><input id="loadTime" value="11:00" type="time" readonly/></div>
+            <div><label>Loaded Date</label><input id="loadDate" value="2025-09-09" type="date"/></div>
+            <div><label>Loaded Time</label><input id="loadTime" value="11:06" type="time" readonly/></div>
           </div>
           <div class="row">
-            <div><label>Test Stop Date</label><input id="stopDate" value="2025-08-15" type="date" readonly/></div>
+            <div><label>Test Stop Date</label><input id="stopDate" value="2025-09-09" type="date" readonly/></div>
             <div><label>Test Stop Time</label><input id="stopTime" value="11:10" type="time" readonly/></div>
           </div>
           
           <div class="row">
-            <div><label>No. of Samples</label><input id="samples" value="3"/></div>
+            <div><label>No. of Samples</label><input id="samples" value="2"/></div>
             <div><label>Checked By</label><input id="checked" value="SAKSHI CHAVHAN"/></div>
           </div>
           <div class="row">
             <div><label>Approved By</label><input id="approved" value="ABHIJEET DHOKRAT"/></div>
           </div>
           <label>Remark</label>
-          <textarea id="remark">Sample SST passed 720 Hrs. No red rust found.</textarea>
+          <textarea id="remark">Sample SST passed 480 Hrs. No red rust found.</textarea>
           
           <label>Sample Photo (Before)</label>
           <input id="before" type="file" accept="image/*"/>
@@ -590,10 +590,10 @@
     revNo: "REV.NO:00",
     revDate: "01.09.2024",
     tcDate: "", // will be set dynamically
-    tag: "39",
-    batch: "250710",
-    part: "3871",
-    customer: "BG FASTENING AND ENGINEERING",
+    tag: "03",
+    batch: "250819",
+    part: "LAC09170",
+    customer: "Star Engineering",
     coatSys: "Zinc Al. Flake Coating",
     color: "SILVER",
     process: "Dip spin coating",
@@ -603,14 +603,14 @@
     capacity: ">= 450 L",
     water: "D.I. Water",
     salt: "Lab, Grade NaCl, 5%",
-    sstHrs: "720",
-    loadDate: "", // will be set dynamically
-    loadTime: "11:00",
+    sstHrs: "480",
+    loadDate: "2025-09-09",
+    loadTime: "11:06",
     stopDate: "", // will be set dynamically
     stopTime: "11:10",
-    obs: "720 Hrs No red rust",
-    samples: "3",
-    remark: "Sample SST passed 720 Hrs. No red rust found.",
+    obs: "480 Hrs No red rust",
+    samples: "2",
+    remark: "Sample SST passed 480 Hrs. No red rust found.",
     checked: "SAKSHI CHAVHAN",
     approved: "ABHIJEET DHOKRAT"
   };
@@ -979,7 +979,7 @@
     });
     
     let y = 10;
-    const margin = 10; // Reduced margin for more space
+    const margin = 10;
     const pageWidth = pdf.internal.pageSize.getWidth();
     const pageHeight = pdf.internal.pageSize.getHeight();
 
@@ -988,7 +988,7 @@
     
     // Header
     const headerStartY = margin + 5;
-    const logoSize = 25; // in mm
+    const logoSize = 25;
     const logoX = margin + 5;
     const logoY = headerStartY;
     let currentY = headerStartY;
@@ -998,11 +998,11 @@
         const aspectRatio = logo.width / logo.height;
         let finalLogoWidth = logoSize * aspectRatio;
         let finalLogoHeight = logoSize;
-        if (finalLogoWidth > 50) { // Limit width if too wide
+        if (finalLogoWidth > 50) {
             finalLogoWidth = 50;
             finalLogoHeight = 50 / aspectRatio;
         }
-        pdf.addImage(logo, 'JPEG', logoX, logoY, finalLogoWidth, finalLogoHeight);
+        pdf.addImage(logo, 'PNG', logoX, logoY, finalLogoWidth, finalLogoHeight, undefined, 'NONE');
     }
 
     pdf.setFontSize(16);
@@ -1024,12 +1024,12 @@
     pdf.text(v('revNo'), pageWidth - margin - 5, currentY + 10, { align: 'right' });
     pdf.text(`REV.DATE: ${v('revDate')}`, pageWidth - margin - 5, currentY + 15, { align: 'right' });
 
-    currentY = headerStartY + Math.max(logoSize, 18) + 5; // Adjust based on max height of logo or text
+    currentY = headerStartY + Math.max(logoSize, 18) + 5;
     pdf.setDrawColor(0);
     pdf.setLineWidth(0.5);
-    pdf.line(margin, currentY, pageWidth - margin, currentY); // Horizontal line
+    pdf.line(margin, currentY, pageWidth - margin, currentY);
 
-    currentY += 5; // Space after header line
+    currentY += 5;
 
     const tableData = [
         ['SST Tag No', v('tag'), 'PRODUCTION BATCH', v('batch')],
@@ -1044,43 +1044,48 @@
         [`No. of Samples for SST`, { content: v('samples'), colSpan: 3, styles: { halign: 'center' } }]
     ];
 
-    pdf.autoTable({
-        startY: currentY,
-        head: [],
-        body: tableData,
-        theme: 'grid',
-        tableWidth: pageWidth - 2 * margin,
-        margin: { left: margin },
-        styles: {
-            font: 'Roboto',
-            fontSize: 8,
-            cellPadding: 2,
-            lineColor: 0,
-            lineWidth: 0.1,
-            valign: 'middle'
-        },
-        headStyles: {
-            fillColor: [240, 240, 240]
-        },
-        columnStyles: {
-            0: { fontStyle: 'bold', fillColor: [240, 240, 240], cellWidth: (pageWidth - 2 * margin) * 0.25 },
-            1: { cellWidth: (pageWidth - 2 * margin) * 0.25, halign: 'center' },
-            2: { fontStyle: 'bold', fillColor: [240, 240, 240], cellWidth: (pageWidth - 2 * margin) * 0.25 },
-            3: { cellWidth: (pageWidth - 2 * margin) * 0.25, halign: 'center' }
-        },
-        didDrawCell: (data) => {
-            if (data.section === 'body' && data.column.index === 1 && data.cell.raw.content) {
-                // Ensure values are centered if they are just content, not objects
-                data.cell.styles.halign = 'center';
-            }
-        }
-    });
+    const tableOptions = {
+      startY: currentY,
+      head: [],
+      body: tableData,
+      theme: 'grid',
+      tableWidth: pageWidth - 2 * margin,
+      margin: { left: margin },
+      styles: {
+          font: 'Roboto',
+          fontSize: 8,
+          cellPadding: 2,
+          lineColor: 0,
+          lineWidth: 0.1,
+          valign: 'middle',
+          minCellHeight: 12 // Increased minimum cell height
+      },
+      headStyles: {
+          fillColor: [240, 240, 240]
+      },
+      columnStyles: {
+          0: { fontStyle: 'bold', fillColor: [240, 240, 240], cellWidth: (pageWidth - 2 * margin) * 0.35 },
+          1: { cellWidth: (pageWidth - 2 * margin) * 0.15, halign: 'center' },
+          2: { fontStyle: 'bold', fillColor: [240, 240, 240], cellWidth: (pageWidth - 2 * margin) * 0.35 },
+          3: { cellWidth: (pageWidth - 2 * margin) * 0.15, halign: 'center' }
+      },
+      didDrawCell: (data) => {
+          if (data.section === 'body' && data.column.index === 1 && data.cell.raw.content) {
+              data.cell.styles.halign = 'center';
+          }
+      }
+    };
 
-    currentY = pdf.autoTable.previous.finalY + 7; // Small space after table
+    pdf.autoTable(tableOptions);
+
+    currentY = pdf.autoTable.previous.finalY + 10;
 
     // Photos
-    const photoWidth = (pageWidth - 2 * margin - 5) / 2; // 5mm space between photos
-    const photoHeight = photoWidth / 1.5; // Fixed aspect ratio for consistency
+    const photoWidth = (pageWidth - 2 * margin - 5) / 2;
+    const photoHeight = photoWidth / 1.5;
+
+    // Add more vertical space before photos
+    currentY += 10;
 
     pdf.setFontSize(10);
     pdf.text('SAMPLE PHOTO BEFORE SST', margin, currentY);
@@ -1107,14 +1112,26 @@
         pdf.setTextColor(0);
     }
     
-    currentY += photoHeight + 15; // Space after photos
+    currentY += photoHeight + 15;
+
+    // Adjust Remark position
+    const footerHeight = 20; // Estimated height of the footer
+    const spaceForRemark = pageHeight - currentY - margin - footerHeight;
+    const remarkText = v('remark');
+    const splitRemark = pdf.splitTextToSize(`Remark: ${remarkText}`, pageWidth - 2 * margin);
+    const remarkHeight = splitRemark.length * 4; // 4mm per line for fontSize 10
+    
+    let remarkY = currentY;
+    if (remarkHeight < spaceForRemark) {
+        // Center the remark in the available space if there's too much room
+        remarkY = currentY + (spaceForRemark - remarkHeight) / 2;
+    }
 
     pdf.setFontSize(10);
-    pdf.text(`Remark: ${v('remark')}`, margin, currentY, { maxWidth: pageWidth - 2 * margin });
-    currentY += 20;
+    pdf.text(splitRemark, margin, remarkY);
 
     // Footer
-    const footerY = pageHeight - margin - 20; // Position footer from bottom
+    const footerY = pageHeight - margin - 20;
 
     pdf.line(margin + 5, footerY, margin + 5 + 70, footerY);
     pdf.setFontSize(10);
