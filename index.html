@@ -202,8 +202,8 @@
     }
 
     .a4 {
-      width: 794px;
-      min-height: 1123px;
+      width: 794px; /* A4 width in pixels at 96 DPI */
+      min-height: 1123px; /* A4 height in pixels at 96 DPI */
       background-color: var(--white);
       box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
       overflow: hidden;
@@ -333,18 +333,21 @@
     .ph {
       width: 100%;
       max-width: 350px;
-      aspect-ratio: 1.5;
+      aspect-ratio: 1.5; /* Maintain aspect ratio */
       border: 2px solid #000;
       position: relative;
       overflow: hidden;
       border-radius: 10px;
       background-color: var(--bg-light);
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
     
     .ph img {
       width: 100%;
       height: 100%;
-      object-fit: contain;
+      object-fit: contain; /* This will prevent images from being cut off */
     }
 
     .photo-caption {
@@ -968,96 +971,157 @@
     updateSuggestions();
 
     const v = (id) => $(id).value;
-    const tempEl = document.createElement('div');
-    tempEl.style.width = '210mm'; // A4 width
-    tempEl.style.height = '297mm'; // A4 height
-    tempEl.style.boxSizing = 'border-box';
-    tempEl.style.padding = '15mm'; // A little margin for breathing room
-    tempEl.style.fontFamily = 'Roboto, sans-serif';
-    tempEl.style.backgroundColor = '#fff';
-    tempEl.style.position = 'absolute';
-    tempEl.style.left = '-9999px';
-    tempEl.style.top = '-9999px';
-    document.body.appendChild(tempEl);
-
-    // Optimized HTML for PDF generation
-    tempEl.innerHTML = `
-      <div style="border: 2px solid #000; padding: 15px; height: 100%; box-sizing: border-box;">
-        <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;border-bottom:1px solid #000;padding-bottom:8px;margin-bottom:12px;">
-          <div style="display:flex;gap:8px;align-items:center;">
-            ${state.logo ? `<img src="${state.logo}" alt="Company Logo" style="width: 50px; height: 50px; object-fit: contain; border: 1px solid #e5e7eb; border-radius: 6px; padding: 3px;">` : `<div style="width:50px; height:50px; display:flex;align-items:center;justify-content:center;font-size:8px;color:#4b5563;background-color:#f3f4f6;border:1px solid #e5e7eb;border-radius:6px;">LOGO</div>`}
-            <div style="flex-grow:1;text-align:left;">
-              <div style="font-size:15px;font-weight:700;color:#1e40af;">${v('company')}</div>
-              <div style="font-weight:bold;font-size:13px;">${v('title')}</div>
-              <div style="font-size:10px;font-weight:500;color:#4b5563;">${v('subtitle')}</div>
-            </div>
-          </div>
-          <table style="font-size:8px;border-collapse:collapse;border:1px solid #000;height:min-content;margin-top:5px;font-weight:500;">
-            <tr><td style="border:1px solid #000;padding:2px 4px;">${v('docNo')}</td></tr>
-            <tr><td style="border:1px solid #000;padding:2px 4px;">${v('revNo')}</td></tr>
-            <tr><td style="border:1px solid #000;padding:2px 4px;">REV.DATE: ${v('revDate')}</td></tr>
-          </table>
-        </div>
-        <table style="width:100%;border-collapse:collapse;margin-top:8px;font-size:9px;">
-          <tbody>
-            <tr><td style="border:1px solid #000;padding:4px 6px;font-weight:600;width:30%;background-color:#f0f0f0;">SST Tag No</td><td style="border:1px solid #000;padding:4px 6px;text-align:center;width:20%;">${v('tag')}</td><td style="border:1px solid #000;padding:4px 6px;font-weight:600;width:30%;background-color:#f0f0f0;">PRODUCTION BATCH</td><td style="border:1px solid #000;padding:4px 6px;text-align:center;width:20%;">${v('batch')}</td></tr>
-            <tr><td style="border:1px solid #000;padding:4px 6px;font-weight:600;background-color:#f0f0f0;">TC Date</td><td style="border:1px solid #000;padding:4px 6px;text-align:center;">${v('tcDate')}</td><td style="border:1px solid #000;padding:4px 6px;font-weight:600;background-color:#f0f0f0;">Part No/Name</td><td style="border:1px solid #000;padding:4px 6px;text-align:center;">${v('part')}</td></tr>
-            <tr><td style="border:1px solid #000;padding:4px 6px;font-weight:600;background-color:#f0f0f0;">Customer Name</td><td style="border:1px solid #000;padding:4px 6px;text-align:center;">${v('customer')}</td><td style="border:1px solid #000;padding:4px 6px;font-weight:600;background-color:#f0f0f0;">Color</td><td style="border:1px solid #000;padding:4px 6px;text-align:center;">${v('color')}</td></tr>
-            <tr><td style="border:1px solid #000;padding:4px 6px;font-weight:600;background-color:#f0f0f0;">Coating System</td><td style="border:1px solid #000;padding:4px 6px;text-align:center;">${v('coatSys')}</td><td style="border:1px solid #000;padding:4px 6px;font-weight:600;background-color:#f0f0f0;">Coating Process</td><td style="border:1px solid #000;padding:4px 6px;text-align:center;">${v('process')}</td></tr>
-            <tr><td style="border:1px solid #000;padding:4px 6px;font-weight:600;background-color:#f0f0f0;">No. of Coat</td><td style="border:1px solid #000;padding:4px 6px;text-align:center;">${v('coats')}</td><td style="border:1px solid #000;padding:4px 6px;font-weight:600;background-color:#f0f0f0;">Coating Thickness</td><td style="border:1px solid #000;padding:4px 6px;text-align:center;">${v('thick')}</td></tr>
-            <tr><td style="border:1px solid #000;padding:4px 6px;font-weight:600;background-color:#f0f0f0;">SST Equipment</td><td style="border:1px solid #000;padding:4px 6px;text-align:center;">${v('equip')}</td><td style="border:1px solid #000;padding:4px 6px;font-weight:600;background-color:#f0f0f0;">Corrosion Test Apparatus Capacity</td><td style="border:1px solid #000;padding:4px 6px;text-align:center;">${v('capacity')}</td></tr>
-            <tr><td style="border:1px solid #000;padding:4px 6px;font-weight:600;background-color:#f0f0f0;">Water type</td><td style="border:1px solid #000;padding:4px 6px;text-align:center;">${v('water')}</td><td style="border:1px solid #000;padding:4px 6px;font-weight:600;background-color:#f0f0f0;">Type of salt</td><td style="border:1px solid #000;padding:4px 6px;text-align:center;">${v('salt')}</td></tr>
-            <tr><td style="border:1px solid #000;padding:4px 6px;font-weight:600;background-color:#f0f0f0;">Component loaded for SST on (Date & time)</td><td style="border:1px solid #000;padding:4px 6px;text-align:center;">${formatDate(v('loadDate'))} ${formatTime(v('loadTime'))}</td><td style="border:1px solid #000;padding:4px 6px;font-weight:600;background-color:#f0f0f0;">Customer requirement for SST</td><td style="border:1px solid #000;padding:4px 6px;text-align:center;">${v('sstHrs')} Hrs</td></tr>
-            <tr><td style="border:1px solid #000;padding:4px 6px;font-weight:600;background-color:#f0f0f0;">Test Stop & Observation Date & Time</td><td style="border:1px solid #000;padding:4px 6px;text-align:center;">${formatDate(v('stopDate'))} ${formatTime(v('stopTime'))}</td><td style="border:1px solid #000;padding:4px 6px;font-weight:600;background-color:#f0f0f0;">Observation for Red Rust</td><td style="border:1px solid #000;padding:4px 6px;text-align:center;">${v('obs')}</td></tr>
-            <tr><td style="border:1px solid #000;padding:4px 6px;font-weight:600;background-color:#f0f0f0;">No. of Samples for SST</td><td colspan="3" style="border:1px solid #000;padding:4px 6px;text-align:center;">${v('samples')}</td></tr>
-          </tbody>
-        </table>
-        <div style="display:flex;flex-direction:row;justify-content:space-between;align-items:flex-start;gap:12px;margin-top:12px;">
-          <div style="width:100%;max-width:350px;">
-            <div style="text-align:center;font-weight:600;font-size:10px;margin:6px 0;">SAMPLE PHOTO BEFORE SST</div>
-            <div style="width:100%;aspect-ratio:1.5;border:1px solid #000;position:relative;overflow:hidden;border-radius:8px;background-color:#f3f4f6;">${state.before ? `<img src="${state.before}" alt="Sample before SST" style="width:100%;height:100%;object-fit:contain;">` : 'No image'}</div>
-          </div>
-          <div style="width:100%;max-width:350px;">
-            <div style="text-align:center;font-weight:600;font-size:10px;margin:6px 0;">SAMPLE PHOTO AFTER SST</div>
-            <div style="width:100%;aspect-ratio:1.5;border:1px solid #000;position:relative;overflow:hidden;border-radius:8px;background-color:#f3f4f6;">${state.after ? `<img src="${state.after}" alt="Sample after SST" style="width:100%;height:100%;object-fit:contain;">` : 'No image'}</div>
-          </div>
-        </div>
-        <div style="font-size:10px;margin-top:12px;text-align:left;font-weight:500;">Remark: ${v('remark')}</div>
-        <div style="display:flex;justify-content:space-between;margin-top:25px;font-size:10px;">
-          <div style="border-top:1px solid #000;padding-top:6px;width:45%;text-align:center;">Checked by: <br><b>${v('checked')}</b></div>
-          <div style="border-top:1px solid #000;padding-top:6px;width:45%;text-align:center;">Approved by: <br><b>${v('approved')}</b></div>
-        </div>
-      </div>
-    `;
-
-    const canvas = await html2canvas(tempEl, {
-      scale: 2.0, // Optimized scale for better quality and size
-      backgroundColor: '#fff',
-      allowTaint: true,
-      useCORS: true
-    });
-    
-    document.body.removeChild(tempEl);
-
     const { jsPDF } = window.jspdf;
     const pdf = new jsPDF({ 
-      unit: 'pt', 
+      unit: 'mm', 
       format: 'a4',
       orientation: 'portrait'
     });
     
-    const imgData = canvas.toDataURL('image/jpeg', 0.8); // Reduced quality for smaller file size
-    const imgProps = pdf.getImageProperties(imgData);
-    const pdfWidth = pdf.internal.pageSize.getWidth();
-    const pdfHeight = pdf.internal.pageSize.getHeight();
-    
-    const scaledHeight = pdfHeight;
-    const scaledWidth = (imgProps.width * scaledHeight) / imgProps.height;
-    const x = (pdfWidth - scaledWidth) / 2;
-    const y = 0; // Start at the very top of the page
+    let y = 10;
+    const margin = 10; // Reduced margin for more space
+    const pageWidth = pdf.internal.pageSize.getWidth();
+    const pageHeight = pdf.internal.pageSize.getHeight();
 
-    // Add image with no margins
-    pdf.addImage(imgData, 'JPEG', x, y, scaledWidth, scaledHeight);
+    // Border
+    pdf.rect(margin, margin, pageWidth - 2 * margin, pageHeight - 2 * margin, 'S');
+    
+    // Header
+    const headerStartY = margin + 5;
+    const logoSize = 25; // in mm
+    const logoX = margin + 5;
+    const logoY = headerStartY;
+    let currentY = headerStartY;
+
+    if (state.logo) {
+        const logo = await loadImage(state.logo);
+        const aspectRatio = logo.width / logo.height;
+        let finalLogoWidth = logoSize * aspectRatio;
+        let finalLogoHeight = logoSize;
+        if (finalLogoWidth > 50) { // Limit width if too wide
+            finalLogoWidth = 50;
+            finalLogoHeight = 50 / aspectRatio;
+        }
+        pdf.addImage(logo, 'JPEG', logoX, logoY, finalLogoWidth, finalLogoHeight);
+    }
+
+    pdf.setFontSize(16);
+    pdf.setTextColor('#1e40af');
+    pdf.text(v('company'), logoX + logoSize + 5, currentY + 5, { maxWidth: pageWidth * 0.5 });
+    
+    pdf.setFontSize(14);
+    pdf.setTextColor('#1f2937');
+    pdf.text(v('title'), logoX + logoSize + 5, currentY + 12, { maxWidth: pageWidth * 0.5 });
+    
+    pdf.setFontSize(10);
+    pdf.setTextColor('#4b5563');
+    pdf.text(v('subtitle'), logoX + logoSize + 5, currentY + 17, { maxWidth: pageWidth * 0.5 });
+    
+    // Header info on right
+    pdf.setFontSize(8);
+    pdf.setTextColor(0);
+    pdf.text(v('docNo'), pageWidth - margin - 5, currentY + 5, { align: 'right' });
+    pdf.text(v('revNo'), pageWidth - margin - 5, currentY + 10, { align: 'right' });
+    pdf.text(`REV.DATE: ${v('revDate')}`, pageWidth - margin - 5, currentY + 15, { align: 'right' });
+
+    currentY = headerStartY + Math.max(logoSize, 18) + 5; // Adjust based on max height of logo or text
+    pdf.setDrawColor(0);
+    pdf.setLineWidth(0.5);
+    pdf.line(margin, currentY, pageWidth - margin, currentY); // Horizontal line
+
+    currentY += 5; // Space after header line
+
+    const tableData = [
+        ['SST Tag No', v('tag'), 'PRODUCTION BATCH', v('batch')],
+        ['TC Date', v('tcDate'), 'Part No/Name', v('part')],
+        ['Customer Name', v('customer'), 'Color', v('color')],
+        ['Coating System', v('coatSys'), 'Coating Process', v('process')],
+        ['No. of Coat', v('coats'), 'Coating Thickness', v('thick')],
+        ['SST Equipment', v('equip'), 'Corrosion Test Apparatus Capacity', v('capacity')],
+        ['Water type', v('water'), 'Type of salt', v('salt')],
+        [`Component loaded for SST on (Date & time)`, `${formatDate(v('loadDate'))} ${formatTime(v('loadTime'))}`, `Customer requirement for SST`, `${v('sstHrs')} Hrs`],
+        [`Test Stop & Observation Date & Time`, `${formatDate(v('stopDate'))} ${formatTime(v('stopTime'))}`, `Observation for Red Rust`, `${v('obs')}`],
+        [`No. of Samples for SST`, { content: v('samples'), colSpan: 3, styles: { halign: 'center' } }]
+    ];
+
+    pdf.autoTable({
+        startY: currentY,
+        head: [],
+        body: tableData,
+        theme: 'grid',
+        tableWidth: pageWidth - 2 * margin,
+        margin: { left: margin },
+        styles: {
+            font: 'Roboto',
+            fontSize: 8,
+            cellPadding: 2,
+            lineColor: 0,
+            lineWidth: 0.1,
+            valign: 'middle'
+        },
+        headStyles: {
+            fillColor: [240, 240, 240]
+        },
+        columnStyles: {
+            0: { fontStyle: 'bold', fillColor: [240, 240, 240], cellWidth: (pageWidth - 2 * margin) * 0.25 },
+            1: { cellWidth: (pageWidth - 2 * margin) * 0.25, halign: 'center' },
+            2: { fontStyle: 'bold', fillColor: [240, 240, 240], cellWidth: (pageWidth - 2 * margin) * 0.25 },
+            3: { cellWidth: (pageWidth - 2 * margin) * 0.25, halign: 'center' }
+        },
+        didDrawCell: (data) => {
+            if (data.section === 'body' && data.column.index === 1 && data.cell.raw.content) {
+                // Ensure values are centered if they are just content, not objects
+                data.cell.styles.halign = 'center';
+            }
+        }
+    });
+
+    currentY = pdf.autoTable.previous.finalY + 7; // Small space after table
+
+    // Photos
+    const photoWidth = (pageWidth - 2 * margin - 5) / 2; // 5mm space between photos
+    const photoHeight = photoWidth / 1.5; // Fixed aspect ratio for consistency
+
+    pdf.setFontSize(10);
+    pdf.text('SAMPLE PHOTO BEFORE SST', margin, currentY);
+    if (state.before) {
+        const photoBefore = await loadImage(state.before);
+        pdf.addImage(photoBefore, 'JPEG', margin, currentY + 5, photoWidth, photoHeight, undefined, 'FAST');
+    } else {
+        pdf.rect(margin, currentY + 5, photoWidth, photoHeight, 'S');
+        pdf.setFontSize(8);
+        pdf.setTextColor(150);
+        pdf.text('No Image Available', margin + photoWidth / 2, currentY + 5 + photoHeight / 2, { align: 'center' });
+        pdf.setTextColor(0);
+    }
+    
+    pdf.text('SAMPLE PHOTO AFTER SST', margin + photoWidth + 5, currentY);
+    if (state.after) {
+        const photoAfter = await loadImage(state.after);
+        pdf.addImage(photoAfter, 'JPEG', margin + photoWidth + 5, currentY + 5, photoWidth, photoHeight, undefined, 'FAST');
+    } else {
+        pdf.rect(margin + photoWidth + 5, currentY + 5, photoWidth, photoHeight, 'S');
+        pdf.setFontSize(8);
+        pdf.setTextColor(150);
+        pdf.text('No Image Available', margin + photoWidth + 5 + photoWidth / 2, currentY + 5 + photoHeight / 2, { align: 'center' });
+        pdf.setTextColor(0);
+    }
+    
+    currentY += photoHeight + 15; // Space after photos
+
+    pdf.setFontSize(10);
+    pdf.text(`Remark: ${v('remark')}`, margin, currentY, { maxWidth: pageWidth - 2 * margin });
+    currentY += 20;
+
+    // Footer
+    const footerY = pageHeight - margin - 20; // Position footer from bottom
+
+    pdf.line(margin + 5, footerY, margin + 5 + 70, footerY);
+    pdf.setFontSize(10);
+    pdf.text(`Checked by: ${v('checked')}`, margin + 5, footerY + 5);
+    
+    pdf.line(pageWidth - margin - 5 - 70, footerY, pageWidth - margin - 5, footerY);
+    pdf.text(`Approved by: ${v('approved')}`, pageWidth - margin - 5, footerY + 5, { align: 'right' });
 
     const customerName = $('customer').value.trim() || 'Customer';
     const partNo = $('part').value.trim() || 'PartNo';
@@ -1067,6 +1131,15 @@
 
     alert('PDF report has been downloaded to your default Downloads folder.');
   });
+  
+  function loadImage(src) {
+      return new Promise((resolve, reject) => {
+          const img = new Image();
+          img.onload = () => resolve(img);
+          img.onerror = reject;
+          img.src = src;
+      });
+  }
 
   $('btnSave').addEventListener('click', (e) => {
     e.preventDefault();
