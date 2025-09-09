@@ -969,8 +969,10 @@
 
     const v = (id) => $(id).value;
     const tempEl = document.createElement('div');
-    tempEl.style.width = '794px'; // A4 width in pixels
-    tempEl.style.padding = '10px';
+    tempEl.style.width = '210mm'; // A4 width
+    tempEl.style.height = '297mm'; // A4 height
+    tempEl.style.boxSizing = 'border-box';
+    tempEl.style.padding = '15mm'; // A little margin for breathing room
     tempEl.style.fontFamily = 'Roboto, sans-serif';
     tempEl.style.backgroundColor = '#fff';
     tempEl.style.position = 'absolute';
@@ -980,7 +982,7 @@
 
     // Optimized HTML for PDF generation
     tempEl.innerHTML = `
-      <div style="border: 2px solid #000; padding: 15px; font-size: 10px;">
+      <div style="border: 2px solid #000; padding: 15px; height: 100%; box-sizing: border-box;">
         <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;border-bottom:1px solid #000;padding-bottom:8px;margin-bottom:12px;">
           <div style="display:flex;gap:8px;align-items:center;">
             ${state.logo ? `<img src="${state.logo}" alt="Company Logo" style="width: 50px; height: 50px; object-fit: contain; border: 1px solid #e5e7eb; border-radius: 6px; padding: 3px;">` : `<div style="width:50px; height:50px; display:flex;align-items:center;justify-content:center;font-size:8px;color:#4b5563;background-color:#f3f4f6;border:1px solid #e5e7eb;border-radius:6px;">LOGO</div>`}
@@ -1029,7 +1031,7 @@
     `;
 
     const canvas = await html2canvas(tempEl, {
-      scale: 1.5, // Reduced scale for smaller file size
+      scale: 2.0, // Optimized scale for better quality and size
       backgroundColor: '#fff',
       allowTaint: true,
       useCORS: true
@@ -1049,25 +1051,11 @@
     const pdfWidth = pdf.internal.pageSize.getWidth();
     const pdfHeight = pdf.internal.pageSize.getHeight();
     
-    const imageAspectRatio = imgProps.width / imgProps.height;
-    const pageAspectRatio = pdfWidth / pdfHeight;
+    const scaledHeight = pdfHeight;
+    const scaledWidth = (imgProps.width * scaledHeight) / imgProps.height;
+    const x = (pdfWidth - scaledWidth) / 2;
+    const y = 0; // Start at the very top of the page
 
-    let scaledWidth, scaledHeight, x, y;
-
-    if (imageAspectRatio > pageAspectRatio) {
-        // Image is wider than the page, scale by width
-        scaledWidth = pdfWidth;
-        scaledHeight = scaledWidth / imageAspectRatio;
-        x = 0;
-        y = (pdfHeight - scaledHeight) / 2;
-    } else {
-        // Image is taller or the same as the page, scale by height
-        scaledHeight = pdfHeight;
-        scaledWidth = scaledHeight * imageAspectRatio;
-        x = (pdfWidth - scaledWidth) / 2;
-        y = 0;
-    }
-    
     // Add image with no margins
     pdf.addImage(imgData, 'JPEG', x, y, scaledWidth, scaledHeight);
 
