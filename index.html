@@ -424,8 +424,9 @@
       opacity: 1;
     }
   </style>
-  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
 </head>
 <body>
   <div class="wrap">
@@ -455,7 +456,7 @@
             <div><label>REV NO</label><input id="revNo" value="REV.NO:00" readonly/></div>
           </div>
           <div class="row">
-            <div><label>REV DATE</label><input id="revDate" type="date" readonly/></div>
+            <div><label>REV DATE</label><input id="revDate" value="01.09.2024" readonly/></div>
             <div><label>TC Date</label><input id="tcDate" readonly/></div>
           </div>
           
@@ -584,7 +585,7 @@
     subtitle: "(TEST CONDUCTED AS PER ASTM B 117)",
     docNo: "DOC NO:014",
     revNo: "REV.NO:00",
-    revDate: "", // will be set dynamically
+    revDate: "01.09.2024",
     tcDate: "", // will be set dynamically
     tag: "39",
     batch: "250710",
@@ -632,7 +633,6 @@
     const formattedDateForInput = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
     
     // Set default values for date/time
-    $('revDate').value = formattedDateForInput;
     $('tcDate').value = formatDate(formattedDateForInput);
     $('loadDate').value = formattedDateForInput;
 
@@ -640,7 +640,7 @@
     inputIds.forEach(id => {
       const el = $(id);
       if (el && defaultValues[id] !== undefined) {
-        if (el.type === 'date' || el.type === 'time') {
+        if (el.type === 'date' || el.type === 'time' || el.id === 'revDate') {
           // Do nothing for date and time as they are handled above or automatically
         } else {
           el.value = defaultValues[id];
@@ -882,7 +882,7 @@
         <table style="font-size:12px;border-collapse:collapse;border:1px solid #000;height:min-content;margin-top:10px;font-weight:500;">
           <tr><td style="border:1px solid #000;padding:5px 8px;">${v('docNo')}</td></tr>
           <tr><td style="border:1px solid #000;padding:5px 8px;">${v('revNo')}</td></tr>
-          <tr><td style="border:1px solid #000;padding:5px 8px;">REV.DATE: ${v('revDate') ? formatDate(v('revDate')) : 'N/A'}</td></tr>
+          <tr><td style="border:1px solid #000;padding:5px 8px;">REV.DATE: ${v('revDate')}</td></tr>
         </table>
       </div>
 
@@ -940,11 +940,12 @@
     $('subtitle').value = defaultValues.subtitle;
     $('docNo').value = defaultValues.docNo;
     $('revNo').value = defaultValues.revNo;
+    $('revDate').value = defaultValues.revDate;
     const today = new Date();
     const formattedDateForInput = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
     const formattedDate = `${String(today.getDate()).padStart(2, '0')}.${String(today.getMonth() + 1).padStart(2, '0')}.${today.getFullYear()}`;
-    $('revDate').value = formattedDateForInput;
     $('tcDate').value = formattedDate;
+    $('loadDate').value = formattedDateForInput;
 
     render();
   }
@@ -977,55 +978,54 @@
     
     tempEl.innerHTML = `
       <div class="report-content" style="border: 3px solid #000; padding: 20px;">
-        <div class="hdr" style="margin-bottom: 15px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;border-bottom:2px solid #000;padding-bottom:12px;margin-bottom:15px;">
           <div style="display:flex;gap:10px;align-items:center;">
-            ${state.logo ? `<img class="logo" src="${state.logo}" alt="Company Logo" style="width: 60px; height: 60px;">` : `<div class="logo" style="width:60px; height:60px; display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--text-light);background-color:var(--bg-light);">LOGO</div>`}
-            <div class="hdr-text">
-              <div style="font-size:18px;font-weight:700;color:var(--primary);">${v('company')}</div>
-              <div class="title" style="font-size:16px;">${v('title')}</div>
-              <div style="font-size:12px;font-weight:500;color:var(--text-light);">${v('subtitle')}</div>
+            ${state.logo ? `<img src="${state.logo}" alt="Company Logo" style="width: 60px; height: 60px; object-fit: contain; border: 1px solid #e5e7eb; border-radius: 8px; padding: 4px;">` : `<div style="width:60px; height:60px; display:flex;align-items:center;justify-content:center;font-size:10px;color:#4b5563;background-color:#f3f4f6;border:1px solid #e5e7eb;border-radius:8px;">LOGO</div>`}
+            <div style="flex-grow:1;text-align:left;">
+              <div style="font-size:18px;font-weight:700;color:#1e40af;">${v('company')}</div>
+              <div style="font-weight:bold;font-size:16px;">${v('title')}</div>
+              <div style="font-size:12px;font-weight:500;color:#4b5563;">${v('subtitle')}</div>
             </div>
           </div>
           <table style="font-size:10px;border-collapse:collapse;border:1px solid #000;height:min-content;margin-top:5px;font-weight:500;">
             <tr><td style="border:1px solid #000;padding:3px 6px;">${v('docNo')}</td></tr>
             <tr><td style="border:1px solid #000;padding:3px 6px;">${v('revNo')}</td></tr>
-            <tr><td style="border:1px solid #000;padding:3px 6px;">REV.DATE: ${v('revDate') ? formatDate(v('revDate')) : 'N/A'}</td></tr>
+            <tr><td style="border:1px solid #000;padding:3px 6px;">REV.DATE: ${v('revDate')}</td></tr>
           </table>
         </div>
-        <table class="boxtbl" style="margin-top: 10px; font-size: 11px;">
-          ${row('SST Tag No', v('tag'), 'PRODUCTION BATCH', v('batch'))}
-          ${row('TC Date', v('tcDate'), 'Part No/Name', v('part'))}
-          ${row('Customer Name', v('customer'), 'Color', v('color'))}
-          ${row('Coating System', v('coatSys'), 'Coating Process', v('process'))}
-          ${row('No. of Coat', v('coats'), 'Coating Thickness', v('thick'))}
-          ${row('SST Equipment', v('equip'), 'Corrosion Test Apparatus Capacity', v('capacity'))}
-          ${row('Water type', v('water'), 'Type of salt', v('salt'))}
-          ${row('Component loaded for SST on (Date & time)', formatDate(v('loadDate')) + ' ' + formatTime(v('loadTime')), 'Customer requirement for SST', v('sstHrs') + ' Hrs')}
-          ${row('Test Stop & Observation Date & Time', formatDate(v('stopDate')) + ' ' + formatTime(v('stopTime')), 'Observation for Red Rust', v('obs'))}
-          <tr><td class="lbl" style="width:150px;">No. of Samples for SST</td><td colspan="3" style="text-align:center;">${v('samples')}</td></tr>
+        <table style="width:100%;border-collapse:collapse;margin-top:10px;font-size:11px;">
+          <tbody>
+            <tr><td style="border:1px solid #000;padding:5px 8px;font-weight:600;width:30%;background-color:#f0f0f0;">SST Tag No</td><td style="border:1px solid #000;padding:5px 8px;text-align:center;width:20%;">${v('tag')}</td><td style="border:1px solid #000;padding:5px 8px;font-weight:600;width:30%;background-color:#f0f0f0;">PRODUCTION BATCH</td><td style="border:1px solid #000;padding:5px 8px;text-align:center;width:20%;">${v('batch')}</td></tr>
+            <tr><td style="border:1px solid #000;padding:5px 8px;font-weight:600;background-color:#f0f0f0;">TC Date</td><td style="border:1px solid #000;padding:5px 8px;text-align:center;">${v('tcDate')}</td><td style="border:1px solid #000;padding:5px 8px;font-weight:600;background-color:#f0f0f0;">Part No/Name</td><td style="border:1px solid #000;padding:5px 8px;text-align:center;">${v('part')}</td></tr>
+            <tr><td style="border:1px solid #000;padding:5px 8px;font-weight:600;background-color:#f0f0f0;">Customer Name</td><td style="border:1px solid #000;padding:5px 8px;text-align:center;">${v('customer')}</td><td style="border:1px solid #000;padding:5px 8px;font-weight:600;background-color:#f0f0f0;">Color</td><td style="border:1px solid #000;padding:5px 8px;text-align:center;">${v('color')}</td></tr>
+            <tr><td style="border:1px solid #000;padding:5px 8px;font-weight:600;background-color:#f0f0f0;">Coating System</td><td style="border:1px solid #000;padding:5px 8px;text-align:center;">${v('coatSys')}</td><td style="border:1px solid #000;padding:5px 8px;font-weight:600;background-color:#f0f0f0;">Coating Process</td><td style="border:1px solid #000;padding:5px 8px;text-align:center;">${v('process')}</td></tr>
+            <tr><td style="border:1px solid #000;padding:5px 8px;font-weight:600;background-color:#f0f0f0;">No. of Coat</td><td style="border:1px solid #000;padding:5px 8px;text-align:center;">${v('coats')}</td><td style="border:1px solid #000;padding:5px 8px;font-weight:600;background-color:#f0f0f0;">Coating Thickness</td><td style="border:1px solid #000;padding:5px 8px;text-align:center;">${v('thick')}</td></tr>
+            <tr><td style="border:1px solid #000;padding:5px 8px;font-weight:600;background-color:#f0f0f0;">SST Equipment</td><td style="border:1px solid #000;padding:5px 8px;text-align:center;">${v('equip')}</td><td style="border:1px solid #000;padding:5px 8px;font-weight:600;background-color:#f0f0f0;">Corrosion Test Apparatus Capacity</td><td style="border:1px solid #000;padding:5px 8px;text-align:center;">${v('capacity')}</td></tr>
+            <tr><td style="border:1px solid #000;padding:5px 8px;font-weight:600;background-color:#f0f0f0;">Water type</td><td style="border:1px solid #000;padding:5px 8px;text-align:center;">${v('water')}</td><td style="border:1px solid #000;padding:5px 8px;font-weight:600;background-color:#f0f0f0;">Type of salt</td><td style="border:1px solid #000;padding:5px 8px;text-align:center;">${v('salt')}</td></tr>
+            <tr><td style="border:1px solid #000;padding:5px 8px;font-weight:600;background-color:#f0f0f0;">Component loaded for SST on (Date & time)</td><td style="border:1px solid #000;padding:5px 8px;text-align:center;">${formatDate(v('loadDate'))} ${formatTime(v('loadTime'))}</td><td style="border:1px solid #000;padding:5px 8px;font-weight:600;background-color:#f0f0f0;">Customer requirement for SST</td><td style="border:1px solid #000;padding:5px 8px;text-align:center;">${v('sstHrs')} Hrs</td></tr>
+            <tr><td style="border:1px solid #000;padding:5px 8px;font-weight:600;background-color:#f0f0f0;">Test Stop & Observation Date & Time</td><td style="border:1px solid #000;padding:5px 8px;text-align:center;">${formatDate(v('stopDate'))} ${formatTime(v('stopTime'))}</td><td style="border:1px solid #000;padding:5px 8px;font-weight:600;background-color:#f0f0f0;">Observation for Red Rust</td><td style="border:1px solid #000;padding:5px 8px;text-align:center;">${v('obs')}</td></tr>
+            <tr><td style="border:1px solid #000;padding:5px 8px;font-weight:600;background-color:#f0f0f0;">No. of Samples for SST</td><td colspan="3" style="border:1px solid #000;padding:5px 8px;text-align:center;">${v('samples')}</td></tr>
+          </tbody>
         </table>
-        <div class="photos" style="gap: 15px; margin-top: 15px;">
-          <div>
-            <div class="photo-caption" style="font-size: 12px;">SAMPLE PHOTO BEFORE SST</div>
-            <div class="ph" style="height: 180px; width: 270px; aspect-ratio: unset;">${state.before ? `<img src="${state.before}" alt="Sample before SST">` : 'No image'}</div>
+
+        <div style="display:flex;flex-direction:row;justify-content:space-between;align-items:flex-start;gap:15px;margin-top:15px;">
+          <div style="width:100%;max-width:350px;">
+            <div style="text-align:center;font-weight:600;font-size:12px;margin:8px 0;">SAMPLE PHOTO BEFORE SST</div>
+            <div style="width:100%;aspect-ratio:1.5;border:2px solid #000;position:relative;overflow:hidden;border-radius:10px;background-color:#f3f4f6;">${state.before ? `<img src="${state.before}" alt="Sample before SST" style="width:100%;height:100%;object-fit:contain;">` : 'No image'}</div>
           </div>
-          <div>
-            <div class="photo-caption" style="font-size: 12px;">SAMPLE PHOTO AFTER SST</div>
-            <div class="ph" style="height: 180px; width: 270px; aspect-ratio: unset;">${state.after ? `<img src="${state.after}" alt="Sample after SST">` : 'No image'}</div>
+          <div style="width:100%;max-width:350px;">
+            <div style="text-align:center;font-weight:600;font-size:12px;margin:8px 0;">SAMPLE PHOTO AFTER SST</div>
+            <div style="width:100%;aspect-ratio:1.5;border:2px solid #000;position:relative;overflow:hidden;border-radius:10px;background-color:#f3f4f6;">${state.after ? `<img src="${state.after}" alt="Sample after SST" style="width:100%;height:100%;object-fit:contain;">` : 'No image'}</div>
           </div>
         </div>
-        <div class="muted" style="font-size: 12px; margin-top: 15px;">Remark: ${v('remark')}</div>
-        <div class="foot" style="margin-top: 30px; font-size: 12px;">
-          <div>Checked by: <br><b>${v('checked')}</b></div>
-          <div>Approved by: <br><b>${v('approved')}</b></div>
+        <div style="font-size:12px;margin-top:15px;text-align:left;font-weight:500;">Remark: ${v('remark')}</div>
+        <div style="display:flex;justify-content:space-between;margin-top:30px;font-size:12px;">
+          <div style="border-top:1px solid #000;padding-top:8px;width:45%;text-align:center;">Checked by: <br><b>${v('checked')}</b></div>
+          <div style="border-top:1px solid #000;padding-top:8px;width:45%;text-align:center;">Approved by: <br><b>${v('approved')}</b></div>
         </div>
       </div>
     `;
 
-    function row(a, b, c, d) {
-      return `<tr><td class="lbl" style="width:150px;">${a}</td><td style="text-align:center">${b || ''}</td><td class="lbl" style="width:150px;">${c}</td><td style="text-align:center">${d || ''}</td></tr>`;
-    }
-    
     const canvas = await html2canvas(tempEl, {
       scale: 1.2,
       backgroundColor: '#fff'
