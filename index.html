@@ -967,17 +967,19 @@
     }
     updateSuggestions();
 
+    const v = (id) => $(id).value;
     const tempEl = document.createElement('div');
-    tempEl.classList.add('a4');
+    tempEl.style.width = '794px';
+    tempEl.style.padding = '20px';
+    tempEl.style.fontFamily = 'Roboto, sans-serif';
+    tempEl.style.backgroundColor = '#fff';
     tempEl.style.position = 'absolute';
     tempEl.style.left = '-9999px';
     tempEl.style.top = '-9999px';
     document.body.appendChild(tempEl);
 
-    const v = (id) => $(id).value;
-    
     tempEl.innerHTML = `
-      <div class="report-content" style="border: 3px solid #000; padding: 20px;">
+      <div style="border: 3px solid #000; padding: 20px;">
         <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;border-bottom:2px solid #000;padding-bottom:12px;margin-bottom:15px;">
           <div style="display:flex;gap:10px;align-items:center;">
             ${state.logo ? `<img src="${state.logo}" alt="Company Logo" style="width: 60px; height: 60px; object-fit: contain; border: 1px solid #e5e7eb; border-radius: 8px; padding: 4px;">` : `<div style="width:60px; height:60px; display:flex;align-items:center;justify-content:center;font-size:10px;color:#4b5563;background-color:#f3f4f6;border:1px solid #e5e7eb;border-radius:8px;">LOGO</div>`}
@@ -1007,7 +1009,6 @@
             <tr><td style="border:1px solid #000;padding:5px 8px;font-weight:600;background-color:#f0f0f0;">No. of Samples for SST</td><td colspan="3" style="border:1px solid #000;padding:5px 8px;text-align:center;">${v('samples')}</td></tr>
           </tbody>
         </table>
-
         <div style="display:flex;flex-direction:row;justify-content:space-between;align-items:flex-start;gap:15px;margin-top:15px;">
           <div style="width:100%;max-width:350px;">
             <div style="text-align:center;font-weight:600;font-size:12px;margin:8px 0;">SAMPLE PHOTO BEFORE SST</div>
@@ -1027,7 +1028,7 @@
     `;
 
     const canvas = await html2canvas(tempEl, {
-      scale: 1.2,
+      scale: 1.5,
       backgroundColor: '#fff'
     });
     
@@ -1040,7 +1041,7 @@
       orientation: 'portrait'
     });
     
-    const imgData = canvas.toDataURL('image/jpeg', 0.8);
+    const imgData = canvas.toDataURL('image/jpeg', 1.0); // Quality set to 1.0
     const imgProps = pdf.getImageProperties(imgData);
     const pdfWidth = pdf.internal.pageSize.getWidth();
     const pdfHeight = pdf.internal.pageSize.getHeight();
