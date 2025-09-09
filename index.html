@@ -976,23 +976,23 @@
     const v = (id) => $(id).value;
     
     tempEl.innerHTML = `
-      <div class="report-content">
-        <div class="hdr">
-          <div style="display:flex;gap:15px;align-items:center;">
-            ${state.logo ? `<img class="logo" src="${state.logo}" alt="Company Logo">` : `<div class="logo" style="display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--text-light);background-color:var(--bg-light);">LOGO</div>`}
+      <div class="report-content" style="border: 3px solid #000; padding: 20px;">
+        <div class="hdr" style="margin-bottom: 15px;">
+          <div style="display:flex;gap:10px;align-items:center;">
+            ${state.logo ? `<img class="logo" src="${state.logo}" alt="Company Logo" style="width: 60px; height: 60px;">` : `<div class="logo" style="width:60px; height:60px; display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--text-light);background-color:var(--bg-light);">LOGO</div>`}
             <div class="hdr-text">
-              <div style="font-size:22px;font-weight:700;color:var(--primary);">${v('company')}</div>
-              <div class="title">${v('title')}</div>
-              <div style="font-size:14px;font-weight:500;color:var(--text-light);">${v('subtitle')}</div>
+              <div style="font-size:18px;font-weight:700;color:var(--primary);">${v('company')}</div>
+              <div class="title" style="font-size:16px;">${v('title')}</div>
+              <div style="font-size:12px;font-weight:500;color:var(--text-light);">${v('subtitle')}</div>
             </div>
           </div>
-          <table style="font-size:12px;border-collapse:collapse;border:1px solid #000;height:min-content;margin-top:10px;font-weight:500;">
-            <tr><td style="border:1px solid #000;padding:5px 8px;">${v('docNo')}</td></tr>
-            <tr><td style="border:1px solid #000;padding:5px 8px;">${v('revNo')}</td></tr>
-            <tr><td style="border:1px solid #000;padding:5px 8px;">REV.DATE: ${v('revDate') ? formatDate(v('revDate')) : 'N/A'}</td></tr>
+          <table style="font-size:10px;border-collapse:collapse;border:1px solid #000;height:min-content;margin-top:5px;font-weight:500;">
+            <tr><td style="border:1px solid #000;padding:3px 6px;">${v('docNo')}</td></tr>
+            <tr><td style="border:1px solid #000;padding:3px 6px;">${v('revNo')}</td></tr>
+            <tr><td style="border:1px solid #000;padding:3px 6px;">REV.DATE: ${v('revDate') ? formatDate(v('revDate')) : 'N/A'}</td></tr>
           </table>
         </div>
-        <table class="boxtbl">
+        <table class="boxtbl" style="margin-top: 10px; font-size: 11px;">
           ${row('SST Tag No', v('tag'), 'PRODUCTION BATCH', v('batch'))}
           ${row('TC Date', v('tcDate'), 'Part No/Name', v('part'))}
           ${row('Customer Name', v('customer'), 'Color', v('color'))}
@@ -1002,20 +1002,20 @@
           ${row('Water type', v('water'), 'Type of salt', v('salt'))}
           ${row('Component loaded for SST on (Date & time)', formatDate(v('loadDate')) + ' ' + formatTime(v('loadTime')), 'Customer requirement for SST', v('sstHrs') + ' Hrs')}
           ${row('Test Stop & Observation Date & Time', formatDate(v('stopDate')) + ' ' + formatTime(v('stopTime')), 'Observation for Red Rust', v('obs'))}
-          <tr><td class="lbl">No. of Samples for SST</td><td colspan="3" style="text-align:center;">${v('samples')}</td></tr>
+          <tr><td class="lbl" style="width:150px;">No. of Samples for SST</td><td colspan="3" style="text-align:center;">${v('samples')}</td></tr>
         </table>
-        <div class="photos">
+        <div class="photos" style="gap: 15px; margin-top: 15px;">
           <div>
-            <div class="photo-caption">SAMPLE PHOTO BEFORE SST</div>
-            <div class="ph">${state.before ? `<img src="${state.before}" alt="Sample before SST">` : 'No image'}</div>
+            <div class="photo-caption" style="font-size: 12px;">SAMPLE PHOTO BEFORE SST</div>
+            <div class="ph" style="height: 180px; width: 270px; aspect-ratio: unset;">${state.before ? `<img src="${state.before}" alt="Sample before SST">` : 'No image'}</div>
           </div>
           <div>
-            <div class="photo-caption">SAMPLE PHOTO AFTER SST</div>
-            <div class="ph">${state.after ? `<img src="${state.after}" alt="Sample after SST">` : 'No image'}</div>
+            <div class="photo-caption" style="font-size: 12px;">SAMPLE PHOTO AFTER SST</div>
+            <div class="ph" style="height: 180px; width: 270px; aspect-ratio: unset;">${state.after ? `<img src="${state.after}" alt="Sample after SST">` : 'No image'}</div>
           </div>
         </div>
-        <div class="muted">Remark: ${v('remark')}</div>
-        <div class="foot">
+        <div class="muted" style="font-size: 12px; margin-top: 15px;">Remark: ${v('remark')}</div>
+        <div class="foot" style="margin-top: 30px; font-size: 12px;">
           <div>Checked by: <br><b>${v('checked')}</b></div>
           <div>Approved by: <br><b>${v('approved')}</b></div>
         </div>
@@ -1023,44 +1023,32 @@
     `;
 
     function row(a, b, c, d) {
-      return `<tr><td class="lbl">${a}</td><td style="text-align:center">${b || ''}</td><td class="lbl">${c}</td><td style="text-align:center">${d || ''}</td></tr>`;
+      return `<tr><td class="lbl" style="width:150px;">${a}</td><td style="text-align:center">${b || ''}</td><td class="lbl" style="width:150px;">${c}</td><td style="text-align:center">${d || ''}</td></tr>`;
     }
     
     const canvas = await html2canvas(tempEl, {
-      scale: 1.5,
+      scale: 1.2,
       backgroundColor: '#fff'
     });
     
     document.body.removeChild(tempEl);
 
-    const img = canvas.toDataURL('image/jpeg', 0.7);
     const { jsPDF } = window.jspdf;
-    
     const pdf = new jsPDF({ 
       unit: 'pt', 
       format: 'a4',
       orientation: 'portrait'
     });
     
-    const pageW = pdf.internal.pageSize.getWidth();
-    const pageH = pdf.internal.pageSize.getHeight();
-    
+    const imgData = canvas.toDataURL('image/jpeg', 0.8);
+    const imgProps = pdf.getImageProperties(imgData);
+    const pdfWidth = pdf.internal.pageSize.getWidth();
+    const pdfHeight = pdf.internal.pageSize.getHeight();
     const margin = 20;
-    const imgW = pageW - 2 * margin;
-    const imgH = imgW * (canvas.height / canvas.width);
+
+    const scaledHeight = (pdfWidth - margin * 2) * imgProps.height / imgProps.width;
     
-    let heightLeft = imgH;
-    let position = margin;
-    
-    pdf.addImage(img, 'JPEG', margin, position, imgW, imgH);
-    heightLeft -= pageH;
-    
-    while (heightLeft > 0) {
-      position = heightLeft - imgH + margin;
-      pdf.addPage();
-      pdf.addImage(img, 'JPEG', margin, position, imgW, imgH);
-      heightLeft -= pageH;
-    }
+    pdf.addImage(imgData, 'JPEG', margin, (pdfHeight - scaledHeight) / 2, pdfWidth - margin * 2, scaledHeight);
 
     const customerName = $('customer').value.trim() || 'Customer';
     const partNo = $('part').value.trim() || 'PartNo';
