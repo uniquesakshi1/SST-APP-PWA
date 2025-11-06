@@ -8,6 +8,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
   <link rel="manifest" href="manifest.json">
+  
+  <script src="https://cdn.jsdelivr.net/npm/heic2any@0.0.15/dist/heic2any.min.js"></script>
+  
 <script>
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
@@ -55,7 +58,107 @@
       color: var(--primary);
       margin: 8px 0 24px;
       text-align: center;
+      cursor: pointer;
     }
+
+    /* --- Home Page Styles --- */
+    .home-container {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        padding: 20px;
+        background-color: var(--white);
+        border-radius: 16px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+    .home-header {
+        border-bottom: 2px solid var(--border);
+        padding-bottom: 15px;
+        margin-bottom: 10px;
+    }
+    .home-header h2 {
+        margin: 0;
+        font-size: 22px;
+        color: var(--primary);
+    }
+    .home-buttons {
+        display: flex;
+        gap: 15px;
+        flex-wrap: wrap;
+    }
+    .home-btn {
+        padding: 15px 25px;
+        font-size: 18px;
+        font-weight: 700;
+        border-radius: 12px;
+        text-align: center;
+    }
+    .customer-list h3 {
+        font-size: 18px;
+        border-bottom: 1px solid var(--border);
+        padding-bottom: 10px;
+        margin-top: 25px;
+    }
+    .customer-folder {
+        background-color: var(--bg-light);
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 10px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+    .customer-folder:hover {
+        background-color: #e5e7eb;
+    }
+    .customer-folder-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .customer-folder-header strong {
+        font-size: 16px;
+        font-weight: 700;
+        color: var(--text-dark);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .report-list {
+        list-style: none;
+        padding: 0;
+        margin: 10px 0 0 20px;
+        border-left: 2px solid var(--border);
+    }
+    .report-list li {
+        padding: 8px 10px;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        transition: background-color 0.2s;
+        margin-left: -20px;
+        padding-left: 20px;
+        border-radius: 4px;
+    }
+    .report-list li:hover {
+        background-color: var(--white);
+    }
+    .report-list .delete-btn {
+        color: #ef4444;
+        font-size: 12px;
+        font-weight: 500;
+        cursor: pointer;
+        opacity: 0.8;
+    }
+    .report-list .delete-btn:hover {
+        opacity: 1;
+    }
+    .no-reports {
+        text-align: center;
+        color: var(--text-light);
+        padding: 20px;
+    }
+    /* --- Home Page Styles End --- */
 
     .grid {
       display: grid;
@@ -184,6 +287,13 @@
       opacity: 0.6;
       cursor: not-allowed;
       transform: none;
+    }
+
+    .btn-secondary {
+        background-color: var(--text-light);
+    }
+    .btn-secondary:hover {
+        background-color: var(--text-dark);
     }
 
     .btn-group {
@@ -378,54 +488,6 @@
       width: 45%;
       text-align: center;
     }
-
-    .saved-reports {
-      margin-top: 24px;
-    }
-
-    .saved-reports h3 {
-      font-size: 16px;
-      font-weight: 600;
-      margin-bottom: 10px;
-    }
-
-    .saved-reports ul {
-      list-style-type: none;
-      padding: 0;
-      max-height: 200px;
-      overflow-y: auto;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-    }
-
-    .saved-reports li {
-      padding: 10px 16px;
-      border-bottom: 1px solid var(--border);
-      cursor: pointer;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .saved-reports li:last-child {
-      border-bottom: none;
-    }
-
-    .saved-reports li:hover {
-      background-color: var(--bg-light);
-    }
-
-    .saved-reports .delete-btn {
-      color: #ef4444;
-      font-size: 12px;
-      font-weight: 500;
-      cursor: pointer;
-      opacity: 0.8;
-    }
-
-    .saved-reports .delete-btn:hover {
-      opacity: 1;
-    }
   </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -433,138 +495,150 @@
 </head>
 <body>
   <div class="wrap">
-    <h1>🧪 SST Report Generator (Single HTML)</h1>
-    <div class="grid">
-      <div class="card">
-        <h2>फ़ॉर्म भरें</h2>
-        <div class="body">
-          <div class="row">
-            <div>
-              <label>Company</label>
-              <input id="company" value="WELLCOAT TECH" readonly/>
-            </div>
-            <div>
-              <label>Logo (optional)</label>
-              <input id="logo" type="file" accept="image/*"/>
-            </div>
-          </div>
+    <h1 onclick="showPage('home')">🧪 SST Report Generator (Single HTML)</h1>
 
-          <label>Report Title</label>
-          <input id="title" value="NEUTRAL SALT SPRAY TEST REPORT" readonly/>
-          <label>Sub‑Title</label>
-          <input id="subtitle" value="(TEST CONDUCTED AS PER ASTM B 117)" readonly/>
-
-          <div class="row">
-            <div><label>DOC NO</label><input id="docNo" value="DOC NO:014" readonly/></div>
-            <div><label>REV NO</label><input id="revNo" value="REV.NO:00" readonly/></div>
-          </div>
-          <div class="row">
-            <div><label>REV DATE</label><input id="revDate" value="01.09.2024" readonly/></div>
-            <div><label>TC Date</label><input id="tcDate" readonly/></div>
-          </div>
-          
-          <div class="row">
-            <div><label>SST Tag No</label><input id="tag" value="03"/></div>
-            <div><label>Production Batch</label><input id="batch" value="250819"/></div>
-          </div>
-          
-          <div class="row">
-            <div class="input-container">
-              <label>Part No/Name</label>
-              <input id="part" value="LAC09170" list="partsList" autocomplete="off"/>
-              <datalist id="partsList"></datalist>
+    <div id="homePage" class="content-page" style="display: none;">
+        <div class="home-container">
+            <div class="home-header">
+                <h2>📊 सेव्ड रिपोर्ट्स और नया रिपोर्ट</h2>
             </div>
-            <div class="input-container">
-              <label>Customer Name</label>
-              <input id="customer" value="Star Engineering" list="customersList" autocomplete="off"/>
-              <datalist id="customersList"></datalist>
+            <div class="home-buttons">
+                <button class="btn home-btn" onclick="clearForm(); showPage('generator')">➕ नया SST रिपोर्ट बनाएँ</button>
             </div>
-          </div>
-          
-          <div class="row">
-            <div><label>Coating System</label><input id="coatSys" value="Zinc Al. Flake Coating"/></div>
-            <div>
-              <label>Color</label>
-              <input id="color" value="SILVER" />
+            <div class="customer-list">
+                <h3>ग्राहक (Customer) के अनुसार रिपोर्ट्स</h3>
+                <div id="customerFolders">
+                    </div>
             </div>
-          </div>
-          <div class="row">
-            <div><label>Coating Process</label><input id="process" value="Dip spin coating"/></div>
-            <div><label>No. of Coat</label><input id="coats" value="2 Base (GEOPERT500) | 1 Top (AQUAZINC)"/></div>
-          </div>
-          <div class="row">
-            <div><label>Coating Thickness</label><input id="thick" value="8–12 MIC"/></div>
-            <div><label>SST Equipment</label><input id="equip" value="Salt Spray Chamber"/></div>
-          </div>
-          <div class="row">
-            <div><label>Capacity</label><input id="capacity" value=">= 450 L"/></div>
-            <div><label>Water Type</label><input id="water" value="D.I. Water"/></div>
-          </div>
-          <div class="row">
-            <div><label>Type of Salt</label><input id="salt" value="Lab, Grade NaCl, 5%"/></div>
-            <div><label>Customer Requirement (Hrs)</label><input id="sstHrs" type="number" value="480" min="0" /></div>
-          </div>
-          
-          <div>
-              <label>Observation for Red Rust</label>
-              <input id="obs" value="480 Hrs No red rust" />
-          </div>
-
-          <div class="row">
-            <div><label>Loaded Date</label><input id="loadDate" value="2025-09-09" type="date"/></div>
-            <div><label>Loaded Time</label><input id="loadTime" value="11:06" type="time" readonly/></div>
-          </div>
-          <div class="row">
-            <div><label>Test Stop Date</label><input id="stopDate" value="2025-09-09" type="date" readonly/></div>
-            <div><label>Test Stop Time</label><input id="stopTime" value="11:10" type="time" readonly/></div>
-          </div>
-          
-          <div class="row">
-            <div><label>No. of Samples</label><input id="samples" value="2"/></div>
-            <div><label>Checked By</label><input id="checked" value="SAKSHI CHAVHAN"/></div>
-          </div>
-          <div class="row">
-            <div><label>Approved By</label><input id="approved" value="ABHIJEET DHOKRAT"/></div>
-          </div>
-          <label>Remark</label>
-          <textarea id="remark">Sample SST passed 480 Hrs. No red rust found.</textarea>
-          
-          <label>Sample Photo (Before)</label>
-          <input id="before" type="file" accept="image/*"/>
-          <label>Sample Photo (After)</label>
-          <input id="after" type="file" accept="image/*"/>
-          <br>
-          <div class="btn-group">
-            <button class="btn" id="btnPdf">Download PDF</button>
-            <button class="btn" id="btnSave">Save Report</button>
-            <button class="btn" id="btnClear">Clear Form</button>
-          </div>
-          <div style="font-size:12px; color:#6b7280; margin-top:10px;">
-            **PDF डाउनलोड करने पर, रिपोर्ट ऑटोमैटिकली सेव हो जाएगी।**
-          </div>
         </div>
-        <div class="saved-reports">
-          <h2>सेव्ड रिपोर्ट्स</h2>
-          <div class="body">
-            <ul id="reportsList">
-              </ul>
-          </div>
-        </div>
-      </div>
+    </div>
+    <div id="generatorPage" class="content-page" style="display: none;">
+        <div class="grid">
+            <div class="card">
+                <h2>फ़ॉर्म भरें</h2>
+                <div class="body">
+                    <div class="row">
+                        <div>
+                            <label>Company</label>
+                            <input id="company" value="WELLCOAT TECH" readonly/>
+                        </div>
+                        <div>
+                            <label>Logo (optional)</label>
+                            <input id="logo" type="file" accept="image/*"/>
+                        </div>
+                    </div>
 
-      <div class="card preview-card">
-        <h2>लाइव प्रीव्यू (A4)</h2>
-        <div class="body">
-          <div id="preview" class="a4-wrapper">
-            <div class="a4">
-              <div class="report-content">
+                    <label>Report Title</label>
+                    <input id="title" value="NEUTRAL SALT SPRAY TEST REPORT" readonly/>
+                    <label>Sub‑Title</label>
+                    <input id="subtitle" value="(TEST CONDUCTED AS PER ASTM B 117)" readonly/>
+
+                    <div class="row">
+                        <div><label>DOC NO</label><input id="docNo" value="DOC NO:014" readonly/></div>
+                        <div><label>REV NO</label><input id="revNo" value="REV.NO:00" readonly/></div>
+                    </div>
+                    <div class="row">
+                        <div><label>REV DATE</label><input id="revDate" value="01.09.2024" readonly/></div>
+                        <div><label>TC Date</label><input id="tcDate" readonly/></div>
+                    </div>
+                    
+                    <div class="row">
+                        <div><label>SST Tag No</label><input id="tag" value="03"/></div>
+                        <div><label>Production Batch</label><input id="batch" value="250819"/></div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="input-container">
+                            <label>Part No/Name</label>
+                            <input id="part" value="LAC09170" list="partsList" autocomplete="off"/>
+                            <datalist id="partsList"></datalist>
+                        </div>
+                        <div class="input-container">
+                            <label>Customer Name</label>
+                            <input id="customer" value="Star Engineering" list="customersList" autocomplete="off"/>
+                            <datalist id="customersList"></datalist>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div><label>Coating System</label><input id="coatSys" value="Zinc Al. Flake Coating"/></div>
+                        <div>
+                            <label>Color</label>
+                            <input id="color" value="SILVER" />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div><label>Coating Process</label><input id="process" value="Dip spin coating"/></div>
+                        <div><label>No. of Coat</label><input id="coats" value="2 Base (GEOPERT500) | 1 Top (AQUAZINC)"/></div>
+                    </div>
+                    <div class="row">
+                        <div><label>Coating Thickness</label><input id="thick" value="8–12 MIC"/></div>
+                        <div><label>SST Equipment</label><input id="equip" value="Salt Spray Chamber"/></div>
+                    </div>
+                    <div class="row">
+                        <div><label>Capacity</label><input id="capacity" value=">= 450 L"/></div>
+                        <div><label>Water Type</label><input id="water" value="D.I. Water"/></div>
+                    </div>
+                    <div class="row">
+                        <div><label>Type of Salt</label><input id="salt" value="Lab, Grade NaCl, 5%"/></div>
+                        <div><label>Customer Requirement (Hrs)</label><input id="sstHrs" type="number" value="480" min="0" /></div>
+                    </div>
+                    
+                    <div>
+                        <label>Observation for Red Rust</label>
+                        <input id="obs" value="480 Hrs No red rust" />
+                    </div>
+
+                    <div class="row">
+                        <div><label>Loaded Date</label><input id="loadDate" value="2025-09-09" type="date"/></div>
+                        <div><label>Loaded Time</label><input id="loadTime" value="11:06" type="time"/></div>
+                    </div>
+                    <div class="row">
+                        <div><label>Test Stop Date</label><input id="stopDate" value="2025-09-09" type="date" readonly/></div>
+                        <div><label>Test Stop Time</label><input id="stopTime" value="11:10" type="time" readonly/></div>
+                    </div>
+                    
+                    <div class="row">
+                        <div><label>No. of Samples</label><input id="samples" value="2"/></div>
+                        <div><label>Checked By</label><input id="checked" value="SAKSHI CHAVHAN"/></div>
+                    </div>
+                    <div class="row">
+                        <div><label>Approved By</label><input id="approved" value="ABHIJEET DHOKRAT"/></div>
+                    </div>
+                    <label>Remark</label>
+                    <textarea id="remark">Sample SST passed 480 Hrs. No red rust found.</textarea>
+                    
+                    <label>Sample Photo (Before)</label>
+                    <input id="before" type="file" accept="image/*"/>
+                    <label>Sample Photo (After)</label>
+                    <input id="after" type="file" accept="image/*"/>
+                    <br>
+                    <div class="btn-group">
+                        <button class="btn" id="btnPdf">Download PDF</button>
+                        <button class="btn btn-secondary" id="btnSave">Save Report</button>
+                        <button class="btn btn-secondary" id="btnClear">Clear Form</button>
+                        <button class="btn btn-secondary" onclick="showPage('home')">होम पर वापस</button>
+                    </div>
+                    <div style="font-size:12px; color:#6b7280; margin-top:10px;">
+                        **PDF डाउनलोड करने पर, रिपोर्ट ऑटोमैटिकली सेव हो जाएगी।**
+                    </div>
                 </div>
             </div>
-          </div>
+
+            <div class="card preview-card">
+                <h2>लाइव प्रीव्यू (A4)</h2>
+                <div class="body">
+                    <div id="preview" class="a4-wrapper">
+                        <div class="a4">
+                            <div class="report-content">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
-  </div>
+    </div>
 
 <script>
   // Right-click and keyboard shortcuts are disabled
@@ -573,13 +647,12 @@
     if (event.ctrlKey || event.metaKey) {
       if (event.key === 'c' || event.key === 'u' || event.key === 's' || event.key === 'i' || event.key === 'j') {
         event.preventDefault();
-        alert('This action is disabled.');
       }
     }
   });
 
   const $ = (id) => document.getElementById(id);
-  const state = { logo: "", before: "", after: "" };
+  const state = { logo: "", before: "", after: "" }; 
   const inputIds = ['company', 'title', 'subtitle', 'docNo', 'revNo', 'revDate', 'tcDate', 'tag', 'batch', 'part', 'customer', 'coatSys', 'color', 'process', 'coats', 'thick', 'equip', 'capacity', 'water', 'salt', 'sstHrs', 'loadDate', 'loadTime', 'stopDate', 'stopTime', 'obs', 'samples', 'remark', 'checked', 'approved'];
 
   const defaultValues = {
@@ -589,7 +662,7 @@
     docNo: "DOC NO:014",
     revNo: "REV.NO:00",
     revDate: "01.09.2024",
-    tcDate: "", // will be set dynamically
+    tcDate: "",
     tag: "03",
     batch: "250819",
     part: "LAC09170",
@@ -604,9 +677,9 @@
     water: "D.I. Water",
     salt: "Lab, Grade NaCl, 5%",
     sstHrs: "480",
-    loadDate: "2025-09-09",
-    loadTime: "11:06",
-    stopDate: "", // will be set dynamically
+    loadDate: "", 
+    loadTime: "",
+    stopDate: "", 
     stopTime: "11:10",
     obs: "480 Hrs No red rust",
     samples: "2",
@@ -614,6 +687,24 @@
     checked: "SAKSHI CHAVHAN",
     approved: "ABHIJEET DHOKRAT"
   };
+
+  let usedCustomers = new Set();
+  let usedParts = new Set();
+  let savedReports = [];
+
+  // --- Page Navigation Logic (Home Page Implementation) ---
+  function showPage(pageId) {
+    document.querySelectorAll('.content-page').forEach(page => {
+        page.style.display = 'none';
+    });
+    if (pageId === 'home') {
+        $('homePage').style.display = 'flex';
+        renderCustomerFolders();
+    } else if (pageId === 'generator') {
+        $('generatorPage').style.display = 'block';
+    }
+  }
+  // --- End Page Navigation Logic ---
 
   // Helper functions
   function formatDate(dateStr) {
@@ -628,40 +719,35 @@
     const hour = parseInt(hours, 10);
     const ampm = hour >= 12 ? 'pm' : 'am';
     const formattedHour = hour % 12 === 0 ? 12 : hour % 12;
-    return `${String(formattedHour).padStart(2, '0')}:${minutes} ${ampm}`;
+    return `${hours}:${minutes} ${ampm}`;
   }
 
   document.addEventListener('DOMContentLoaded', () => {
     const today = new Date();
     const formattedDateForInput = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+    const formattedDate = `${String(today.getDate()).padStart(2, '0')}.${String(today.getMonth() + 1).padStart(2, '0')}.${today.getFullYear()}`;
     
-    // Set default values for date/time
-    $('tcDate').value = formatDate(formattedDateForInput);
-    $('loadDate').value = formattedDateForInput;
-
-    // Set other default values from the object
     inputIds.forEach(id => {
       const el = $(id);
       if (el && defaultValues[id] !== undefined) {
-        if (el.type === 'date' || el.type === 'time' || el.id === 'revDate') {
-          // Do nothing for date and time as they are handled above or automatically
-        } else {
-          el.value = defaultValues[id];
-        }
+        el.value = defaultValues[id];
       }
     });
+
+    $('tcDate').value = formattedDate;
+    $('loadDate').value = formattedDateForInput;
+    $('loadTime').value = `${String(today.getHours()).padStart(2, '0')}:${String(today.getMinutes()).padStart(2, '0')}`;
+
 
     loadInitialReports();
     loadSuggestions();
     updateSuggestions();
     calculateStopDate();
     render();
+    
+    showPage('home');
   });
   
-  let usedCustomers = new Set();
-  let usedParts = new Set();
-  let savedReports = [];
-
   function loadSuggestions() {
     const savedCustomers = JSON.parse(localStorage.getItem('sstCustomers') || '[]');
     const savedParts = JSON.parse(localStorage.getItem('sstParts') || '[]');
@@ -692,8 +778,10 @@
     const loadTimeStr = $('loadTime').value;
     const sstHours = parseInt($('sstHrs').value, 10);
 
-    if (!loadDateStr || isNaN(sstHours)) {
+    if (!loadDateStr || !loadTimeStr || isNaN(sstHours)) {
       $('stopDate').value = '';
+      $('stopTime').value = '';
+      $('tcDate').value = formatDate(loadDateStr) || '';
       return;
     }
 
@@ -714,8 +802,8 @@
 
     $('stopDate').value = newStopDate;
     $('stopTime').value = newStopTime;
-    $('tcDate').value = formatDate(newStopDate); // Update TC Date as well
-    render(); // Re-render to show updated values
+    $('tcDate').value = formatDate(newStopDate);
+    render();
   }
 
   function updateObsText() {
@@ -745,17 +833,51 @@
           coatsInput.value = "2 Base (GEOPERT500) | 1 Top (AQUAZINC)";
       } else if (color === "BLACK") {
           coatsInput.value = "2 Base (ZINTEC 300 HPA) | 2 Top (TECHDIP HL)";
+      } else {
+          // Keep current value
       }
       render();
   }
 
-  function fileToDataURL(file) {
-    return new Promise((res, rej) => {
-      const reader = new FileReader();
-      reader.onload = (e) => res(e.target.result);
-      reader.onerror = rej;
-      reader.readAsDataURL(file);
-    });
+  // **UPDATED: Function to handle file conversion (especially HEIC)**
+  async function fileToDataURL(file) {
+      if (file.type === "image/heic" || file.type === "image/heif" || file.name.toLowerCase().endsWith('.heic') || file.name.toLowerCase().endsWith('.heif')) {
+          
+          try {
+              if (typeof heic2any === 'undefined') {
+                  throw new Error("heic2any library is not loaded.");
+              }
+
+              const convertedBlob = await heic2any({
+                  blob: file,
+                  toType: "image/jpeg",
+                  quality: 0.9
+              });
+              
+              const finalBlob = Array.isArray(convertedBlob) ? convertedBlob[0] : convertedBlob;
+              
+              return new Promise((res, rej) => {
+                  const reader = new FileReader();
+                  reader.onload = (e) => res(e.target.result);
+                  reader.onerror = rej;
+                  reader.readAsDataURL(finalBlob);
+              });
+              
+          } catch (error) {
+              console.error("HEIC to JPEG conversion failed:", error);
+              // **USER ALERT HERE**
+              alert("❌ HEIC फ़ाइल को बदलने (Convert) में समस्या हुई। कृपया JPG/PNG फ़ाइल का उपयोग करें। Error: " + error.message);
+              return ""; // Return empty string on failure
+          }
+      } else {
+          // For non-HEIC files
+          return new Promise((res, rej) => {
+              const reader = new FileReader();
+              reader.onload = (e) => res(e.target.result);
+              reader.onerror = rej;
+              reader.readAsDataURL(file);
+          });
+      }
   }
   
   function getFormData() {
@@ -777,105 +899,186 @@
     state.logo = data.logo || "";
     state.before = data.before || "";
     state.after = data.after || "";
+    
+    $('logo').value = null; 
+    $('before').value = null;
+    $('after').value = null;
+
+    calculateStopDate();
     render();
+    showPage('generator');
   }
 
   function saveReport() {
     const reportData = getFormData();
-    reportData.id = Date.now();
-    savedReports.push(reportData);
+    
+    if (!reportData.customer || !reportData.part) {
+        alert("ग्राहक का नाम (Customer Name) और पार्ट नंबर/नाम (Part No/Name) आवश्यक है।");
+        return;
+    }
+
+    if (reportData.logo === 'loading' || reportData.before === 'loading' || reportData.after === 'loading') {
+        alert("इमेज कन्वर्जन अभी जारी है। कृपया कुछ सेकंड प्रतीक्षा करें और फिर से सेव करें।");
+        return;
+    }
+
+    // Check if report already exists (by ID, if loading an existing one)
+    const existingIndex = savedReports.findIndex(r => r.id === reportData.id);
+    if (existingIndex !== -1) {
+        // Update existing report (e.g., if loaded and saved again)
+        savedReports[existingIndex] = reportData;
+    } else {
+        // Save as new report
+        reportData.id = Date.now();
+        savedReports.push(reportData);
+    }
+    
     localStorage.setItem('sstSavedReports', JSON.stringify(savedReports));
-    alert('Report saved successfully!');
-    renderReportsList();
+    
+    const customerValue = $('customer').value.trim();
+    const partValue = $('part').value.trim();
+    if (customerValue) {
+      usedCustomers.add(customerValue);
+      localStorage.setItem('sstCustomers', JSON.stringify(Array.from(usedCustomers)));
+    }
+    if (partValue) {
+      usedParts.add(partValue);
+      localStorage.setItem('sstParts', JSON.stringify(Array.from(usedParts)));
+    }
+    updateSuggestions();
+    
+    renderCustomerFolders();
   }
 
-  function loadReport(id) {
+  window.loadReport = (id) => {
     const report = savedReports.find(r => r.id === id);
     if (report) {
       setFormData(report);
-      alert('Report loaded successfully!');
     }
   }
 
-  function deleteReport(id) {
-    savedReports = savedReports.filter(r => r.id !== id);
-    localStorage.setItem('sstSavedReports', JSON.stringify(savedReports));
-    renderReportsList();
-    alert('Report deleted successfully.');
+  window.deleteReport = (e, id) => {
+    e.stopPropagation();
+    if(confirm('क्या आप सचमुच इस रिपोर्ट को हटाना चाहते हैं?')) {
+        savedReports = savedReports.filter(r => r.id !== id);
+        localStorage.setItem('sstSavedReports', JSON.stringify(savedReports));
+        renderCustomerFolders();
+        alert('Report deleted successfully.');
+    }
   }
 
-  function renderReportsList() {
-    const reportsListEl = $('reportsList');
-    reportsListEl.innerHTML = '';
-    if (savedReports.length === 0) {
-      reportsListEl.innerHTML = '<li style="justify-content:center;color:#6b7280;">कोई सेव्ड रिपोर्ट नहीं है।</li>';
-      return;
-    }
-    savedReports.forEach(report => {
-      const li = document.createElement('li');
-      li.innerHTML = `
-        <span onclick="loadReport(${report.id})">
-          ${report.part || 'No Part'} - ${report.customer || 'No Customer'}
-        </span>
-        <span class="delete-btn" onclick="deleteReport(${report.id})">🗑️</span>
-      `;
-      reportsListEl.appendChild(li);
-    });
-  }
-  
   function loadInitialReports() {
     const storedReports = localStorage.getItem('sstSavedReports');
     if (storedReports) {
       savedReports = JSON.parse(storedReports);
     }
-    renderReportsList();
+    renderCustomerFolders();
+  }
+  
+  function renderCustomerFolders() {
+    const container = $('customerFolders');
+    container.innerHTML = '';
+    
+    if (savedReports.length === 0) {
+        container.innerHTML = '<div class="no-reports">कोई सेव्ड रिपोर्ट नहीं है।</div>';
+        return;
+    }
+    
+    const groupedReports = savedReports.reduce((acc, report) => {
+        const customer = report.customer.trim() || 'Uncategorized';
+        if (!acc[customer]) {
+            acc[customer] = [];
+        }
+        acc[customer].push(report);
+        return acc;
+    }, {});
+    
+    const sortedCustomers = Object.keys(groupedReports).sort();
+    
+    sortedCustomers.forEach(customer => {
+        const customerDiv = document.createElement('div');
+        customerDiv.className = 'customer-folder';
+        customerDiv.innerHTML = `
+            <div class="customer-folder-header">
+                <strong>📁 ${customer} (${groupedReports[customer].length})</strong>
+                <span>⬇️</span>
+            </div>
+            <ul class="report-list" style="display: none;">
+            </ul>
+        `;
+        
+        const list = customerDiv.querySelector('.report-list');
+        groupedReports[customer].sort((a, b) => b.id - a.id).forEach(report => {
+            const formattedDate = formatDate(report.stopDate) || 'No Date';
+            const reportItem = document.createElement('li');
+            reportItem.innerHTML = `
+                <span onclick="loadReport(${report.id})">
+                    ${report.part || 'No Part'} - (${formattedDate})
+                </span>
+                <span class="delete-btn" onclick="deleteReport(event, ${report.id})">🗑️</span>
+            `;
+            list.appendChild(reportItem);
+        });
+        
+        customerDiv.addEventListener('click', (e) => {
+            if (e.target.tagName !== 'SPAN' || e.target.classList.contains('delete-btn')) return;
+            const isVisible = list.style.display !== 'none';
+            list.style.display = isVisible ? 'none' : 'block';
+            customerDiv.querySelector('.customer-folder-header span').textContent = isVisible ? '⬇️' : '⬆️';
+        });
+        
+        container.appendChild(customerDiv);
+    });
   }
 
-  function showReminder() {
-      const stopDate = $('stopDate').value;
-      const stopTime = $('stopTime').value;
-      
-      const formattedDate = formatDate(stopDate);
-      const formattedTime = formatTime(stopTime);
 
-      if (formattedDate && formattedTime) {
-          alert(`Reminder: यह पार्ट ${formattedDate} को ${formattedTime} पर पूरा हो जाएगा।`);
-      } else {
-          alert("रिमाइंडर के लिए टेस्ट स्टॉप डेट और टाइम की जानकारी उपलब्ध नहीं है।");
-      }
-  }
-
-  const formElements = document.querySelectorAll('input, textarea');
+  const formElements = document.querySelectorAll('#generatorPage input, #generatorPage textarea');
   formElements.forEach(el => {
     if (el.type !== 'file' && !el.readOnly) {
       el.addEventListener('input', render);
     }
   });
 
-  $('logo').addEventListener('change', async e => {
-    const f = e.target.files?.[0];
-    if (f) state.logo = await fileToDataURL(f);
-    render();
-  });
-  $('before').addEventListener('change', async e => {
-    const f = e.target.files?.[0];
-    if (f) state.before = await fileToDataURL(f);
-    render();
-  });
-  $('after').addEventListener('change', async e => {
-    const f = e.target.files?.[0];
-    if (f) state.after = await fileToDataURL(f);
-    render();
-  });
+  // **UPDATED FILE INPUT LISTENERS for Async Handling**
+  // This logic correctly handles the 'loading' state and re-renders only after conversion is complete or failed.
+  const setupFileListener = (inputId, stateKey) => {
+    $(inputId).addEventListener('change', async e => {
+      const f = e.target.files?.[0];
+      if (f) {
+        state[stateKey] = "loading"; // Set temporary loading state
+        render(); 
+        const dataUrl = await fileToDataURL(f); // Wait for conversion
+        state[stateKey] = dataUrl;
+        render(); // Final render
+      } else {
+        state[stateKey] = "";
+        render();
+      }
+    });
+  };
+
+  setupFileListener('logo', 'logo');
+  setupFileListener('before', 'before');
+  setupFileListener('after', 'after');
+  
+  // **END UPDATED FILE INPUT LISTENERS**
+
 
   function render() {
     const P = $('preview').querySelector('.report-content');
     const v = (id) => $(id).value;
     
+    const renderImage = (src, alt) => {
+        if (src === "loading") {
+             return `<div style="width:100%;height:100%;display:flex;justify-content:center;align-items:center;color:#4b5563;font-size:14px;">🔄 Converting HEIC...</div>`;
+        }
+        return src ? `<img src="${src}" alt="${alt}">` : 'No image';
+    };
+
     P.innerHTML = `
       <div class="hdr">
         <div style="display:flex;gap:15px;align-items:center;">
-          ${state.logo ? `<img class="logo" src="${state.logo}" alt="Company Logo">` : `<div class="logo" style="display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--text-light);background-color:var(--bg-light);">LOGO</div>`}
+          ${state.logo && state.logo !== 'loading' ? `<img class="logo" src="${state.logo}" alt="Company Logo">` : `<div class="logo" style="display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--text-light);background-color:var(--bg-light);">${state.logo === 'loading' ? 'LOADING...' : 'LOGO'}</div>`}
           <div class="hdr-text">
             <div style="font-size:22px;font-weight:700;color:var(--primary);">${v('company')}</div>
             <div class="title">${v('title')}</div>
@@ -905,11 +1108,11 @@
       <div class="photos">
         <div>
           <div class="photo-caption">SAMPLE PHOTO BEFORE SST</div>
-          <div class="ph">${state.before ? `<img src="${state.before}" alt="Sample before SST">` : 'No image'}</div>
+          <div class="ph">${renderImage(state.before, "Sample before SST")}</div>
         </div>
         <div>
           <div class="photo-caption">SAMPLE PHOTO AFTER SST</div>
-          <div class="ph">${state.after ? `<img src="${state.after}" alt="Sample after SST">` : 'No image'}</div>
+          <div class="ph">${renderImage(state.after, "Sample after SST")}</div>
         </div>
       </div>
 
@@ -932,43 +1135,59 @@
         el.value = defaultValues[id] || '';
       }
     });
-    $('logo').value = '';
-    $('before').value = '';
-    $('after').value = '';
+    $('logo').value = null;
+    $('before').value = null;
+    $('after').value = null;
     state.logo = state.before = state.after = "";
     
-    // Resetting readonly fields as well, just in case
     $('company').value = defaultValues.company;
     $('title').value = defaultValues.title;
     $('subtitle').value = defaultValues.subtitle;
     $('docNo').value = defaultValues.docNo;
     $('revNo').value = defaultValues.revNo;
     $('revDate').value = defaultValues.revDate;
+    
     const today = new Date();
     const formattedDateForInput = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
     const formattedDate = `${String(today.getDate()).padStart(2, '0')}.${String(today.getMonth() + 1).padStart(2, '0')}.${today.getFullYear()}`;
+    
     $('tcDate').value = formattedDate;
     $('loadDate').value = formattedDateForInput;
+    $('loadTime').value = `${String(today.getHours()).padStart(2, '0')}:${String(today.getMinutes()).padStart(2, '0')}`;
+    
+    $('tag').value = defaultValues.tag;
+    $('batch').value = defaultValues.batch;
+    $('part').value = defaultValues.part;
+    $('customer').value = defaultValues.customer;
+    $('coatSys').value = defaultValues.coatSys;
+    $('color').value = defaultValues.color;
+    $('process').value = defaultValues.process;
+    $('coats').value = defaultValues.coats;
+    $('thick').value = defaultValues.thick;
+    $('equip').value = defaultValues.equip;
+    $('capacity').value = defaultValues.capacity;
+    $('water').value = defaultValues.water;
+    $('salt').value = defaultValues.salt;
+    $('sstHrs').value = defaultValues.sstHrs;
+    $('obs').value = defaultValues.obs;
+    $('samples').value = defaultValues.samples;
+    $('remark').value = defaultValues.remark;
+    $('checked').value = defaultValues.checked;
+    $('approved').value = defaultValues.approved;
+    
     calculateStopDate();
     render();
   }
 
   $('btnPdf').addEventListener('click', async (e) => {
     e.preventDefault();
+
+    if (state.logo === 'loading' || state.before === 'loading' || state.after === 'loading') {
+        alert("इमेज कन्वर्जन अभी जारी है। कृपया कुछ सेकंड प्रतीक्षा करें और फिर से PDF डाउनलोड करें।");
+        return;
+    }
     
     saveReport();
-
-    const customerValue = $('customer').value.trim();
-    const partValue = $('part').value.trim();
-    if (customerValue) {
-      usedCustomers.add(customerValue);
-      localStorage.setItem('sstCustomers', JSON.stringify(Array.from(usedCustomers)));
-    }
-    if (partValue) {
-      usedParts.add(partValue);
-      localStorage.setItem('sstParts', JSON.stringify(Array.from(usedParts)));
-    }
-    updateSuggestions();
 
     const v = (id) => $(id).value;
     const { jsPDF } = window.jspdf;
@@ -978,31 +1197,37 @@
       orientation: 'portrait'
     });
     
-    let y = 10;
     const margin = 10;
     const pageWidth = pdf.internal.pageSize.getWidth();
     const pageHeight = pdf.internal.pageSize.getHeight();
 
-    // Border
     pdf.rect(margin, margin, pageWidth - 2 * margin, pageHeight - 2 * margin, 'S');
     
-    // Header
     const headerStartY = margin + 5;
     const logoSize = 25;
     const logoX = margin + 5;
     const logoY = headerStartY;
     let currentY = headerStartY;
+    let logoDisplayHeight = 0;
 
     if (state.logo) {
         const logo = await loadImage(state.logo);
-        const aspectRatio = logo.width / logo.height;
-        let finalLogoWidth = logoSize * aspectRatio;
-        let finalLogoHeight = logoSize;
-        if (finalLogoWidth > 50) {
-            finalLogoWidth = 50;
-            finalLogoHeight = 50 / aspectRatio;
+        const maxLogoSize = 25; 
+        
+        let finalLogoWidth = logo.width;
+        let finalLogoHeight = logo.height;
+
+        if (finalLogoWidth > maxLogoSize || finalLogoHeight > maxLogoSize) {
+            const ratio = Math.min(maxLogoSize / finalLogoWidth, maxLogoSize / finalLogoHeight);
+            finalLogoWidth *= ratio;
+            finalLogoHeight *= ratio;
         }
-        pdf.addImage(logo, 'PNG', logoX, logoY, finalLogoWidth, finalLogoHeight, undefined, 'NONE');
+        
+        logoDisplayHeight = finalLogoHeight; 
+        
+        const imageType = state.logo.startsWith('data:image/png') ? 'PNG' : 'JPEG';
+
+        pdf.addImage(logo, imageType, logoX, logoY, finalLogoWidth, finalLogoHeight, undefined, 'NONE');
     }
 
     pdf.setFontSize(16);
@@ -1017,14 +1242,13 @@
     pdf.setTextColor('#4b5563');
     pdf.text(v('subtitle'), logoX + logoSize + 5, currentY + 17, { maxWidth: pageWidth * 0.5 });
     
-    // Header info on right
     pdf.setFontSize(8);
     pdf.setTextColor(0);
     pdf.text(v('docNo'), pageWidth - margin - 5, currentY + 5, { align: 'right' });
     pdf.text(v('revNo'), pageWidth - margin - 5, currentY + 10, { align: 'right' });
     pdf.text(`REV.DATE: ${v('revDate')}`, pageWidth - margin - 5, currentY + 15, { align: 'right' });
 
-    currentY = headerStartY + Math.max(logoSize, 18) + 5;
+    currentY = headerStartY + Math.max(logoDisplayHeight, 18) + 5; 
     pdf.setDrawColor(0);
     pdf.setLineWidth(0.5);
     pdf.line(margin, currentY, pageWidth - margin, currentY);
@@ -1058,7 +1282,7 @@
           lineColor: 0,
           lineWidth: 0.1,
           valign: 'middle',
-          minCellHeight: 12 // Increased minimum cell height
+          minCellHeight: 14 
       },
       headStyles: {
           fillColor: [240, 240, 240]
@@ -1068,11 +1292,6 @@
           1: { cellWidth: (pageWidth - 2 * margin) * 0.15, halign: 'center' },
           2: { fontStyle: 'bold', fillColor: [240, 240, 240], cellWidth: (pageWidth - 2 * margin) * 0.35 },
           3: { cellWidth: (pageWidth - 2 * margin) * 0.15, halign: 'center' }
-      },
-      didDrawCell: (data) => {
-          if (data.section === 'body' && data.column.index === 1 && data.cell.raw.content) {
-              data.cell.styles.halign = 'center';
-          }
       }
     };
 
@@ -1080,58 +1299,61 @@
 
     currentY = pdf.autoTable.previous.finalY + 10;
 
-    // Photos
     const photoWidth = (pageWidth - 2 * margin - 5) / 2;
     const photoHeight = photoWidth / 1.5;
-
-    // Add more vertical space before photos
-    currentY += 10;
+    
+    const photoBeforeY = currentY + 5;
+    const photoAfterX = margin + photoWidth + 5;
 
     pdf.setFontSize(10);
     pdf.text('SAMPLE PHOTO BEFORE SST', margin, currentY);
     if (state.before) {
         const photoBefore = await loadImage(state.before);
-        pdf.addImage(photoBefore, 'JPEG', margin, currentY + 5, photoWidth, photoHeight, undefined, 'FAST');
+        const imageType = state.before.startsWith('data:image/png') ? 'PNG' : 'JPEG';
+        pdf.addImage(photoBefore, imageType, margin, photoBeforeY, photoWidth, photoHeight, undefined, 'FAST');
     } else {
-        pdf.rect(margin, currentY + 5, photoWidth, photoHeight, 'S');
+        pdf.rect(margin, photoBeforeY, photoWidth, photoHeight, 'S');
         pdf.setFontSize(8);
         pdf.setTextColor(150);
-        pdf.text('No Image Available', margin + photoWidth / 2, currentY + 5 + photoHeight / 2, { align: 'center' });
+        pdf.text('No Image Available', margin + photoWidth / 2, photoBeforeY + photoHeight / 2, { align: 'center' });
         pdf.setTextColor(0);
     }
     
-    pdf.text('SAMPLE PHOTO AFTER SST', margin + photoWidth + 5, currentY);
+    pdf.text('SAMPLE PHOTO AFTER SST', photoAfterX, currentY);
     if (state.after) {
         const photoAfter = await loadImage(state.after);
-        pdf.addImage(photoAfter, 'JPEG', margin + photoWidth + 5, currentY + 5, photoWidth, photoHeight, undefined, 'FAST');
+        const imageType = state.after.startsWith('data:image/png') ? 'PNG' : 'JPEG';
+        pdf.addImage(photoAfter, imageType, photoAfterX, photoBeforeY, photoWidth, photoHeight, undefined, 'FAST');
     } else {
-        pdf.rect(margin + photoWidth + 5, currentY + 5, photoWidth, photoHeight, 'S');
+        pdf.rect(photoAfterX, photoBeforeY, photoWidth, photoHeight, 'S');
         pdf.setFontSize(8);
         pdf.setTextColor(150);
-        pdf.text('No Image Available', margin + photoWidth + 5 + photoWidth / 2, currentY + 5 + photoHeight / 2, { align: 'center' });
+        pdf.text('No Image Available', photoAfterX + photoWidth / 2, photoBeforeY + photoHeight / 2, { align: 'center' });
         pdf.setTextColor(0);
     }
     
     currentY += photoHeight + 15;
 
-    // Adjust Remark position
-    const footerHeight = 20; // Estimated height of the footer
-    const spaceForRemark = pageHeight - currentY - margin - footerHeight;
+    const footerHeight = 25; 
     const remarkText = v('remark');
     const splitRemark = pdf.splitTextToSize(`Remark: ${remarkText}`, pageWidth - 2 * margin);
-    const remarkHeight = splitRemark.length * 4; // 4mm per line for fontSize 10
+    const remarkLineHeight = 5; 
+    const remarkHeight = splitRemark.length * remarkLineHeight; 
     
-    let remarkY = currentY;
-    if (remarkHeight < spaceForRemark) {
-        // Center the remark in the available space if there's too much room
-        remarkY = currentY + (spaceForRemark - remarkHeight) / 2;
+    let remarkY = currentY + 5; 
+
+    if (remarkY + remarkHeight > (pageHeight - margin - footerHeight)) {
+        remarkY = pageHeight - margin - footerHeight - remarkHeight - 2; 
+        if (remarkY < currentY + 5) {
+            remarkY = currentY + 5;
+        }
     }
+
 
     pdf.setFontSize(10);
     pdf.text(splitRemark, margin, remarkY);
 
-    // Footer
-    const footerY = pageHeight - margin - 20;
+    const footerY = pageHeight - margin - 20; 
 
     pdf.line(margin + 5, footerY, margin + 5 + 70, footerY);
     pdf.setFontSize(10);
@@ -1145,8 +1367,6 @@
     const filename = `${customerName.replace(/[^a-z0-9]/gi, '_')}_${partNo.replace(/[^a-z0-9]/gi, '_')}.pdf`;
 
     pdf.save(filename);
-
-    alert('PDF report has been downloaded to your default Downloads folder.');
   });
   
   function loadImage(src) {
@@ -1161,18 +1381,16 @@
   $('btnSave').addEventListener('click', (e) => {
     e.preventDefault();
     saveReport();
-    showReminder();
+    alert('रिपोर्ट सफलतापूर्वक सेव हो गई है और अब होम पेज पर उपलब्ध है।');
+    showPage('home');
   });
 
   $('btnClear').addEventListener('click', clearForm);
   
   window.loadReport = loadReport;
   window.deleteReport = deleteReport;
+  window.showPage = showPage;
 
-  loadInitialReports();
-  loadSuggestions();
-  updateSuggestions();
-  
   $('customer').addEventListener('input', updateSuggestions);
   $('part').addEventListener('input', updateSuggestions);
   
@@ -1180,9 +1398,6 @@
   $('loadTime').addEventListener('change', calculateStopDate);
   $('sstHrs').addEventListener('input', () => { calculateStopDate(); updateObsText(); updateRemarkText(); });
   $('color').addEventListener('input', updateCoatInfo);
-  
-  calculateStopDate();
-  render();
 </script>
 </body>
 </html>
