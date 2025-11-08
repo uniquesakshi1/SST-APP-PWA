@@ -4,6 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>SST Report Generator</title>
+  <link rel="manifest" href="manifest.json"> 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
@@ -19,6 +20,7 @@
         var e = a.data.orientation;
         var f = a.data.canvas;
 
+        // Ensure to handle the toBlob callback properly
         b.toBlob(function(b) {
           self.postMessage({
             heic2any: {
@@ -45,7 +47,16 @@
   </script>
 
 <script>
-  // NOTE: Manifest/SW.js for PWA removed to simplify the single HTML file
+  // PWA Service Worker Registration (assuming you have service-worker.js and manifest.json)
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./service-worker.js').then(registration => {
+        console.log('SW registered: ', registration);
+      }).catch(registrationError => {
+        console.log('SW registration failed: ', registrationError);
+      });
+    });
+  }
 </script>
   <style>
     /* --- CSS Code (Same as before) --- */
@@ -600,7 +611,17 @@
                         </div>
                         <div><label>Coating System</label><input id="coatSys" value="Zinc Al. Flake Coating"/></div>
                     </div>
-                    
+
+                    <div class="row">
+                        <div>
+                            <label>Customer Email ID</label>
+                            <input id="customerEmail" type="email" value="" placeholder="customer@example.com"/>
+                        </div>
+                        <div>
+                            <label>Customer WhatsApp No.</label>
+                            <input id="customerWhatsapp" type="text" value="" placeholder="9876543210"/>
+                        </div>
+                    </div>
                     <div class="row">
                         <div>
                             <label>Color</label>
@@ -659,6 +680,12 @@
                         <button class="btn" id="btnPdf">Download PDF</button>
                         <button class="btn btn-secondary" id="btnSave">Save Report</button>
                         <button class="btn btn-secondary" onclick="setSSTAlarm()">सेट SST अलार्म</button>
+                        
+                        <button class="btn" style="background-color: #007bff;" onclick="shareViaEmail()">✉️ Send Email (No File)</button>
+                        <button class="btn" style="background-color: #25D366;" onclick="shareViaWhatsapp()">💬 Send WhatsApp (No File)</button>
+                        
+                        <button class="btn" style="background-color: #8A2BE2;" onclick="sharePdfViaWebShare()">📲 Share PDF (With Number)</button>
+                        
                         <button class="btn btn-secondary" onclick="showPage('home')">होम पर वापस</button>
                     </div>
                     <div style="font-size:12px; color:#6b7280; margin-top:10px;">
@@ -683,7 +710,7 @@
     </div>
 
 <script>
-  // --- JavaScript Code (Updated for Automatic Status Check) ---
+  // --- JavaScript Code (Updated for Web Share API and WhatsApp Number) ---
   
   // Right-click and keyboard shortcuts are disabled
   document.addEventListener('contextmenu', event => event.preventDefault());
@@ -697,8 +724,7 @@
 
   const $ = (id) => document.getElementById(id);
   const state = { logo: "", before: "", after: "" }; 
-  // ADDED 'status' to inputIds
-  const inputIds = ['company', 'title', 'subtitle', 'docNo', 'revNo', 'revDate', 'tcDate', 'tag', 'batch', 'part', 'customer', 'coatSys', 'color', 'process', 'coats', 'thick', 'equip', 'capacity', 'water', 'salt', 'sstHrs', 'loadDate', 'loadTime', 'stopDate', 'stopTime', 'obs', 'samples', 'remark', 'checked', 'approved', 'status'];
+  const inputIds = ['company', 'title', 'subtitle', 'docNo', 'revNo', 'revDate', 'tcDate', 'tag', 'batch', 'part', 'customer', 'customerEmail', 'customerWhatsapp', 'coatSys', 'color', 'process', 'coats', 'thick', 'equip', 'capacity', 'water', 'salt', 'sstHrs', 'loadDate', 'loadTime', 'stopDate', 'stopTime', 'obs', 'samples', 'remark', 'checked', 'approved', 'status'];
 
   const defaultValues = {
     company: "WELLCOAT TECH",
@@ -712,6 +738,8 @@
     batch: "250819",
     part: "LAC09170",
     customer: "Star Engineering",
+    customerEmail: "",
+    customerWhatsapp: "",
     coatSys: "Zinc Al. Flake Coating",
     color: "SILVER",
     process: "Dip spin coating",
@@ -731,7 +759,7 @@
     remark: "Sample SST passed 480 Hrs. No red rust found.",
     checked: "SAKSHI CHAVHAN",
     approved: "ABHIJEET DHOKRAT",
-    status: "Running" // Default Status
+    status: "Running"
   };
 
   let usedCustomers = new Set();
@@ -979,7 +1007,7 @@
         return;
     }
 
-    // --- NEW LOGIC: AUTOMATIC STATUS CHECK ---
+    // --- LOGIC: AUTOMATIC STATUS CHECK ---
     const stopDateStr = reportData.stopDate; // YYYY-MM-DD
     const stopTimeStr = reportData.stopTime; // HH:MM (24-hour format)
 
@@ -1005,7 +1033,7 @@
         // Fallback: If dates are missing, use the user-selected status
         reportData.status = $('status').value;
     }
-    // --- END NEW LOGIC ---
+    // --- END LOGIC ---
 
     // Assign an ID if it's a new report (or update the current one)
     reportData.id = reportData.id || Date.now();
@@ -1069,7 +1097,7 @@
     renderCustomerFolders();
   }
   
-  // *** renderCustomerFolders FUNCTION (Same as before) ***
+  // *** renderCustomerFolders FUNCTION ***
   function renderCustomerFolders() {
       const container = $('customerFolders');
       container.innerHTML = '';
@@ -1145,7 +1173,6 @@
               
               customerDiv.addEventListener('click', (e) => {
                   // Folder toggle logic
-                  // Check if the click target is the folder header itself, not the list items or delete button
                   if (e.target.closest('.report-list') && !e.target.classList.contains('delete-btn')) return;
                   
                   const isVisible = list.style.display !== 'none';
@@ -1160,29 +1187,29 @@
   // *** END renderCustomerFolders FUNCTION ***
 
 
-  const formElements = document.querySelectorAll('#generatorPage input, #generatorPage textarea, #generatorPage select'); // Added select
+  const formElements = document.querySelectorAll('#generatorPage input, #generatorPage textarea, #generatorPage select'); 
   formElements.forEach(el => {
     if (el.type !== 'file' && !el.readOnly) {
       el.addEventListener('input', render);
     }
   });
 
-  // Setup File Input Listeners
+  // Setup File Input Listeners (Same as before)
   const setupFileListener = (inputId, stateKey) => {
     $(inputId).addEventListener('change', async e => {
       const f = e.target.files?.[0];
       if (f) {
-        state[stateKey] = "loading"; // Set temporary loading state
+        state[stateKey] = "loading"; 
         render(); 
         try {
-            const dataUrl = await fileToDataURL(f); // Wait for conversion
+            const dataUrl = await fileToDataURL(f); 
             state[stateKey] = dataUrl;
         } catch(error) {
             console.error("File processing failed:", error);
-            state[stateKey] = ""; // Clear on failure
+            state[stateKey] = ""; 
             alert("❌ फ़ाइल लोड या कन्वर्ट नहीं हो पाई।");
         }
-        render(); // Final render
+        render(); 
       } else {
         state[stateKey] = "";
         render();
@@ -1290,6 +1317,8 @@
     $('batch').value = defaultValues.batch;
     $('part').value = defaultValues.part;
     $('customer').value = defaultValues.customer;
+    $('customerEmail').value = defaultValues.customerEmail;
+    $('customerWhatsapp').value = defaultValues.customerWhatsapp;
     $('coatSys').value = defaultValues.coatSys;
     $('color').value = defaultValues.color;
     $('process').value = defaultValues.process;
@@ -1315,6 +1344,116 @@
     render();
   }
 
+  // --- NEW SHARING FUNCTIONS ---
+
+  function shareViaEmail() {
+      const email = $('customerEmail').value.trim();
+      const customer = $('customer').value.trim() || 'Customer';
+      const part = $('part').value.trim() || 'SST Report';
+
+      if (!email) {
+          alert("Please fill in the 'Customer Email ID' first.");
+          return;
+      }
+      
+      const subject = encodeURIComponent(`SST Report: ${part} for ${customer}`);
+      const body = encodeURIComponent(`Dear ${customer},\n\nPlease find the attached PDF file for your SST Report (${part}). You need to download it first using the 'Download PDF' button and attach it manually to this email.\n\nThank you,\n${$('checked').value}`);
+      
+      // mailto: link will open the default email app
+      const mailtoLink = `mailto:${email}?subject=${subject}&body=${body}`;
+      window.open(mailtoLink, '_blank');
+      
+      alert("✅ Your email app has been opened. Please manually attach the PDF file downloaded using the 'Download PDF' button.");
+  }
+
+  function shareViaWhatsapp() {
+      const whatsappNo = $('customerWhatsapp').value.trim();
+      const customer = $('customer').value.trim() || 'Customer';
+      const part = $('part').value.trim() || 'SST Report';
+
+      // Remove any non-digit characters and check for minimum length
+      const cleanedNo = whatsappNo.replace(/[^0-9]/g, '');
+      
+      if (cleanedNo.length < 10) {
+          alert("Please fill in a valid 'Customer WhatsApp No.' (min 10 digits).");
+          return;
+      }
+      
+      const message = encodeURIComponent(`Hello ${customer},\n\nThis is the PDF file of your SST Report (${part}). Please download and review it.`);
+      
+      // WhatsApp URL for sending message
+      const whatsappLink = `https://wa.me/${cleanedNo}?text=${message}`;
+      window.open(whatsappLink, '_blank');
+      
+      alert("✅ Your WhatsApp chat has been opened. Please manually attach the PDF file downloaded using the 'Download PDF' button.");
+  }
+
+  /**
+   * Generates the PDF blob and attempts to share it using the Web Share API.
+   * This is the function to share the actual file and pass the WhatsApp number in the text for context.
+   */
+  async function sharePdfViaWebShare() {
+      if (!navigator.share || !navigator.canShare || !navigator.canShare({ files: [new File([""], "dummy.pdf", { type: "application/pdf" })] })) {
+          alert("❌ Your device/browser does not support sharing files directly from a webpage. Please use the 'Download PDF' button and share manually.");
+          return;
+      }
+
+      const v = (id) => $(id).value;
+      const customerName = $('customer').value.trim() || 'Customer';
+      const partNo = $('part').value.trim() || 'PartNo';
+      const whatsappNo = $('customerWhatsapp').value.trim().replace(/[^0-9]/g, '');
+      
+      // Filename
+      const filename = `${customerName.replace(/[^a-z0-9]/gi, '_')}_${partNo.replace(/[^a-z0-9]/gi, '_')}.pdf`;
+      
+      // Text for sharing
+      let shareText = `Dear ${customerName},\n\nPlease find the attached PDF file for your SST Report (${partNo}).`;
+      
+      // Include number in the text if available (for context in the sharing app)
+      if (whatsappNo.length >= 10) {
+          shareText += `\n\nReport for number: ${whatsappNo}`;
+          alert("✅ Sharing initiated. Please select the WhatsApp app, and then manually select the chat/contact you want to send the file to.");
+      } else {
+          alert("❌ Customer WhatsApp No. is missing or invalid. Sharing initiated without contact number. Please select the correct recipient.");
+      }
+
+      // 1. Generate PDF (using the same logic as btnPdf, but getting the blob)
+      const pdfBlob = await generatePdfBlob(v, state);
+
+      if (!pdfBlob) {
+          alert("PDF generation failed. Cannot share.");
+          return;
+      }
+
+      // 2. Create the File object from the Blob
+      const file = new File([pdfBlob], filename, { type: 'application/pdf' });
+
+      // 3. Prepare the share data
+      const shareData = {
+          files: [file],
+          title: `SST Report: ${partNo}`,
+          text: shareText,
+          // Note: Web Share API does NOT support pre-filling a specific WhatsApp contact with a file.
+          // It only opens the native share sheet. The user must manually select WhatsApp/contact.
+      };
+
+      try {
+          // 4. Attempt to share
+          await navigator.share(shareData);
+          console.log('PDF shared successfully via Web Share API');
+          // No need for a final alert, as the share dialog handles success/cancel
+      } catch (error) {
+          if (error.name === 'AbortError') {
+              console.log('Share aborted by user.');
+          } else {
+              console.error('Error sharing PDF:', error);
+              alert(`❌ File sharing failed. Please use the 'Download PDF' button and attach manually. Error: ${error.message}`);
+          }
+      }
+  }
+
+  // --- END NEW SHARING FUNCTIONS ---
+
   $('btnPdf').addEventListener('click', async (e) => {
     e.preventDefault();
 
@@ -1327,184 +1466,211 @@
     saveReport();
 
     const v = (id) => $(id).value;
-    const { jsPDF } = window.jspdf;
-    const pdf = new jsPDF({ 
-      unit: 'mm', 
-      format: 'a4',
-      orientation: 'portrait'
-    });
-    
-    const margin = 10;
-    const pageWidth = pdf.internal.pageSize.getWidth();
-    const pageHeight = pdf.internal.pageSize.getHeight();
-
-    pdf.rect(margin, margin, pageWidth - 2 * margin, pageHeight - 2 * margin, 'S');
-    
-    const headerStartY = margin + 5;
-    const logoSize = 25;
-    const logoX = margin + 5;
-    const logoY = headerStartY;
-    let currentY = headerStartY;
-    let logoDisplayHeight = 0;
-
-    if (state.logo) {
-        const logo = await loadImage(state.logo);
-        const maxLogoSize = 25; 
-        
-        let finalLogoWidth = logo.width;
-        let finalLogoHeight = logo.height;
-
-        if (finalLogoWidth > maxLogoSize || finalLogoHeight > maxLogoSize) {
-            const ratio = Math.min(maxLogoSize / finalLogoWidth, maxLogoSize / finalLogoHeight);
-            finalLogoWidth *= ratio;
-            finalLogoHeight *= ratio;
-        }
-        
-        logoDisplayHeight = finalLogoHeight; 
-        
-        const imageType = state.logo.startsWith('data:image/png') ? 'PNG' : 'JPEG';
-
-        pdf.addImage(logo, imageType, logoX, logoY, finalLogoWidth, finalLogoHeight, undefined, 'NONE');
-    }
-
-    pdf.setFontSize(16);
-    pdf.setTextColor('#1e40af');
-    pdf.text(v('company'), logoX + logoSize + 5, currentY + 5, { maxWidth: pageWidth * 0.5 });
-    
-    pdf.setFontSize(14);
-    pdf.setTextColor('#1f2937');
-    pdf.text(v('title'), logoX + logoSize + 5, currentY + 12, { maxWidth: pageWidth * 0.5 });
-    
-    pdf.setFontSize(10);
-    pdf.setTextColor('#4b5563');
-    pdf.text(v('subtitle'), logoX + logoSize + 5, currentY + 17, { maxWidth: pageWidth * 0.5 });
-    
-    pdf.setFontSize(8);
-    pdf.setTextColor(0);
-    pdf.text(v('docNo'), pageWidth - margin - 5, currentY + 5, { align: 'right' });
-    pdf.text(v('revNo'), pageWidth - margin - 5, currentY + 10, { align: 'right' });
-    pdf.text(`REV.DATE: ${v('revDate')}`, pageWidth - margin - 5, currentY + 15, { align: 'right' });
-
-    currentY = headerStartY + Math.max(logoDisplayHeight, 18) + 5; 
-    pdf.setDrawColor(0);
-    pdf.setLineWidth(0.5);
-    pdf.line(margin, currentY, pageWidth - margin, currentY);
-
-    currentY += 5;
-
-    const tableData = [
-        ['SST Tag No', v('tag'), 'PRODUCTION BATCH', v('batch')],
-        ['TC Date', v('tcDate'), 'Part No/Name', v('part')],
-        ['Customer Name', v('customer'), 'Color', v('color')],
-        ['Coating System', v('coatSys'), 'Coating Process', v('process')],
-        ['No. of Coat', v('coats'), 'Coating Thickness', v('thick')],
-        ['SST Equipment', v('equip'), 'Corrosion Test Apparatus Capacity', v('capacity')],
-        ['Water type', v('water'), 'Type of salt', v('salt')],
-        [`Component loaded for SST on (Date & time)`, `${formatDate(v('loadDate'))} ${formatTime(v('loadTime'))}`, `Customer requirement for SST`, `${v('sstHrs')} Hrs`],
-        [`Test Stop & Observation Date & Time`, `${formatDate(v('stopDate'))} ${formatTime(v('stopTime'))}`, `Observation for Red Rust`, `${v('obs')}`],
-        [`No. of Samples for SST`, { content: v('samples'), colSpan: 3, styles: { halign: 'center' } }]
-    ];
-
-    const tableOptions = {
-      startY: currentY,
-      head: [],
-      body: tableData,
-      theme: 'grid',
-      tableWidth: pageWidth - 2 * margin,
-      margin: { left: margin },
-      styles: {
-          font: 'Roboto',
-          fontSize: 8,
-          cellPadding: 2,
-          lineColor: 0,
-          lineWidth: 0.1,
-          valign: 'middle',
-          minCellHeight: 14 
-      },
-      headStyles: {
-          fillColor: [240, 240, 240]
-      },
-      columnStyles: {
-          0: { fontStyle: 'bold', fillColor: [240, 240, 240], cellWidth: (pageWidth - 2 * margin) * 0.35 },
-          1: { cellWidth: (pageWidth - 2 * margin) * 0.15, halign: 'center' },
-          2: { fontStyle: 'bold', fillColor: [240, 240, 240], cellWidth: (pageWidth - 2 * margin) * 0.35 },
-          3: { cellWidth: (pageWidth - 2 * margin) * 0.15, halign: 'center' }
-      }
-    };
-
-    pdf.autoTable(tableOptions);
-
-    currentY = pdf.autoTable.previous.finalY + 10;
-
-    const photoWidth = (pageWidth - 2 * margin - 5) / 2;
-    const photoHeight = photoWidth / 1.5;
-    
-    const photoBeforeY = currentY + 5;
-    const photoAfterX = margin + photoWidth + 5;
-
-    pdf.setFontSize(10);
-    pdf.text('SAMPLE PHOTO BEFORE SST', margin, currentY);
-    if (state.before) {
-        const photoBefore = await loadImage(state.before);
-        const imageType = state.before.startsWith('data:image/png') ? 'PNG' : 'JPEG';
-        pdf.addImage(photoBefore, imageType, margin, photoBeforeY, photoWidth, photoHeight, undefined, 'FAST');
-    } else {
-        pdf.rect(margin, photoBeforeY, photoWidth, photoHeight, 'S');
-        pdf.setFontSize(8);
-        pdf.setTextColor(150);
-        pdf.text('No Image Available', margin + photoWidth / 2, photoBeforeY + photoHeight / 2, { align: 'center' });
-        pdf.setTextColor(0);
-    }
-    
-    pdf.text('SAMPLE PHOTO AFTER SST', photoAfterX, currentY);
-    if (state.after) {
-        const photoAfter = await loadImage(state.after);
-        const imageType = state.after.startsWith('data:image/png') ? 'PNG' : 'JPEG';
-        pdf.addImage(photoAfter, imageType, photoAfterX, photoBeforeY, photoWidth, photoHeight, undefined, 'FAST');
-    } else {
-        pdf.rect(photoAfterX, photoBeforeY, photoWidth, photoHeight, 'S');
-        pdf.setFontSize(8);
-        pdf.setTextColor(150);
-        pdf.text('No Image Available', photoAfterX + photoWidth / 2, photoBeforeY + photoHeight / 2, { align: 'center' });
-        pdf.setTextColor(0);
-    }
-    
-    currentY += photoHeight + 15;
-
-    const footerHeight = 25; 
-    const remarkText = v('remark');
-    const splitRemark = pdf.splitTextToSize(`Remark: ${remarkText}`, pageWidth - 2 * margin);
-    const remarkLineHeight = 5; 
-    const remarkHeight = splitRemark.length * remarkLineHeight; 
-    
-    let remarkY = currentY + 5; 
-
-    if (remarkY + remarkHeight > (pageHeight - margin - footerHeight)) {
-        remarkY = pageHeight - margin - footerHeight - remarkHeight - 2; 
-        if (remarkY < currentY + 5) {
-            remarkY = currentY + 5;
-        }
-    }
-
-
-    pdf.setFontSize(10);
-    pdf.text(splitRemark, margin, remarkY);
-
-    const footerY = pageHeight - margin - 20; 
-
-    pdf.line(margin + 5, footerY, margin + 5 + 70, footerY);
-    pdf.setFontSize(10);
-    pdf.text(`Checked by: ${v('checked')}`, margin + 5, footerY + 5);
-    
-    pdf.line(pageWidth - margin - 5 - 70, footerY, pageWidth - margin - 5, footerY);
-    pdf.text(`Approved by: ${v('approved')}`, pageWidth - margin - 5, footerY + 5, { align: 'right' });
-
     const customerName = $('customer').value.trim() || 'Customer';
     const partNo = $('part').value.trim() || 'PartNo';
     const filename = `${customerName.replace(/[^a-z0-9]/gi, '_')}_${partNo.replace(/[^a-z0-9]/gi, '_')}.pdf`;
 
-    pdf.save(filename);
+    const pdfBlob = await generatePdfBlob(v, state);
+
+    if (pdfBlob) {
+        const url = URL.createObjectURL(pdfBlob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    } else {
+        alert("PDF डाउनलोड विफल रहा।");
+    }
   });
+
+  // Function to generate the PDF and return a Blob
+  async function generatePdfBlob(v, state) {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF({ 
+              unit: 'mm', 
+              format: 'a4',
+              orientation: 'portrait'
+            });
+            
+            const margin = 10;
+            const pageWidth = pdf.internal.pageSize.getWidth();
+            const pageHeight = pdf.internal.pageSize.getHeight();
+
+            pdf.rect(margin, margin, pageWidth - 2 * margin, pageHeight - 2 * margin, 'S');
+            
+            const headerStartY = margin + 5;
+            const logoSize = 25;
+            const logoX = margin + 5;
+            const logoY = headerStartY;
+            let currentY = headerStartY;
+            let logoDisplayHeight = 0;
+
+            if (state.logo) {
+                const logo = await loadImage(state.logo);
+                const maxLogoSize = 25; 
+                
+                let finalLogoWidth = logo.width;
+                let finalLogoHeight = logo.height;
+
+                if (finalLogoWidth > maxLogoSize || finalLogoHeight > maxLogoSize) {
+                    const ratio = Math.min(maxLogoSize / finalLogoWidth, maxLogoSize / finalLogoHeight);
+                    finalLogoWidth *= ratio;
+                    finalLogoHeight *= ratio;
+                }
+                
+                logoDisplayHeight = finalLogoHeight; 
+                
+                const imageType = state.logo.startsWith('data:image/png') ? 'PNG' : 'JPEG';
+
+                pdf.addImage(logo, imageType, logoX, logoY, finalLogoWidth, finalLogoHeight, undefined, 'NONE');
+            }
+
+            pdf.setFontSize(16);
+            pdf.setTextColor('#1e40af');
+            pdf.text(v('company'), logoX + logoSize + 5, currentY + 5, { maxWidth: pageWidth * 0.5 });
+            
+            pdf.setFontSize(14);
+            pdf.setTextColor('#1f2937');
+            pdf.text(v('title'), logoX + logoSize + 5, currentY + 12, { maxWidth: pageWidth * 0.5 });
+            
+            pdf.setFontSize(10);
+            pdf.setTextColor('#4b5563');
+            pdf.text(v('subtitle'), logoX + logoSize + 5, currentY + 17, { maxWidth: pageWidth * 0.5 });
+            
+            pdf.setFontSize(8);
+            pdf.setTextColor(0);
+            pdf.text(v('docNo'), pageWidth - margin - 5, currentY + 5, { align: 'right' });
+            pdf.text(v('revNo'), pageWidth - margin - 5, currentY + 10, { align: 'right' });
+            pdf.text(`REV.DATE: ${v('revDate')}`, pageWidth - margin - 5, currentY + 15, { align: 'right' });
+
+            currentY = headerStartY + Math.max(logoDisplayHeight, 18) + 5; 
+            pdf.setDrawColor(0);
+            pdf.setLineWidth(0.5);
+            pdf.line(margin, currentY, pageWidth - margin, currentY);
+
+            currentY += 5;
+
+            const tableData = [
+                ['SST Tag No', v('tag'), 'PRODUCTION BATCH', v('batch')],
+                ['TC Date', v('tcDate'), 'Part No/Name', v('part')],
+                ['Customer Name', v('customer'), 'Color', v('color')],
+                ['Coating System', v('coatSys'), 'Coating Process', v('process')],
+                ['No. of Coat', v('coats'), 'Coating Thickness', v('thick')],
+                ['SST Equipment', v('equip'), 'Corrosion Test Apparatus Capacity', v('capacity')],
+                ['Water type', v('water'), 'Type of salt', v('salt')],
+                [`Component loaded for SST on (Date & time)`, `${formatDate(v('loadDate'))} ${formatTime(v('loadTime'))}`, `Customer requirement for SST`, `${v('sstHrs')} Hrs`],
+                [`Test Stop & Observation Date & Time`, `${formatDate(v('stopDate'))} ${formatTime(v('stopTime'))}`, `Observation for Red Rust`, `${v('obs')}`],
+                [`No. of Samples for SST`, { content: v('samples'), colSpan: 3, styles: { halign: 'center' } }]
+            ];
+
+            const tableOptions = {
+              startY: currentY,
+              head: [],
+              body: tableData,
+              theme: 'grid',
+              tableWidth: pageWidth - 2 * margin,
+              margin: { left: margin },
+              styles: {
+                  font: 'Roboto',
+                  fontSize: 8,
+                  cellPadding: 2,
+                  lineColor: 0,
+                  lineWidth: 0.1,
+                  valign: 'middle',
+                  minCellHeight: 14 
+              },
+              headStyles: {
+                  fillColor: [240, 240, 240]
+              },
+              columnStyles: {
+                  0: { fontStyle: 'bold', fillColor: [240, 240, 240], cellWidth: (pageWidth - 2 * margin) * 0.35 },
+                  1: { cellWidth: (pageWidth - 2 * margin) * 0.15, halign: 'center' },
+                  2: { fontStyle: 'bold', fillColor: [240, 240, 240], cellWidth: (pageWidth - 2 * margin) * 0.35 },
+                  3: { cellWidth: (pageWidth - 2 * margin) * 0.15, halign: 'center' }
+              }
+            };
+
+            pdf.autoTable(tableOptions);
+
+            currentY = pdf.autoTable.previous.finalY + 10;
+
+            const photoWidth = (pageWidth - 2 * margin - 5) / 2;
+            const photoHeight = photoWidth / 1.5;
+            
+            const photoBeforeY = currentY + 5;
+            const photoAfterX = margin + photoWidth + 5;
+
+            pdf.setFontSize(10);
+            pdf.text('SAMPLE PHOTO BEFORE SST', margin, currentY);
+            if (state.before) {
+                const photoBefore = await loadImage(state.before);
+                const imageType = state.before.startsWith('data:image/png') ? 'PNG' : 'JPEG';
+                pdf.addImage(photoBefore, imageType, margin, photoBeforeY, photoWidth, photoHeight, undefined, 'FAST');
+            } else {
+                pdf.rect(margin, photoBeforeY, photoWidth, photoHeight, 'S');
+                pdf.setFontSize(8);
+                pdf.setTextColor(150);
+                pdf.text('No Image Available', margin + photoWidth / 2, photoBeforeY + photoHeight / 2, { align: 'center' });
+                pdf.setTextColor(0);
+            }
+            
+            pdf.text('SAMPLE PHOTO AFTER SST', photoAfterX, currentY);
+            if (state.after) {
+                const photoAfter = await loadImage(state.after);
+                const imageType = state.after.startsWith('data:image/png') ? 'PNG' : 'JPEG';
+                pdf.addImage(photoAfter, imageType, photoAfterX, photoBeforeY, photoWidth, photoHeight, undefined, 'FAST');
+            } else {
+                pdf.rect(photoAfterX, photoBeforeY, photoWidth, photoHeight, 'S');
+                pdf.setFontSize(8);
+                pdf.setTextColor(150);
+                pdf.text('No Image Available', photoAfterX + photoWidth / 2, photoBeforeY + photoHeight / 2, { align: 'center' });
+                pdf.setTextColor(0);
+            }
+            
+            currentY += photoHeight + 15;
+
+            const footerHeight = 25; 
+            const remarkText = v('remark');
+            const splitRemark = pdf.splitTextToSize(`Remark: ${remarkText}`, pageWidth - 2 * margin);
+            const remarkLineHeight = 5; 
+            const remarkHeight = splitRemark.length * remarkLineHeight; 
+            
+            let remarkY = currentY + 5; 
+
+            if (remarkY + remarkHeight > (pageHeight - margin - footerHeight)) {
+                remarkY = pageHeight - margin - footerHeight - remarkHeight - 2; 
+                if (remarkY < currentY + 5) {
+                    remarkY = currentY + 5;
+                }
+            }
+
+
+            pdf.setFontSize(10);
+            pdf.text(splitRemark, margin, remarkY);
+
+            const footerY = pageHeight - margin - 20; 
+
+            pdf.line(margin + 5, footerY, margin + 5 + 70, footerY);
+            pdf.setFontSize(10);
+            pdf.text(`Checked by: ${v('checked')}`, margin + 5, footerY + 5);
+            
+            pdf.line(pageWidth - margin - 5 - 70, footerY, pageWidth - margin - 5, footerY);
+            pdf.text(`Approved by: ${v('approved')}`, pageWidth - margin - 5, footerY + 5, { align: 'right' });
+
+            // Resolve with the PDF blob
+            resolve(pdf.output('blob'));
+
+        } catch (error) {
+            console.error("PDF generation error:", error);
+            reject(error);
+        }
+    });
+  }
   
   function loadImage(src) {
       return new Promise((resolve, reject) => {
@@ -1523,7 +1689,7 @@
     showPage('home'); 
   });
 
-  // --- NEW FUNCTION: SET ALARM ---
+  // --- SST ALARM FUNCTION (Placeholder for PWA Notification) ---
   window.setSSTAlarm = () => {
       const stopDate = $('stopDate').value;
       const stopTime = $('stopTime').value;
@@ -1535,40 +1701,37 @@
           return;
       }
       
-      const label = `SST Complete: ${customer} ${part}`;
-      
-      // The clock tool needs the time in H:M[:S] format. The form uses HH:MM (24-hour).
-      // We will ensure the time is passed correctly to the clock tool.
-      
-      // Since the clock tool is not available in the user's browser environment (JavaScript), 
-      // I will generate the tool call for the AI (me) to set the alarm.
-      console.log(`Setting alarm for: ${stopTime} on ${stopDate} with label: ${label}`);
-      alert(`✅ अलार्म सेट करने के लिए तैयार है। यह ${formatDate(stopDate)} को ${formatTime(stopTime)} पर बजेगा। अब मैं (Assistant) अलार्म सेट कर रहा हूँ।`);
-      
-      // I will now call the tool to set the alarm for the user.
       const [h, m] = stopTime.split(':');
-      const timeForAlarm = `${parseInt(h)}:${m}`; // Convert 24h to simple H:M format (e.g., 09:10 -> 9:10)
+      const [y, mon, d] = stopDate.split('-');
+      // Note: Month in Date constructor is 0-indexed
+      const alarmDateTime = new Date(y, mon - 1, d, h, m, 0);
+      const now = new Date();
 
-      // I will use a separate prompt to the AI to call the clock tool.
-      // In a real device environment, this JS function would directly call the native alarm API.
-      // Since I am the AI, I must now transition to the tool call.
+      if (alarmDateTime < now) {
+          alert("❌ अलार्म सेट नहीं हो सकता, यह समय पहले ही निकल चुका है।");
+          return;
+      }
       
-      // To fulfill the user's request in the most helpful way, I will make the tool call based on the form data.
-      // However, as the form data is only in the user's local browser, I must prompt the user to provide it again
-      // so the clock tool can be used. Since the user can't run the JS in the AI, I must assume the user
-      // has filled the form and is now asking for the alarm.
+      const label = `SST Complete: ${customer} ${part}`;
+      const delay = alarmDateTime.getTime() - now.getTime();
       
-      window.alarmRequestData = { date: stopDate, time: timeForAlarm, label: label };
-      // Instead of an alert, I'll return the tool call to set the alarm.
-      // Since I can't return the tool call from inside this JS function, 
-      // I will ask the user to confirm the details so I can set the alarm in the next step.
+      alert(`✅ अलार्म सेट हो गया है। (${formatDate(stopDate)} को ${formatTime(stopTime)} बजे) - कृपया ऐप/टैब को खुला रखें ताकि यह बजे।`);
+
+      // Simulating the alarm
+      setTimeout(() => {
+          alert(`🔔 ALARM: SST Report (${customer} - ${part}) ${$('sstHrs').value} hours completed!`);
+          console.log(`ALARM FIRED: ${label}`);
+      }, delay);
   }
-  // --- END NEW FUNCTION ---
+  // --- END SST ALARM FUNCTION ---
   
   window.loadReport = loadReport;
   window.deleteReport = deleteReport;
-  window.showPage = showPage; // Expose to global scope for HTML clicks
-  window.setSSTAlarm = setSSTAlarm; // Expose the new function
+  window.showPage = showPage;
+  window.setSSTAlarm = setSSTAlarm; 
+  window.shareViaEmail = shareViaEmail;
+  window.shareViaWhatsapp = shareViaWhatsapp;
+  window.sharePdfViaWebShare = sharePdfViaWebShare; // Expose the new function
 
   $('customer').addEventListener('input', updateSuggestions);
   $('part').addEventListener('input', updateSuggestions);
