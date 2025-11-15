@@ -1,1745 +1,1606 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="hi">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>SST Report Generator</title>
-  <link rel="manifest" href="manifest.json"> 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Job Card / Route Card - Cloud App (PWA) with Full Access</title>
+  
+  <link rel="manifest" href="manifest.json">
   
   <script>
-    // --- HEIC Worker Script Code (Must be inlined for local file access) ---
-    // This is the content of heic2any-worker.js
-    const heicWorkerCode = `
-      self.onmessage = function(a) {
-        var b = a.data.heif;
-        var c = a.data.toType || "image/png";
-        var d = a.data.encoderOptions || .9;
-        var e = a.data.orientation;
-        var f = a.data.canvas;
-
-        // Ensure to handle the toBlob callback properly
-        b.toBlob(function(b) {
-          self.postMessage({
-            heic2any: {
-              success: true,
-              result: b
-            }
-          }, [b]);
-        }, c, d);
-      };
-    `;
-    
-    // Create a Blob URL for the worker script
-    const heicWorkerBlob = new Blob([heicWorkerCode], { type: 'application/javascript' });
-    const HEIC_WORKER_URL = URL.createObjectURL(heicWorkerBlob);
-
-    // --- Main heic2any Library Code (Modified to use the Blob URL) ---
-    /*! heic2any v0.0.15 | MIT License | github.com/alexcorvi/heic2any */
-    (function(){'use strict';function g(a,c,d,b){a=a.target;a.removeEventListener("load",g);a.removeEventListener("error",b);try{a.crossOrigin?c.canvas(a,d,b):c.image(a,d,b)}catch(e){b(e)}}function h(a,c,d,b){a=a.target;a.removeEventListener("load",h);a.removeEventListener("error",b);try{c.video(a,d,b)}catch(e){b(e)}}function k(a){return a.split(";")[0].split("/")[0]}function l(a,c,d, workerUrl){var b=a.getByteCount();if(b>10485760){var e=document.createElement("p");e.innerHTML="\u003cb\u003eHEIC\u003c/b\u003e files with size \u003cb\u003e\u003e 10MB\u003c/b\u003e will take some time to convert and may crash on mobile. Please use a smaller image.";document.body.prepend(e)}var f=document.createElement("canvas");f.width=a.getDisplayWidth();f.height=a.getDisplayHeight();(new Worker(workerUrl,{name:"heic2any"})).postMessage({heif:a,toType:c.toType,encoderOptions:c.encoderOptions||.9,orientation:c.orientation,canvas:f},{transfer:[f.getContext("bitmaprenderer").canvas]})}var m;m=m||function(a,c){function d(e){try{if(e=e.target,e.removeEventListener("error",d),e.result instanceof ArrayBuffer)for(var a=new Uint8Array(e.result),c=[],b=0;b<a.length;b++)c.push(String.fromCharCode(a[b]));var f=a.slice(0,12),g=(new DataView(f.buffer.slice(f.byteOffset))).getUint32(0);if(1185122605===g)return void m(e.result,function(a){if(a.length)for(var d=0;d<a.length;d++){var e=a[d];if(e.getMimeType().match(/^image\/avif/)&&(b=document.createElement("video"),b.src=URL.createObjectURL(e.getBlob(),!1),b.addEventListener("load",h),b.addEventListener("error",c),void 0===b.load().catch(c)))return}c("No AVIF image found")},c,b);if(1212879940===g)return void n(e.result,function(a){if(a.length)for(var d=0;d<a.length;d++){var e=a[d];if(e.getMimeType().match(/^image\/heif/)){b=document.createElement("video");b.src=URL.createObjectURL(e.getBlob(),!1);b.addEventListener("loadedmetadata",function(){var a=e.getPrimaryItem();a=a&&a.getMetadata&&a.getMetadata().getOrientation();b.addEventListener("load",h);b.addEventListener("error",c);if(void 0===b.load().catch(c))return},!1);return}}c("No HEIF image found")},c,b);if(1414441029===g)return void n(e.result,function(a){if(a.length)for(var d=0;d<a.length;d++){var e=a[d];if(e.getMimeType().match(/^image\/heic/)){b=document.createElement("video");b.src=URL.createObjectURL(e.getBlob(),!1);b.addEventListener("loadedmetadata",function(){var a=e.getPrimaryItem();a=a&&a.getMetadata&&a.getMetadata().getOrientation();b.addEventListener("load",h);b.addEventListener("error",c);if(void 0===b.load().catch(c))return},!1);return}}c("No HEIC image found")},c,b);if(1314332263===g)return void o(e.result,function(a){if(a.length)for(var d=0;d<a.length;d++){var e=a[d];if(e.getMimeType().match(/^image\/(heif|heic|avif)/))return b=document.createElement("img"),b.src=URL.createObjectURL(e.getBlob(),!1),b.addEventListener("load",g),b.addEventListener("error",c),void 0===b.load().catch(c)}c("No image found")},c,b);c("Unrecognized file type")}catch(f){c(f)}}var b=a.getMetadata&&a.getMetadata().getOrientation();var e=new FileReader;e.addEventListener("load",d,!1);e.addEventListener("error",c,!1);e.readAsArrayBuffer(a)};function p(a){return new Promise(function(c,d){try{m(a,function(b){c(Array.isArray(b)?b:[b])},d,a)}catch(b){d(b)}})}var q;q=function(a,c,d,b){a.width=a.videoWidth;a.height=a.videoHeight;var e=document.createElement("canvas");e.width=a.videoWidth;e.height=a.videoHeight;e.getContext("2d").drawImage(a,0,0,a.videoWidth,a.videoHeight);a=e.toDataURL(c,d);e=a.split(",")[0].split(":")[1].split(";")[0];a=a.split(",")[1];b(new Blob([Uint8Array.from(atob(a),function(a){return a.charCodeAt(0)})],{type:e}))};function r(a,c,d){return new Promise(function(b,e){try{if(k(a.type).match(/^(heic|heif|avif)/)){var f=a.getPrimaryItem();f&&f.getMetadata&&f.getMetadata().getOrientation();l(a,c,d,d)}else{var h=document.createElement("img");h.src=URL.createObjectURL(a.getBlob(),!1);h.addEventListener("load",g);h.addEventListener("error",e);h.crossOrigin=c.crossOrigin||!1;if(void 0===h.load().catch(e))return}window.addEventListener("message",function(a){try{if(a.data.heic2any){var c=a.data.heic2any;c.success?b(c.result):e(c.error)}}catch(d){e(d)}},!1)}catch(f){e(f)}})}window.heic2any=function(a){return Array.isArray(a.blob)?Promise.all(a.blob.map(function(c){return p(c).then(function(c){return Promise.all(c.map(function(c){return r(c,a,HEIC_WORKER_URL)}))})})).then(function(a){return a.flat(Infinity)}):p(a.blob).then(function(c){return Promise.all(c.map(function(c){return r(c,a,HEIC_WORKER_URL)}))})};})();
-    
-    // Fallback for jspdf-autotable's missing font warning
-    if (typeof jspdf !== 'undefined' && jspdf.jsPDF && !jspdf.jsPDF.existsFile) {
-        jspdf.jsPDF.existsFile = function() { return false; }; 
-    }
-  </script>
-
-<script>
-  // PWA Service Worker Registration (assuming you have service-worker.js and manifest.json)
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./service-worker.js').then(registration => {
-        console.log('SW registered: ', registration);
-      }).catch(registrationError => {
-        console.log('SW registration failed: ', registrationError);
-      });
-    });
-  }
-</script>
-  <style>
-    /* --- CSS Code (Same as before) --- */
-    :root {
-      --primary: #1e40af;
-      --secondary: #60a5fa;
-      --text-dark: #1f2937;
-      --text-light: #4b5563;
-      --bg-light: #f3f4f6;
-      --white: #ffffff;
-      --border: #e5e7eb;
-    }
-
-    * {
-      box-sizing: border-box;
-      font-family: 'Roboto', sans-serif;
-    }
-
-    body {
-      margin: 0;
-      background-color: var(--bg-light);
-      color: var(--text-dark);
-      /* user-select for disabling selection on mobile PWA */
-      -webkit-user-select: none; 
-      -moz-user-select: none;
-      -ms-user-select: none;
-      user-select: none;
-    }
-
-    .wrap {
-      max-width: 1200px;
-      margin: auto;
-      padding: 16px 16px 40px;
-    }
-
-    h1 {
-      font-size: 28px;
-      font-weight: 700;
-      color: var(--primary);
-      margin: 8px 0 24px;
-      text-align: center;
-      cursor: pointer;
-    }
-
-    /* --- Home Page Styles --- */
-    .home-container {
-        display: flex;
-        flex-direction: column;
-        gap: 20px;
-        padding: 20px;
-        background-color: var(--white);
-        border-radius: 16px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-    }
-    .home-header {
-        border-bottom: 2px solid var(--border);
-        padding-bottom: 15px;
-        margin-bottom: 10px;
-    }
-    .home-header h2 {
-        margin: 0;
-        font-size: 22px;
-        color: var(--primary);
-    }
-    .home-buttons {
-        display: flex;
-        gap: 15px;
-        flex-wrap: wrap;
-    }
-    .home-btn {
-        padding: 15px 25px;
-        font-size: 18px;
-        font-weight: 700;
-        border-radius: 12px;
-        text-align: center;
-    }
-    .customer-list h3 {
-        font-size: 18px;
-        border-bottom: 1px solid var(--border);
-        padding-bottom: 10px;
-        margin-top: 25px;
-    }
-    .customer-folder {
-        background-color: var(--bg-light);
-        padding: 15px;
-        border-radius: 8px;
-        margin-bottom: 10px;
-        cursor: pointer;
-        transition: background-color 0.2s;
-    }
-    .customer-folder:hover {
-        background-color: #e5e7eb;
-    }
-    .customer-folder-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-    .customer-folder-header strong {
-        font-size: 16px;
-        font-weight: 700;
-        color: var(--text-dark);
-        display: flex;
-        align-items: center;
-        gap: 8px;
-    }
-    .report-list {
-        list-style: none;
-        padding: 0;
-        margin: 10px 0 0 20px;
-        border-left: 2px solid var(--border);
-    }
-    .report-list li {
-        padding: 8px 10px;
-        cursor: pointer;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        transition: background-color 0.2s;
-        margin-left: -20px;
-        padding-left: 20px;
-        border-radius: 4px;
-    }
-    .report-list li:hover {
-        background-color: var(--white);
-    }
-    .report-list .delete-btn {
-        color: #ef4444;
-        font-size: 12px;
-        font-weight: 500;
-        cursor: pointer;
-        opacity: 0.8;
-    }
-    .report-list .delete-btn:hover {
-        opacity: 1;
-    }
-    .no-reports {
-        text-align: center;
-        color: var(--text-light);
-        padding: 20px;
-    }
-    /* --- Home Page Styles End --- */
-
-    .grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 24px;
-    }
-
-    @media (min-width: 960px) {
-      .grid {
-        grid-template-columns: 420px 1fr;
-      }
-    }
-
-    .card {
-      background-color: var(--white);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-      overflow: hidden;
-    }
-
-    .card h2 {
-      font-size: 20px;
-      font-weight: 600;
-      margin: 0;
-      padding: 16px 20px;
-      background-color: var(--bg-light);
-      border-bottom: 1px solid var(--border);
-    }
-
-    .card .body {
-      padding: 20px;
-    }
-
-    label {
-      display: block;
-      font-size: 13px;
-      font-weight: 500;
-      margin-top: 14px;
-      margin-bottom: 6px;
-      color: var(--text-light);
-    }
-
-    input, textarea, select {
-      width: 100%;
-      padding: 12px 16px;
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      font-size: 15px;
-      outline: none;
-      transition: border-color 0.3s, box-shadow 0.3s;
-    }
-    
-    input[readonly], textarea[readonly] {
-      background-color: #f0f0f0;
-      cursor: not-allowed;
-      border-color: #e5e7eb;
-    }
-
-    input:not([readonly]):focus, textarea:not([readonly]):focus, select:focus {
-      border-color: var(--secondary);
-      box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.25);
-    }
-
-    textarea {
-      min-height: 100px;
-      resize: vertical;
-    }
-
-    .row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-    }
-
-    .row .input-container {
-      position: relative;
-    }
-
-    .suggestions {
-      position: absolute;
-      top: 100%;
-      left: 0;
-      right: 0;
-      background-color: var(--white);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      max-height: 150px;
-      overflow-y: auto;
-      z-index: 10;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-    }
-
-    .suggestions div {
-      padding: 10px 16px;
-      cursor: pointer;
-      font-size: 14px;
-    }
-
-    .suggestions div:hover {
-      background-color: var(--bg-light);
-    }
-
-    .btn {
-      display: inline-block;
-      background-color: var(--primary);
-      color: var(--white);
-      border: none;
-      padding: 14px 20px;
-      border-radius: 12px;
-      cursor: pointer;
-      font-weight: 600;
-      font-size: 16px;
-      transition: background-color 0.3s, transform 0.1s;
-    }
-
-    .btn:hover {
-      background-color: #1e3a8a;
-    }
-
-    .btn:active {
-      transform: translateY(1px);
-    }
-
-    .btn:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-      transform: none;
-    }
-
-    .btn-secondary {
-        background-color: var(--text-light);
-    }
-    .btn-secondary:hover {
-        background-color: var(--text-dark);
-    }
-
-    .btn-group {
-      margin-top: 20px;
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
-
-    /* A4 preview */
-    .a4-wrapper {
-      padding: 20px;
-      overflow: hidden;
-      display: flex;
-      justify-content: center;
-    }
-
-    .a4 {
-      width: 794px; /* A4 width in pixels at 96 DPI */
-      min-height: 1123px; /* A4 height in pixels at 96 DPI */
-      background-color: var(--white);
-      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .report-content {
-      border: 3px solid #000;
-      padding: 30px;
-      width: 100%;
-      height: 100%;
-      box-sizing: border-box;
-    }
-
-    /* Mobile styles for the preview card */
-    @media (max-width: 959px) {
-      .card.preview-card .body {
-        padding: 0;
-      }
-      .a4-wrapper {
-        padding: 16px;
-      }
-      .a4 {
-        margin: 0;
-        min-height: unset;
-        box-shadow: none;
-        width: 100%;
-        overflow-x: hidden;
-        
-        /* Scaling the A4 content to fit the screen */
-        transform-origin: top center;
-        transform: scale(calc((100vw - 32px) / 794)); /* 32px is total horizontal padding */
-      }
-    }
-
-    .hdr {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 20px;
-      border-bottom: 2px solid #000;
-      padding-bottom: 12px;
-      margin-bottom: 20px;
-    }
-
-    .logo {
-      width: 70px;
-      height: 70px;
-      object-fit: contain;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 4px;
-    }
-
-    .hdr-text {
-      flex-grow: 1;
-      text-align: left;
-    }
-
-    .hdr-text div {
-      font-size: 14px;
-      font-weight: 500;
-    }
-
-    .hdr-text .title {
-      font-weight: bold;
-      font-size: 20px;
-      margin-top: 6px;
-      color: var(--primary);
-    }
-
-    .hdr-info {
-      font-size: 12px;
-      border: 1px solid #000;
-      padding: 8px 10px;
-      border-radius: 8px;
-      text-align: right;
-    }
-
-    .hdr-info div {
-      white-space: nowrap;
-    }
-
-    .boxtbl {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 15px;
-      font-size: 13px;
-    }
-
-    .boxtbl td {
-      border: 1px solid #000;
-      padding: 10px 8px;
-      vertical-align: top;
-    }
-
-    .boxtbl .lbl {
-      font-weight: 600;
-      width: 180px;
-      text-align: left;
-      background-color: #f0f0f0;
-    }
-
-    .boxtbl td:nth-child(2), .boxtbl td:nth-child(4) {
-      font-weight: 500;
-      text-align: center;
-    }
-
-    .photos {
-      display: flex;
-      flex-direction: row;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: 20px;
-      margin-top: 20px;
-    }
-
-    @media (max-width: 767px) {
-        .photos {
-            flex-direction: column;
-            align-items: center;
-            gap: 15px;
+    // 🔒 SECURITY Enhancement: Disable Right Click and Developer Tools Access
+    document.addEventListener('contextmenu', event => event.preventDefault()); // Right Click Disable
+    document.onkeydown = function(e) {
+        // F12 (123) और Ctrl+Shift+I/C/J/K को ब्लॉक करता है
+        if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'C' || e.key === 'J' || e.key === 'K'))) {
+            return false;
         }
+        // Ctrl+U (View Source) को ब्लॉक करता है
+        if (e.ctrlKey && e.key === 'u') {
+            return false;
+        }
+    };
+  </script>
+  
+  <script type="module">
+        // --- FIREBASE CONFIGURATION ---
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js';
+        import { getFirestore, collection, doc, setDoc, getDocs, deleteDoc, query, where } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
+        
+        const firebaseConfig = {
+            apiKey: "AIzaSyAaQoa6pSF7ZEPne6BYT8V7l6OslHPTYjw",
+            authDomain: "jobcard-app-7b99c.firebaseapp.com",
+            projectId: "jobcard-app-7b99c",
+            storageBucket: "jobcard-app-7b99c.firebasestorage.app",
+            messagingSenderId: "36117182109",
+            appId: "1:36117182109:web:3007d2193063100d3c4674"
+        };
+        
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        window.db = getFirestore(app);
+        window.auth = getAuth(app); 
+
+        // 🛑 RBAC REMOVED: Assume full access for any logged-in user
+        let currentUserRole = 'admin'; 
+        let currentView = 'home'; 
+
+        // --- Full Access Control Function (SIMPLIFIED) ---
+        // 🛠️ FIX: Defining globally to resolve 'is not defined' error.
+        window.updateActionButtons = function(reportData) {
+            // FIX: Check if we have a valid uniqueId that is not a temporary NEW_ one.
+            const isReportLoaded = reportData && reportData.uniqueId && !reportData.uniqueId.startsWith('NEW_');
+            const isCompleted = document.getElementById('statusField')?.value === 'Completed';
+            
+            // 🔓 All actions enabled for logged-in users (since role is 'admin' or logged_out)
+            const isLoggedIn = currentUserRole !== 'logged_out';
+
+            document.getElementById('saveReport').disabled = !isLoggedIn;
+            document.getElementById('deleteReport').disabled = !(isLoggedIn && isReportLoaded);
+            document.getElementById('completeReportBtn').disabled = !(isReportLoaded && isLoggedIn && !isCompleted);
+
+            // FORM Inputs: All inputs enabled if logged in
+            document.querySelectorAll('.form input, .form select, .form button:not(#loginButton, #signUpButton, #logoutButton, #homeViewBtn, #formViewBtn, #newJobFromHome)').forEach(el => {
+                el.disabled = !isLoggedIn;
+            });
+
+            document.getElementById('applyBtn').disabled = !isLoggedIn;
+            document.getElementById('updateOpsBtn').disabled = !isLoggedIn;
+
+            // FIX: Check reportData.uniqueId for display
+            document.getElementById('currentReportId').textContent = `Active ID: ${reportData && reportData.uniqueId ? (reportData.uniqueId.startsWith('NEW') ? '-- New --' : reportData.uniqueId) : '-- New --'}`;
+            
+            if (isReportLoaded && isLoggedIn) {
+                document.getElementById('saveReport').textContent = '💾 Update Report';
+            } else if (isLoggedIn) {
+                document.getElementById('saveReport').textContent = '💾 Save New Report';
+            } else {
+                 document.getElementById('saveReport').textContent = '⚠️ Log In to Save';
+            }
+        };
+
+        // --- AUTHENTICATION & CLOUD FUNCTIONS ---
+        window.handleAuthAction = async (actionType) => {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            if (actionType !== 'logout' && (!email || !password)) {
+                alert("कृपया ईमेल और पासवर्ड डालें।");
+                return;
+            }
+
+            try {
+                if (actionType === 'signup') {
+                    // Simplified: Just create user in Auth, no Firestore doc needed now
+                    await createUserWithEmailAndPassword(window.auth, email, password);
+                    alert(`✅ Signed Up and Logged In as ${email}. Full access enabled.`);
+                } else if (actionType === 'signin') {
+                    await signInWithEmailAndPassword(window.auth, email, password);
+                    alert(`✅ Signed In as ${email}.`);
+                } else if (actionType === 'logout') {
+                    await signOut(window.auth);
+                    alert("👋 Logged Out successfully!");
+                }
+            } catch (error) {
+                alert(`❌ Auth Failed: ${error.message}`);
+            }
+        };
+
+        window.updateAuthUI = async (user) => {
+            const loggedOutUI = document.getElementById('loggedOutUI');
+            const loggedInUI = document.getElementById('loggedInUI');
+            const authStatus = document.getElementById('authStatus');
+            const userEmailDisplay = document.getElementById('userEmailDisplay');
+            
+            if (user) {
+                loggedOutUI.style.display = 'none';
+                loggedInUI.style.display = 'flex';
+                
+                // 🛑 RBAC REMOVED: Set role to 'admin' (full access) if logged in
+                currentUserRole = 'admin'; 
+                userEmailDisplay.textContent = `User: ${user.email} | Role: FULL ACCESS`;
+                
+                authStatus.textContent = `Status: Logged In (Cloud Active)`;
+                authStatus.style.color = '#059669';
+                
+                showView('home');
+                
+            } else {
+                // Logged Out State
+                loggedOutUI.style.display = 'flex';
+                loggedInUI.style.display = 'none';
+                authStatus.textContent = "Status: Logged Out (Cloud Disabled)";
+                authStatus.style.color = '#dc2626';
+                currentUserRole = 'logged_out';
+            }
+            
+            // Check if active report ID is set, if not pass null
+            const activeData = currentActiveReportId ? getFormData() : null;
+            window.updateActionButtons(activeData);
+        };
+
+        onAuthStateChanged(window.auth, (user) => {
+            window.updateAuthUI(user);
+        });
+        
+        window.cloudSaveReport = async (data, docId) => {
+            if (!window.auth.currentUser) throw new Error("User not logged in.");
+            const record = {
+                ...data, 
+                timestamp: data.timestamp || new Date().toISOString(), // Preserve original timestamp if exists
+                savedBy: window.auth.currentUser.email,
+                updatedAt: new Date().toISOString(), 
+                status: data.status || 'Running' 
+            };
+             await setDoc(doc(window.db, 'job_cards', docId), record); 
+        };
+        
+        window.cloudLoadReports = async (queryTerm = '', statusFilter = 'Running') => {
+            if (!window.auth.currentUser) return [];
+            const reports = [];
+            let qRef = collection(window.db, 'job_cards');
+            
+            let q = query(qRef, where("status", "==", statusFilter));
+
+            const querySnapshot = await getDocs(q);
+            
+            querySnapshot.forEach((doc) => {
+                const data = doc.data();
+                data.uniqueId = doc.id; 
+                
+                const searchString = `${data.challan} ${data.batchNo} ${data.customerName} ${data.partDesc} ${data.uniqueId}`.toLowerCase();
+                if (!queryTerm || searchString.includes(queryTerm.toLowerCase())) {
+                    reports.push(data);
+                }
+            });
+
+            // reports को updatedAt के आधार पर छाँटें (नवीनतम पहले)
+            return reports.sort((a,b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+        };
+
+        window.cloudDeleteReport = async (docId) => {
+            if (!window.auth.currentUser) throw new Error("User not logged in.");
+            // 🛑 RBAC REMOVED: Any logged-in user can delete
+            await deleteDoc(doc(window.db, 'job_cards', docId));
+        };
+
+        // --- NEW VIEW SWITCHING LOGIC (UNCHANGED) ---
+        function showView(view) {
+            const homePanel = document.getElementById('homePanel');
+            const formPanel = document.querySelector('.form');
+            const previewPanel = document.querySelector('.preview-wrap');
+            const homeViewBtn = document.getElementById('homeViewBtn');
+            const formViewBtn = document.getElementById('formViewBtn');
+        
+            currentView = view;
+            
+            if (view === 'home') {
+                homePanel.style.display = 'flex';
+                formPanel.style.display = 'none';
+                previewPanel.style.display = 'none';
+                homeViewBtn.style.display = 'none';
+                formViewBtn.style.display = 'block';
+                if (window.auth.currentUser) {
+                    window.loadReportsList('', 'Running'); 
+                    window.loadReportsList('', 'Completed'); 
+                }
+            } else { 
+                formPanel.style.display = 'block';
+                previewPanel.style.display = 'flex';
+                homePanel.style.display = 'none';
+                homeViewBtn.style.display = 'block';
+                formViewBtn.style.display = 'none';
+            }
+        }
+        window.showView = showView; 
+        
+    </script>
+    
+  <style>
+    /* ------------------- STYLES: UPDATED FOR 5MM/18MM HEIGHT ------------------- */
+    body { font-family: Arial, sans-serif; margin: 12px; background:#f5f5f5; font-size: 14px; }
+    .container { display: flex; gap: 12px; min-height: 85vh; }
+    .panel { background: white; padding: 12px; border-radius:8px; box-shadow:0 2px 6px rgba(0,0,0,.08); }
+    .form { width: 36%; max-width:420px; overflow-y:auto; height:85vh; flex-shrink: 0; } 
+    .preview-wrap { width: 64%; display:flex; flex-direction:column; gap:8px; align-items:center; flex-grow: 1; min-width: 300px; }
+    .preview { 
+        width:100%; 
+        max-width:210mm; 
+        height: auto; 
+        min-height: 297mm; 
+        background:white; 
+        box-shadow:0 2px 8px rgba(0,0,0,.12); 
+        padding:12mm; 
+        box-sizing:border-box; 
+        overflow-x: auto; 
+        font-size: 10px; 
+    } 
+    h2 { text-align:center; margin:0 0 8px 0; font-size:18px; }
+    label { display:block; font-size:13px; margin-top:8px; }
+    input[type="text"], input[type="date"], input[type="email"], select { width:100%; padding:6px 8px; margin-top:4px; box-sizing:border-box; border: 1px solid #ccc; border-radius: 4px; }
+    .top-grid { display:flex; gap:8px; }
+    .top-grid > div { flex:1; }
+    .actions { display:flex; gap:8px; margin-top:8px; }
+    button { padding:8px 10px; border: none; background:#2563eb; color:white; border-radius:6px; cursor:pointer; font-size: 14px;}
+    button.secondary { background:#6b7280; }
+    button.delete-btn { background:#dc2626; } 
+    button.pdf-btn { background:#f97316; }
+    button.print-btn { background:#059669; }
+    button:disabled { background:#9ca3af; cursor: not-allowed; }
+    .note { font-size:12px; color:#666; margin-top:8px; }
+    
+    table { 
+        width:100%; 
+        border-collapse: collapse; 
+        table-layout: fixed; 
+    }
+    table th, table td { 
+        border:1px solid #444; 
+        padding: 4px 6px; 
+        text-align:left; 
+        vertical-align:top; 
+        line-height: 1.4; 
+    } 
+    
+    /* Column 4 (Observation) should be smaller now */
+    #pvTable td:nth-child(5) { 
+        font-size: 9px; 
+        line-height: 1.2;
     }
 
-    .ph {
-      width: 100%;
-      max-width: 350px;
-      aspect-ratio: 1.5; /* Maintain aspect ratio */
-      border: 2px solid #000;
-      position: relative;
-      overflow: hidden;
-      border-radius: 10px;
-      background-color: var(--bg-light);
-      display: flex;
-      justify-content: center;
-      align-items: center;
+    .rows-input { 
+        margin-top:8px; 
+        border:1px solid #ddd; 
+        padding:6px; 
+        border-radius:6px; 
+        background: #fcfcfc; 
     }
     
-    .ph img {
-      width: 100%;
-      height: 100%;
-      object-fit: contain; /* This will prevent images from being cut off */
+    .row-group { border: 1px solid #eee; padding: 8px; margin-bottom: 10px; border-radius: 4px; background: #fff; }
+    .row-header { font-weight: bold; margin-bottom: 6px; font-size: 13px; display: flex; justify-content: space-between; align-items: center; background: #f9f9f9; padding: 4px; border-radius: 4px; }
+    .row-detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 6px; }
+    .observation-fields { 
+        border-top: 1px dashed #ddd; 
+        padding-top: 8px; 
+        margin-top: 8px; 
+        display: grid; 
+        grid-template-columns: 1fr 1fr; 
+        gap: 6px; 
+    } 
+    .report-search-section { border-bottom: 1px solid #ddd; padding-bottom: 10px; margin-bottom: 10px; }
+    .search-area { display: flex; gap: 8px; margin-bottom: 8px; }
+    .report-list-container { max-height: 150px; overflow-y: auto; border: 1px solid #ddd; border-radius: 4px; margin-bottom: 8px; }
+    
+    /* --- New Styles for Customer/Month Grouping in Home View --- */
+    .customer-group, .month-group {
+        border: 1px solid #e5e7eb; /* light gray border */
+        margin-bottom: 10px;
+        border-radius: 6px;
+        overflow: hidden;
     }
-
-    .photo-caption {
-      text-align: center;
-      font-weight: 600;
-      font-size: 14px;
-      margin: 8px 0;
-      color: var(--text-dark);
+    .customer-header, .month-header {
+        background: #f3f4f6; /* very light gray background */
+        padding: 8px 10px;
+        font-weight: bold;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        transition: background-color 0.2s;
+        font-size: 14px;
+        color: #1f2937;
+        user-select: none; /* Prevent text selection on click */
     }
-
-    .muted {
-      font-size: 14px;
-      margin-top: 20px;
-      text-align: left;
-      font-weight: 500;
+    .month-header {
+        background: #f9fafb; /* slightly lighter for month */
+        padding-left: 20px;
+        font-size: 13px;
     }
-
-    .foot {
-      display: flex;
-      justify-content: space-between;
-      margin-top: 40px;
-      font-size: 14px;
+    .customer-header:hover, .month-header:hover {
+        background: #e5e7eb;
     }
+    .report-list-item {
+        padding: 6px 15px 6px 30px; /* Indentation for item */
+        border-bottom: 1px dashed #eee;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        transition: background-color 0.2s;
+        font-size: 13px;
+        background: white;
+    }
+    .report-list-item:hover {
+        background: #f7f7f7;
+    }
+    .report-list-item.selected { 
+        background: #dbeafe; 
+        font-weight: bold; 
+        border-left: 3px solid #2563eb; 
+        padding-left: 27px;
+    }
+    .folder-content {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease-out;
+    }
+    .folder-content.expanded {
+        max-height: 2000px; /* Enough height for expansion */
+        transition: max-height 0.5s ease-in;
+    }
+    /* Arrow rotation for folder icon */
+    .toggle-icon {
+        transition: transform 0.3s;
+    }
+    .toggle-icon.expanded {
+        transform: rotate(90deg);
+    }
+    /* Hide the original list item styles (in case of conflict) */
+    .report-item {
+        display: none !important;
+    }
+    
+    /* End of New Styles for Customer/Month Grouping */
 
-    .foot div {
-      border-top: 1px solid #000;
-      padding-top: 8px;
-      width: 45%;
-      text-align: center;
+
+    .full-width-grid { grid-template-columns: 1fr; } 
+    .operator-supervisor-grid { 
+        display: grid; 
+        grid-template-columns: 1fr; 
+        gap: 6px; 
+        border-top: 1px dashed #ddd; 
+        padding-top: 8px; 
+        margin-top: 8px; 
+    }
+    .auth-bar {
+        background-color: #f0f8ff;
+        padding: 8px 12px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        margin-bottom: 12px;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+    }
+    .auth-bar input { padding: 4px 6px; border: 1px solid #999; border-radius: 3px; margin-right: 5px; width: 140px; }
+    .auth-bar button { padding: 4px 8px; margin-left: 5px; cursor: pointer; border: none; border-radius: 3px; font-weight: bold; font-size: 13px; }
+    .auth-status-text { font-weight: bold; margin-right: 10px; font-size: 14px; }
+    .auth-controls { display: flex; align-items: center; flex-wrap: wrap; }
+    
+    .inspection-codes-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr 1fr; 
+        gap: 5px;
+        margin-top: 10px;
+        margin-bottom: 10px;
+    }
+    .inspection-codes-grid > div {
+        text-align: center;
+        border: 1px solid #ccc;
+        padding: 5px;
+        font-size: 10px;
+        line-height: 1;
+        background: #fcfcfc;
+    }
+    
+    .hide-inspection { display: none; } 
+    
+    @media (max-width: 900px) {
+        .container { flex-direction: column; }
+        .form { width: 100%; max-width: none; height: auto; order: 1; }
+        .preview-wrap { width: 100%; order: 2; align-items: stretch; }
+        .preview { min-height: 200px; padding: 5px; box-shadow: none; overflow-x: auto; }
+        .preview table { min-width: 1000px; } 
+        .auth-bar { flex-direction: column; align-items: stretch; }
+        .auth-controls { justify-content: center; margin-top: 8px; }
+        .auth-bar input { width: calc(50% - 10px); margin: 5px; }
+        .auth-bar button { width: auto; margin: 5px; }
+        
+        #homePanel { height: auto !important; }
+    }
+    @media print {
+        body * { visibility: hidden; }
+        .preview, .preview * { visibility: visible; }
+        .preview { 
+            position: absolute; 
+            left:0; 
+            top:0; 
+            box-shadow:none; 
+            width: 210mm; 
+            height: auto; 
+            padding: 12mm; 
+            margin: 0; 
+            overflow: hidden; 
+            font-size: 9.5px; 
+        }
+        .preview table { min-width: 100%; }
+        .preview table th, .preview table td { 
+            padding: 4px 5px; 
+            line-height: 1.4; 
+        } 
+        /* Ensure Observation column has appropriate styles if needed */
+        #pvTable td:nth-child(5) { font-size: 9px; } 
     }
   </style>
-  
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
 </head>
 <body>
-  <div class="wrap">
-    <h1 onclick="showPage('home')">🧪 SST Report Generator (Single HTML)</h1>
-
-    <div id="homePage" class="content-page" style="display: none;">
-        <div class="home-container">
-            <div class="home-header">
-                <h2>📊 सेव्ड रिपोर्ट्स और नया रिपोर्ट</h2>
-            </div>
-            <div class="home-buttons">
-                <button class="btn home-btn" onclick="clearForm(); showPage('generator')">➕ नया SST रिपोर्ट बनाएँ</button>
-            </div>
-            <div class="customer-list">
-                <h3>रिपोर्ट फ़ोल्डर (स्टेटस के अनुसार)</h3>
-                <div id="customerFolders">
-                    </div>
-            </div>
-        </div>
+    
+  <div class="auth-bar">
+    <div id="loggedOutUI" class="auth-controls">
+        <span class="auth-status-text" id="authStatus" style="color: #dc2626;">Status: Logged Out (Cloud Disabled)</span>
+        <input type="email" id="loginEmail" placeholder="Email" value="test@jobcard.com">
+        <input type="password" id="loginPassword" placeholder="Password" value="password123">
+        <button id="loginButton" style="background-color: #3f51b5; color: white;" onclick="handleAuthAction('signin')">Sign In</button>
+        <button id="signUpButton" style="background-color: #059669; color: white;" onclick="handleAuthAction('signup')">Sign Up</button>
     </div>
-    <div id="generatorPage" class="content-page" style="display: none;">
-        <div class="grid">
-            <div class="card">
-                <h2>फ़ॉर्म भरें</h2>
-                <div class="body">
-                    <div class="row">
-                        <div>
-                            <label>Company</label>
-                            <input id="company" value="WELLCOAT TECH" readonly/>
-                        </div>
-                        <div>
-                            <label>Logo (optional)</label>
-                            <input id="logo" type="file" accept="image/*"/>
-                        </div>
-                    </div>
+    
+    <div id="loggedInUI" class="auth-controls" style="display: none;">
+        <span class="auth-status-text" id="userEmailDisplay" style="color: #059669;"></span>
+        <button id="logoutButton" style="background-color: #f97316; color: white;" onclick="handleAuthAction('logout')">Log Out</button>
+    </div>
+  </div>
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px; flex-wrap: wrap;">
+    <h1 style="font-size:18px;margin:0 0 5px 0;">Job Card / Route Card — Cloud PWA System (Full Access)</h1>
+    <div class="actions" style="width: auto; align-items: center; flex-wrap: wrap;">
+      <button id="homeViewBtn" class="secondary" style="background:#5a67d8;">🏠 Home / Job Folders</button> 
+      <button id="formViewBtn" class="secondary" style="background:#2563eb; display:none;">📝 Go to Job Card Form</button> 
+      <span id="currentReportId" style="font-size:14px; color:#666; margin-right: 15px;">Active ID: -- New --</span>
+      <button id="downloadPdfBtn" class="pdf-btn">⬇️ Download PDF (Auto Height)</button>
+      <button id="printBtn" class="print-btn">🖨️ Print Job Card (Screen View)</button>
+    </div>
+  </div>
 
-                    <label>Report Title</label>
-                    <input id="title" value="NEUTRAL SALT SPRAY TEST REPORT" readonly/>
-                    <label>Sub‑Title</label>
-                    <input id="subtitle" value="(TEST CONDUCTED AS PER ASTM B 117)" readonly/>
-
-                    <div class="row">
-                        <div><label>DOC NO</label><input id="docNo" value="DOC NO:014" readonly/></div>
-                        <div><label>REV NO</label><input id="revNo" value="REV.NO:00" readonly/></div>
-                    </div>
-                    <div class="row">
-                        <div><label>REV DATE</label><input id="revDate" value="01.09.2024" readonly/></div>
-                        <div><label>TC Date</label><input id="tcDate" readonly/></div>
-                    </div>
-                    
-                    <div class="row">
-                        <div>
-                            <label>Report Status</label>
-                            <select id="status">
-                                <option value="Running">Running (चल रहा है)</option>
-                                <option value="Complete">Complete (पूरा हुआ)</option>
-                            </select>
-                        </div>
-                        <div><label>SST Tag No</label><input id="tag" value="03"/></div>
-                    </div>
-                    
-                    <div class="row">
-                        <div><label>Production Batch</label><input id="batch" value="250819"/></div>
-                        <div class="input-container">
-                            <label>Part No/Name</label>
-                            <input id="part" value="LAC09170" list="partsList" autocomplete="off"/>
-                            <datalist id="partsList"></datalist>
-                        </div>
-                    </div>
-                    
-                    <div class="row">
-                        <div class="input-container">
-                            <label>Customer Name</label>
-                            <input id="customer" value="Star Engineering" list="customersList" autocomplete="off"/>
-                            <datalist id="customersList"></datalist>
-                        </div>
-                        <div><label>Coating System</label><input id="coatSys" value="Zinc Al. Flake Coating"/></div>
-                    </div>
-
-                    <div class="row">
-                        <div>
-                            <label>Customer Email ID</label>
-                            <input id="customerEmail" type="email" value="" placeholder="customer@example.com"/>
-                        </div>
-                        <div>
-                            <label>Customer WhatsApp No.</label>
-                            <input id="customerWhatsapp" type="text" value="" placeholder="9876543210"/>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div>
-                            <label>Color</label>
-                            <input id="color" value="SILVER" />
-                        </div>
-                        <div><label>Coating Process</label><input id="process" value="Dip spin coating"/></div>
-                    </div>
-                    <div class="row">
-                        <div><label>No. of Coat</label><input id="coats" value="2 Base (GEOPERT500) | 1 Top (AQUAZINC)"/></div>
-                        <div><label>Coating Thickness</label><input id="thick" value="8–12 MIC"/></div>
-                    </div>
-                    <div class="row">
-                        <div><label>SST Equipment</label><input id="equip" value="Salt Spray Chamber"/></div>
-                        <div><label>Capacity</label><input id="capacity" value=">= 450 L"/></div>
-                    </div>
-                    <div class="row">
-                        <div><label>Water Type</label><input id="water" value="D.I. Water"/></div>
-                        <div><label>Type of Salt</label><input id="salt" value="Lab, Grade NaCl, 5%"/></div>
-                    </div>
-                    <div class="row">
-                        <div><label>Customer Requirement (Hrs)</label><input id="sstHrs" type="number" value="480" min="0" /></div>
-                        <div>
-                            <label>No. of Samples</label><input id="samples" value="2"/>
-                        </div>
-                    </div>
-                    
-                    <div>
-                        <label>Observation for Red Rust</label>
-                        <input id="obs" value="480 Hrs No red rust" />
-                    </div>
-
-                    <div class="row">
-                        <div><label>Loaded Date</label><input id="loadDate" value="2025-09-09" type="date"/></div>
-                        <div><label>Loaded Time</label><input id="loadTime" value="11:06" type="time"/></div>
-                    </div>
-                    <div class="row">
-                        <div><label>Test Stop Date</label><input id="stopDate" value="2025-09-09" type="date" readonly/></div>
-                        <div><label>Test Stop Time</label><input id="stopTime" value="11:10" type="time" readonly/></div>
-                    </div>
-                    
-                    <div class="row">
-                        <div><label>Checked By</label><input id="checked" value="SAKSHI CHAVHAN"/></div>
-                        <div><label>Approved By</label><input id="approved" value="ABHIJEET DHOKRAT"/></div>
-                    </div>
-                    <label>Remark</label>
-                    <textarea id="remark">Sample SST passed 480 Hrs. No red rust found.</textarea>
-                    
-                    <label>Sample Photo (Before) - **कैमरा/फ़ाइल चुनें**</label>
-                    <input id="before" type="file" accept="image/*"/>
-                    
-                    <label>Sample Photo (After) - **कैमरा/फ़ाइल चुनें**</label>
-                    <input id="after" type="file" accept="image/*"/>
-                    
-                    <br>
-                    <div class="btn-group">
-                        <button class="btn" id="btnPdf">Download PDF</button>
-                        <button class="btn btn-secondary" id="btnSave">Save Report</button>
-                        <button class="btn btn-secondary" onclick="setSSTAlarm()">सेट SST अलार्म</button>
-                        
-                        <button class="btn" style="background-color: #007bff;" onclick="shareViaEmail()">✉️ Send Email (No File)</button>
-                        <button class="btn" style="background-color: #25D366;" onclick="shareViaWhatsapp()">💬 Send WhatsApp (No File)</button>
-                        
-                        <button class="btn" style="background-color: #8A2BE2;" onclick="sharePdfViaWebShare()">📲 Share PDF (With Number)</button>
-                        
-                        <button class="btn btn-secondary" onclick="showPage('home')">होम पर वापस</button>
-                    </div>
-                    <div style="font-size:12px; color:#6b7280; margin-top:10px;">
-                        **PDF डाउनलोड करने पर, रिपोर्ट ऑटोमैटिकली सेव हो जाएगी।**
-                    </div>
+  <div class="container">
+    
+    <div id="homePanel" class="panel" style="width:100%; height:85vh; display: none; flex-direction: column; gap: 15px;">
+        <h2 style="font-size: 20px; color:#10b981; margin-bottom: 0;">📋 Job Card Management Home</h2>
+        <div style="display: flex; gap: 15px; flex-grow: 1;">
+            
+            <div style="flex: 1; border: 1px solid #ddd; padding: 10px; border-radius: 6px; background: #fffbe6; display: flex; flex-direction: column;">
+                <h3 style="margin: 0 0 10px 0; color:#f59e0b;">🏃 Running Jobs (Active)</h3>
+                <div class="search-area" style="margin-bottom: 8px;">
+                    <input id="runningSearch" type="text" placeholder="Challan / Part / Customer से खोजें" oninput="loadReportsList(this.value, 'Running')" />
+                    <button onclick="loadReportsList(document.getElementById('runningSearch').value, 'Running')">🔍</button>
+                </div>
+                <div id="runningJobsContainer" class="report-list-container" style="max-height: none; flex-grow: 1; border: none; padding: 0;">
+                    <div style="padding:10px; text-align:center; color:#666;">... Loading Running Jobs ...</div>
+                </div>
+                <div style="margin-top: 10px; text-align: center;">
+                    <button id="newJobFromHome" style="background:#10b981;">➕ Create New Job Card</button>
                 </div>
             </div>
-
-            <div class="card preview-card">
-                <h2>लाइव प्रीव्यू (A4)</h2>
-                <div class="body">
-                    <div id="preview" class="a4-wrapper">
-                        <div class="a4">
-                            <div class="report-content">
-                                </div>
-                        </div>
-                    </div>
+            
+            <div style="flex: 1; border: 1px solid #ddd; padding: 10px; border-radius: 6px; background: #f0fdf4; display: flex; flex-direction: column;">
+                <h3 style="margin: 0 0 10px 0; color:#059669;">✅ Completed Jobs (History)</h3>
+                <div class="search-area" style="margin-bottom: 8px;">
+                    <input id="completedSearch" type="text" placeholder="Challan / Part / Customer से खोजें" oninput="loadReportsList(this.value, 'Completed')" />
+                    <button onclick="loadReportsList(document.getElementById('completedSearch').value, 'Completed')">🔍</button>
+                </div>
+                <div id="completedJobsContainer" class="report-list-container" style="max-height: none; flex-grow: 1; border: none; padding: 0;">
+                    <div style="padding:10px; text-align:center; color:#666;">... Loading Completed Jobs ...</div>
                 </div>
             </div>
         </div>
     </div>
-    </div>
-
-<script>
-  // --- JavaScript Code (Updated for Web Share API and WhatsApp Number) ---
-  
-  // Right-click and keyboard shortcuts are disabled
-  document.addEventListener('contextmenu', event => event.preventDefault());
-  document.addEventListener('keydown', event => {
-    if (event.ctrlKey || event.metaKey) {
-      if (event.key === 'c' || event.key === 'u' || event.key === 's' || event.key === 'i' || event.key === 'j') {
-        event.preventDefault();
-      }
-    }
-  });
-
-  const $ = (id) => document.getElementById(id);
-  const state = { logo: "", before: "", after: "" }; 
-  const inputIds = ['company', 'title', 'subtitle', 'docNo', 'revNo', 'revDate', 'tcDate', 'tag', 'batch', 'part', 'customer', 'customerEmail', 'customerWhatsapp', 'coatSys', 'color', 'process', 'coats', 'thick', 'equip', 'capacity', 'water', 'salt', 'sstHrs', 'loadDate', 'loadTime', 'stopDate', 'stopTime', 'obs', 'samples', 'remark', 'checked', 'approved', 'status'];
-
-  const defaultValues = {
-    company: "WELLCOAT TECH",
-    title: "NEUTRAL SALT SPRAY TEST REPORT",
-    subtitle: "(TEST CONDUCTED AS PER ASTM B 117)",
-    docNo: "DOC NO:014",
-    revNo: "REV.NO:00",
-    revDate: "01.09.2024",
-    tcDate: "",
-    tag: "03",
-    batch: "250819",
-    part: "LAC09170",
-    customer: "Star Engineering",
-    customerEmail: "",
-    customerWhatsapp: "",
-    coatSys: "Zinc Al. Flake Coating",
-    color: "SILVER",
-    process: "Dip spin coating",
-    coats: "2 Base (GEOPERT500) | 1 Top (AQUAZINC)",
-    thick: "8–12 MIC",
-    equip: "Salt Spray Chamber",
-    capacity: ">= 450 L",
-    water: "D.I. Water",
-    salt: "Lab, Grade NaCl, 5%",
-    sstHrs: "480",
-    loadDate: "", 
-    loadTime: "",
-    stopDate: "", 
-    stopTime: "11:10",
-    obs: "480 Hrs No red rust",
-    samples: "2",
-    remark: "Sample SST passed 480 Hrs. No red rust found.",
-    checked: "SAKSHI CHAVHAN",
-    approved: "ABHIJEET DHOKRAT",
-    status: "Running"
-  };
-
-  let usedCustomers = new Set();
-  let usedParts = new Set();
-  let savedReports = [];
-
-  // --- Page Navigation Logic ---
-  function showPage(pageId) {
-    document.querySelectorAll('.content-page').forEach(page => {
-        page.style.display = 'none';
-    });
-    if (pageId === 'home') {
-        $('homePage').style.display = 'flex';
-        renderCustomerFolders();
-    } else if (pageId === 'generator') {
-        $('generatorPage').style.display = 'block';
-    }
-  }
-  // --- End Page Navigation Logic ---
-
-  // Helper functions
-  function formatDate(dateStr) {
-    if (!dateStr) return '';
-    const [year, month, day] = dateStr.split('-');
-    return `${day}.${month}.${year}`;
-  }
-  
-  function formatTime(timeStr) {
-    if (!timeStr) return '';
-    const [hours, minutes] = timeStr.split(':');
-    const hour = parseInt(hours, 10);
-    const ampm = hour >= 12 ? 'pm' : 'am';
-    const formattedHour = hour % 12 === 0 ? 12 : hour % 12;
-    return `${hours}:${minutes} ${ampm}`;
-  }
-
-  document.addEventListener('DOMContentLoaded', () => {
-    const today = new Date();
-    const formattedDateForInput = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
-    
-    inputIds.forEach(id => {
-      const el = $(id);
-      if (el && defaultValues[id] !== undefined) {
-        el.value = defaultValues[id];
-      }
-    });
-
-    $('tcDate').value = formatDate(formattedDateForInput);
-    $('loadDate').value = formattedDateForInput;
-    $('loadTime').value = `${String(today.getHours()).padStart(2, '0')}:${String(today.getMinutes()).padStart(2, '0')}`;
-
-
-    loadInitialReports();
-    loadSuggestions();
-    updateSuggestions();
-    calculateStopDate();
-    render();
-    
-    // **BLANK PAGE FIX:** Ensure the initial page displayed is 'home'
-    showPage('home'); 
-  });
-  
-  function loadSuggestions() {
-    const savedCustomers = JSON.parse(localStorage.getItem('sstCustomers') || '[]');
-    const savedParts = JSON.parse(localStorage.getItem('sstParts') || '[]');
-    savedCustomers.forEach(c => usedCustomers.add(c));
-    savedParts.forEach(p => usedParts.add(p));
-  }
-  
-  function updateSuggestions() {
-    const customerDatalist = $('customersList');
-    customerDatalist.innerHTML = '';
-    usedCustomers.forEach(customer => {
-      const option = document.createElement('option');
-      option.value = customer;
-      customerDatalist.appendChild(option);
-    });
-    
-    const partDatalist = $('partsList');
-    partDatalist.innerHTML = '';
-    usedParts.forEach(part => {
-      const option = document.createElement('option');
-      option.value = part;
-      partDatalist.appendChild(option);
-    });
-  }
-  
-  function calculateStopDate() {
-    const loadDateStr = $('loadDate').value;
-    const loadTimeStr = $('loadTime').value;
-    const sstHours = parseInt($('sstHrs').value, 10);
-
-    if (!loadDateStr || !loadTimeStr || isNaN(sstHours)) {
-      $('stopDate').value = '';
-      $('stopTime').value = '';
-      $('tcDate').value = formatDate(loadDateStr) || '';
-      return;
-    }
-
-    const [year, month, day] = loadDateStr.split('-').map(Number);
-    const [hours, minutes] = loadTimeStr.split(':').map(Number);
-    const startDate = new Date(year, month - 1, day, hours, minutes);
-
-    const endDate = new Date(startDate.getTime() + sstHours * 60 * 60 * 1000);
-
-    const endYear = endDate.getFullYear();
-    const endMonth = String(endDate.getMonth() + 1).padStart(2, '0');
-    const endDay = String(endDate.getDate()).padStart(2, '0');
-    const newStopDate = `${endYear}-${endMonth}-${endDay}`;
-    
-    const endHours = String(endDate.getHours()).padStart(2, '0');
-    const endMinutes = String(endDate.getMinutes()).padStart(2, '0');
-    const newStopTime = `${endHours}:${endMinutes}`;
-
-    $('stopDate').value = newStopDate;
-    $('stopTime').value = newStopTime;
-    $('tcDate').value = formatDate(newStopDate);
-    render();
-  }
-
-  function updateObsText() {
-      const sstHours = $('sstHrs').value;
-      if (sstHours) {
-          $('obs').value = `${sstHours} Hrs No red rust`;
-      } else {
-          $('obs').value = '';
-      }
-      render();
-  }
-
-  function updateRemarkText() {
-      const sstHours = $('sstHrs').value;
-      if (sstHours) {
-          $('remark').value = `Sample SST passed ${sstHours} Hrs. No red rust found.`;
-      } else {
-          $('remark').value = '';
-      }
-      render();
-  }
-
-  function updateCoatInfo() {
-      const color = $('color').value.trim().toUpperCase();
-      const coatsInput = $('coats');
-      if (color === "SILVER") {
-          coatsInput.value = "2 Base (GEOPERT500) | 1 Top (AQUAZINC)";
-      } else if (color === "BLACK") {
-          coatsInput.value = "2 Base (ZINTEC 300 HPA) | 2 Top (TECHDIP HL)";
-      } else {
-          // Keep current value
-      }
-      render();
-  }
-
-  // Function to handle file conversion (especially HEIC)
-  async function fileToDataURL(file) {
-      if (file.type === "image/heic" || file.type === "image/heif" || file.name.toLowerCase().endsWith('.heic') || file.name.toLowerCase().endsWith('.heif')) {
-          
-          try {
-              if (typeof heic2any === 'undefined') {
-                   // This should now be caught by the inlined library, but keeping this check for safety.
-                   throw new Error("heic2any library is not loaded. Internal Error.");
-              }
-
-              const convertedBlob = await heic2any({
-                  blob: file,
-                  toType: "image/jpeg",
-                  quality: 0.9,
-              });
-              
-              const finalBlob = Array.isArray(convertedBlob) ? convertedBlob[0] : convertedBlob;
-              
-              return new Promise((res, rej) => {
-                  const reader = new FileReader();
-                  reader.onload = (e) => res(e.target.result);
-                  reader.onerror = rej;
-                  reader.readAsDataURL(finalBlob);
-              });
-              
-          } catch (error) {
-              console.error("HEIC to JPEG conversion failed:", error);
-              alert("❌ HEIC फ़ाइल को बदलने (Convert) में समस्या हुई। कृपया JPG/PNG फ़ाइल का उपयोग करें। Error: " + error.message);
-              return ""; // Return empty string on failure
-          }
-      } else {
-          // For non-HEIC files
-          return new Promise((res, rej) => {
-              const reader = new FileReader();
-              reader.onload = (e) => res(e.target.result);
-              reader.onerror = rej;
-              reader.readAsDataURL(file);
-          });
-      }
-  }
-  
-  function getFormData() {
-    const data = {};
-    inputIds.forEach(id => {
-      data[id] = $(id).value;
-    });
-    data.logo = state.logo;
-    data.before = state.before;
-    data.after = state.after;
-    return data;
-  }
-
-  function setFormData(data) {
-    // Clear any existing loading state
-    state.logo = state.before = state.after = "";
-
-    inputIds.forEach(id => {
-      const el = $(id);
-      if (el) el.value = data[id] || '';
-    });
-    
-    // Set default status if not present (for old reports)
-    if (!data.status && $('status')) {
-        $('status').value = 'Running';
-    }
-
-    // Re-set image data
-    state.logo = data.logo || "";
-    state.before = data.before || "";
-    state.after = data.after || "";
-    
-    // Clear file inputs so the user can select a new file
-    $('logo').value = null; 
-    $('before').value = null;
-    $('after').value = null;
-
-    calculateStopDate();
-    render();
-    showPage('generator');
-  }
-
-  function saveReport() {
-    const reportData = getFormData();
-    
-    if (!reportData.customer || !reportData.part) {
-        alert("ग्राहक का नाम (Customer Name) और पार्ट नंबर/नाम (Part No/Name) आवश्यक है।");
-        return;
-    }
-
-    if (reportData.logo === 'loading' || reportData.before === 'loading' || reportData.after === 'loading') {
-        alert("इमेज कन्वर्जन अभी जारी है। कृपया कुछ सेकंड प्रतीक्षा करें और फिर से सेव करें।");
-        return;
-    }
-
-    // --- LOGIC: AUTOMATIC STATUS CHECK ---
-    const stopDateStr = reportData.stopDate; // YYYY-MM-DD
-    const stopTimeStr = reportData.stopTime; // HH:MM (24-hour format)
-
-    if (stopDateStr && stopTimeStr) {
-        // Create a Date object for the calculated stop time
-        const [stopY, stopM, stopD] = stopDateStr.split('-').map(Number);
-        const [stopH, stopMin] = stopTimeStr.split(':').map(Number);
-        // Note: Months in Date constructor are 0-indexed (Jan=0, Feb=1, etc.), so use stopM - 1
-        const stopDateTime = new Date(stopY, stopM - 1, stopD, stopH, stopMin, 0);
+    <div class="panel form" style="display: none;">
+      
+      <div class="report-search-section">
+        <h2 style="font-size: 16px; text-align: left; margin-bottom: 8px; color:#2563eb;">Active Job Card</h2>
         
-        const currentDateTime = new Date();
-
-        if (currentDateTime >= stopDateTime) {
-            // Test hours are complete or passed. Force status to 'Complete'.
-            reportData.status = 'Complete';
-            // Also update the form field visually
-            if ($('status')) $('status').value = 'Complete';
-        } else {
-            // Test is still running. Keep the status as set by the user (defaulting to Running).
-            reportData.status = $('status').value;
-        }
-    } else {
-        // Fallback: If dates are missing, use the user-selected status
-        reportData.status = $('status').value;
-    }
-    // --- END LOGIC ---
-
-    // Assign an ID if it's a new report (or update the current one)
-    reportData.id = reportData.id || Date.now();
-    
-    // Check if report already exists (by ID)
-    const existingIndex = savedReports.findIndex(r => r.id === reportData.id);
-    if (existingIndex !== -1) {
-        // Update existing report
-        savedReports[existingIndex] = reportData;
-    } else {
-        // Save as new report
-        savedReports.push(reportData);
-    }
-    
-    localStorage.setItem('sstSavedReports', JSON.stringify(savedReports));
-    
-    const customerValue = $('customer').value.trim();
-    const partValue = $('part').value.trim();
-    if (customerValue) {
-      usedCustomers.add(customerValue);
-      localStorage.setItem('sstCustomers', JSON.stringify(Array.from(usedCustomers)));
-    }
-    if (partValue) {
-      usedParts.add(partValue);
-      localStorage.setItem('sstParts', JSON.stringify(Array.from(usedParts)));
-    }
-    updateSuggestions();
-    
-    renderCustomerFolders();
-  }
-
-  window.loadReport = (id) => {
-    const report = savedReports.find(r => r.id === id);
-    if (report) {
-      // Temporarily add ID to data so setFormData knows it's an existing report
-      report.id = id; 
-      setFormData(report);
-    }
-  }
-
-  window.deleteReport = (e, id) => {
-    e.stopPropagation();
-    if(confirm('क्या आप सचमुच इस रिपोर्ट को हटाना चाहते हैं?')) {
-        savedReports = savedReports.filter(r => r.id !== id);
-        localStorage.setItem('sstSavedReports', JSON.stringify(savedReports));
-        renderCustomerFolders();
-        alert('Report deleted successfully.');
-    }
-  }
-
-  function loadInitialReports() {
-    const storedReports = localStorage.getItem('sstSavedReports');
-    if (storedReports) {
-      savedReports = JSON.parse(storedReports).map(report => ({
-          // Ensure every report has an ID and default status for proper handling
-          id: report.id || Date.now() + Math.random(), 
-          status: report.status || 'Running', // Set default status for old reports
-          ...report
-      }));
-    }
-    renderCustomerFolders();
-  }
-  
-  // *** renderCustomerFolders FUNCTION ***
-  function renderCustomerFolders() {
-      const container = $('customerFolders');
-      container.innerHTML = '';
-      
-      if (savedReports.length === 0) {
-          container.innerHTML = '<div class="no-reports">कोई सेव्ड रिपोर्ट नहीं है।</div>';
-          return;
-      }
-      
-      // 1. Group by Status (Running or Complete)
-      const statusGroups = savedReports.reduce((acc, report) => {
-          const status = report.status || 'Running'; // Default to Running
-          const customer = report.customer.trim() || 'Uncategorized';
-          
-          if (!acc[status]) {
-              acc[status] = {};
-          }
-          
-          // 2. Further group by Customer within the status
-          if (!acc[status][customer]) {
-              acc[status][customer] = [];
-          }
-          acc[status][customer].push(report);
-          return acc;
-      }, {});
-      
-      // Define the order of the main folders
-      const statusOrder = ['Running', 'Complete'];
-      
-      statusOrder.forEach(status => {
-          const customersInStatus = statusGroups[status];
-          
-          if (!customersInStatus || Object.keys(customersInStatus).length === 0) {
-              return; // Skip if no reports in this status
-          }
-          
-          // Create the main Status Folder (Running / Complete)
-          const statusHeader = document.createElement('h3');
-          statusHeader.innerHTML = `📂 **${status}** Reports (${Object.keys(customersInStatus).length} Customers)`;
-          container.appendChild(statusHeader);
-          
-          const sortedCustomers = Object.keys(customersInStatus).sort();
-          
-          sortedCustomers.forEach(customer => {
-              const customerDiv = document.createElement('div');
-              customerDiv.className = 'customer-folder';
-              
-              // Sort reports by ID (newest first)
-              const sortedReports = customersInStatus[customer].sort((a, b) => b.id - a.id);
-              
-              customerDiv.innerHTML = `
-                  <div class="customer-folder-header">
-                      <strong>👤 ${customer} (${sortedReports.length} Reports)</strong>
-                      <span>⬇️</span>
-                  </div>
-                  <ul class="report-list" style="display: none;">
-                  </ul>
-              `;
-              
-              const list = customerDiv.querySelector('.report-list');
-              
-              sortedReports.forEach(report => {
-                  const formattedDate = formatDate(report.stopDate) || 'No Date';
-                  const reportItem = document.createElement('li');
-                  reportItem.innerHTML = `
-                      <span onclick="loadReport(${report.id})">
-                          ${report.part || 'No Part'} - (${formattedDate})
-                      </span>
-                      <span class="delete-btn" onclick="deleteReport(event, ${report.id})">🗑️</span>
-                  `;
-                  list.appendChild(reportItem);
-              });
-              
-              customerDiv.addEventListener('click', (e) => {
-                  // Folder toggle logic
-                  if (e.target.closest('.report-list') && !e.target.classList.contains('delete-btn')) return;
-                  
-                  const isVisible = list.style.display !== 'none';
-                  list.style.display = isVisible ? 'none' : 'block';
-                  customerDiv.querySelector('.customer-folder-header span').textContent = isVisible ? '⬇️' : '⬆️';
-              });
-              
-              container.appendChild(customerDiv);
-          });
-      });
-  }
-  // *** END renderCustomerFolders FUNCTION ***
-
-
-  const formElements = document.querySelectorAll('#generatorPage input, #generatorPage textarea, #generatorPage select'); 
-  formElements.forEach(el => {
-    if (el.type !== 'file' && !el.readOnly) {
-      el.addEventListener('input', render);
-    }
-  });
-
-  // Setup File Input Listeners (Same as before)
-  const setupFileListener = (inputId, stateKey) => {
-    $(inputId).addEventListener('change', async e => {
-      const f = e.target.files?.[0];
-      if (f) {
-        state[stateKey] = "loading"; 
-        render(); 
-        try {
-            const dataUrl = await fileToDataURL(f); 
-            state[stateKey] = dataUrl;
-        } catch(error) {
-            console.error("File processing failed:", error);
-            state[stateKey] = ""; 
-            alert("❌ फ़ाइल लोड या कन्वर्ट नहीं हो पाई।");
-        }
-        render(); 
-      } else {
-        state[stateKey] = "";
-        render();
-      }
-    });
-  };
-
-  setupFileListener('logo', 'logo');
-  setupFileListener('before', 'before');
-  setupFileListener('after', 'after');
-  
-  function render() {
-    const P = $('preview').querySelector('.report-content');
-    const v = (id) => $(id).value;
-    
-    const renderImage = (src, alt) => {
-        if (src === "loading") {
-             return `<div style="width:100%;height:100%;display:flex;justify-content:center;align-items:center;color:#4b5563;font-size:14px;">🔄 HEIC Convert हो रहा है...</div>`;
-        }
-        return src ? `<img src="${src}" alt="${alt}">` : 'No image';
-    };
-
-    P.innerHTML = `
-      <div class="hdr">
-        <div style="display:flex;gap:15px;align-items:center;">
-          ${state.logo && state.logo !== 'loading' ? `<img class="logo" src="${state.logo}" alt="Company Logo">` : `<div class="logo" style="display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--text-light);background-color:var(--bg-light);">${state.logo === 'loading' ? 'LOADING...' : 'LOGO'}</div>`}
-          <div class="hdr-text">
-            <div style="font-size:22px;font-weight:700;color:var(--primary);">${v('company')}</div>
-            <div class="title">${v('title')}</div>
-            <div style="font-size:14px;font-weight:500;color:var(--text-light);">${v('subtitle')}</div>
-          </div>
+        <div style="display: none;"><label>Job Status</label><input id="statusField" type="text" value="Running" readonly></div>
+        
+        <div class="report-actions-bottom">
+          <button id="newReportBtn" class="secondary" style="background:#10b981;">➕ New Job Card</button>
+          <button id="saveReport" disabled>💾 Save New Report</button>
+          <button id="completeReportBtn" class="secondary" style="background:#059669;" disabled>✅ Mark as Completed</button> 
+          <button id="deleteReport" class="delete-btn" disabled>🗑️ Delete</button>
         </div>
-        <table style="font-size:12px;border-collapse:collapse;border:1px solid #000;height:min-content;margin-top:10px;font-weight:500;">
-          <tr><td style="border:1px solid #000;padding:5px 8px;">${v('docNo')}</td></tr>
-          <tr><td style="border:1px solid #000;padding:5px 8px;">${v('revNo')}</td></tr>
-          <tr><td style="border:1px solid #000;padding:5px 8px;">REV.DATE: ${v('revDate')}</td></tr>
+        <div class="note" style="color: #f97316; font-weight: bold;">🔑 Report Customer/Part/Challan No से Save होगी।</div>
+        <div class="note" style="color: #dc2626; font-weight: bold;">⚠️ यह डेटा क्लाउड (Firebase) पर सेव होगा।</div>
+      </div>
+      
+      <h2 style="margin-top:20px;">General Information</h2>
+      <label>Customer Name
+        <input id="customerName" type="text" placeholder="Customer name" value="Star Engineering" />
+      </label>
+      
+      <div class="top-grid">
+        <div><label>Order/Challan Qty<input id="orderQty" type="text" placeholder="Qty" value="1000 Pcs" /></label></div>
+        <div><label>Challan No/Date<input id="challan" type="text" placeholder="No / Date" value="CH/2508/01 | 01.09.2025" /></label></div>
+      </div>
+      <label>Part Desc / No<input id="partDesc" type="text" placeholder="Part description or no" value="LAC09170" /></label>
+      <div class="top-grid">
+        <div><label>Coating Spec (e.g. 2B, 1T)</label><input id="coatingSpec" type="text" placeholder="e.g. 1B,2B,1T" value="2 Base | 2 Top"/></div>
+        <div>
+          <label>**Paint**
+            <select id="paint">
+                <option value="Silver">Silver</option>
+                <option value="Black" selected>Black</option>
+            </select>
+          </label>
+        </div>
+      </div>
+      
+      <label>**Batch No.**
+        <input id="batchNo" type="text" placeholder="Batch number" value="250819" />
+      </label>
+      
+      <h2 style="margin-top:20px;">Coating Batch Numbers & Paint Details</h2>
+      <div class="inspection-codes-grid">
+          <div id="silverInspDiv" class="hide-inspection"><label>Silver Paint Name</label><input id="silverInsp" type="text" placeholder="Silver Paint Name" value="Silver Paint" /></div>
+          <div id="blackInspDiv"><label>Black Paint Name</label><input id="blackInsp" type="text" placeholder="Black Paint Name" value="Black Paint" /></div>
+          <div><label>Base Coat Batch No.</label><input id="baseBatch" type="text" placeholder="Base Coat Batch No" value="BCB101" /></div>
+          <div><label>Top Coat Batch No.</label><input id="topBatch" type="text" placeholder="Top Coat Batch No" value="TCB202" /></div>
+      </div>
+      
+      <h2 style="margin-top:20px;">Operation Details (Input Fields)</h2>
+      <div class="rows-input"><div id="rowsInput"></div></div>
+      <div class="note">हर ऑपरेशन के नीचे **Observation** फील्ड्स में अलग-अलग वैल्यू भरें।</div>
+      
+      <div class="actions">
+        <button id="updateOpsBtn" style="flex:1;">Update Operations</button>
+        <button id="applyBtn" style="flex:1;">Apply to Preview</button>
+        <button id="clearBtn" class="secondary" style="flex:1;">Clear Form</button>
+      </div>
+
+      <h2 style="margin-top:20px;">Signatures & Notes</h2>
+      <label>Verified By<input id="verifiedBy" type="text" placeholder="Verified by" value="SAKSHI CHAVHAN" /></label>
+      <label>Approved By<input id="approvedBy" type="text" placeholder="Approved by" value="ABHIJEET DHOKRAT" /></label>
+      <label>Notes<input id="notes" type="text" placeholder="Notes / Remark" value="P- Pointage, V- Viscosity, T- Temp, S-speed, A-Adhesion." /></label>
+      
+    </div>
+
+    <div class="preview-wrap" style="display: none;">
+      <div class="panel" style="width:100%; padding:8px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <div class="small">ISO 9001:2015</div>
+        </div>
+      </div>
+      <div id="preview" class="preview panel">
+        <h2>JOB CARD / ROUTE CARD</h2>
+        
+        <table style="margin-bottom:8px; table-layout: fixed; width:100%;">
+            <tr>
+                <td style="width:33.3%; text-align:center;">Format No: **WT/PDR/11**</td>
+                <td style="width:33.3%; text-align:center;">REV. NO: **01**</td>
+                <td style="width:33.3%; text-align:center;">REV. DATE: **01.09.2025**</td>
+            </tr>
         </table>
-      </div>
+        
+        <table style="margin-bottom:8px; table-layout: auto;">
+          <tr><td style="width:18%">Customer Name</td><td id="pvCustomer" style="width:32%"></td><td style="width:18%">Order/Challan Qty</td><td id="pvQty" style="width:32%"></td></tr>
+          <tr><td>Customer Challan No/Date</td><td id="pvChallan" colspan="3"></td></tr>
+          <tr><td>Part Desc/No</td><td id="pvPart"></td><td>**Batch No.**</td><td id="pvBatchNo"></td></tr>
+        </table>
 
-      <table class="boxtbl">
-        ${row('SST Tag No', v('tag'), 'PRODUCTION BATCH', v('batch'))}
-        ${row('TC Date', v('tcDate'), 'Part No/Name', v('part'))}
-        ${row('Customer Name', v('customer'), 'Color', v('color'))}
-        ${row('Coating System', v('coatSys'), 'Coating Process', v('process'))}
-        ${row('No. of Coat', v('coats'), 'Coating Thickness', v('thick'))}
-        ${row('SST Equipment', v('equip'), 'Corrosion Test Apparatus Capacity', v('capacity'))}
-        ${row('Water type', v('water'), 'Type of salt', v('salt'))}
-        ${row(`Component loaded for SST on (Date & time)`, `${formatDate(v('loadDate'))} ${formatTime(v('loadTime'))}`, `Customer requirement for SST`, `${v('sstHrs')} Hrs`)}
-        ${row(`Test Stop & Observation Date & Time`, `${formatDate(v('stopDate'))} ${formatTime(v('stopTime'))}`, `Observation for Red Rust`, `${v('obs')}`)}
-        <tr><td class="lbl">No. of Samples for SST</td><td colspan="3" style="text-align:center;">${v('samples')}</td></tr>
-      </table>
+        <table style="margin-bottom:8px; table-layout: auto;">
+            <thead>
+                <tr>
+                    <td style="width:25%">COATING SPECIFICATION</td>
+                    <th id="pvInspHeader" style="width:17%; text-align:center;">Paint</th>
+                    <th style="width:29%; text-align:center;">BASE COAT BATCH NO.</th>
+                    <th style="width:29%; text-align:center;">TOP COAT BATCH NO.</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td id="pvCoating" style="text-align:center; font-weight:bold;"></td>
+                    <td id="pvInspValue" style="text-align:center;"></td>
+                    <td id="pvBaseBatch" style="text-align:center;"></td>
+                    <td id="pvTopBatch" style="text-align:center;"></td>
+                </tr>
+            </tbody>
+        </table>
 
-      <div class="photos">
-        <div>
-          <div class="photo-caption">SAMPLE PHOTO BEFORE SST</div>
-          <div class="ph">${renderImage(state.before, "Sample before SST")}</div>
+        <table id="pvTable">
+          <thead>
+            <tr>
+              <th style="width:4%">Sr No</th>
+              <th style="width:10%">Date/Shift</th>
+              <th style="width:12%">Operation</th>
+              <th style="width:28%">Specifications</th> 
+              <th style="width:18%">Observation</th>
+              <th style="width:7%">From Time</th>
+              <th style="width:7%">To Time</th>
+              <th style="width:7%">Inspection OK/NOK</th>
+              <th style="width:16%">Operator/Supervisor/QA Signature</th> </tr>
+          </thead>
+          <tbody id="pvRows"></tbody>
+        </table>
+        
+        <div style="display:flex;justify-content:space-between;margin-top:6px;">
+          <div>Verified By: <span id="pvVerified"></span></div>
+          <div>Approved By: <span id="pvApproved"></span></div>
         </div>
-        <div>
-          <div class="photo-caption">SAMPLE PHOTO AFTER SST</div>
-          <div class="ph">${renderImage(state.after, "Sample after SST")}</div>
+        
+        <div style="margin-top:6px;">
+            Note - <span id="pvNotes"></span>
         </div>
       </div>
+    </div>
+  </div>
 
-      <div class="muted">Remark: ${v('remark')}</div>
-      <div class="foot">
-        <div>Checked by: <br><b>${v('checked')}</b></div>
-        <div>Approved by: <br><b>${v('approved')}</b></div>
-      </div>
-    `;
-  }
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
 
-  function row(a, b, c, d) {
-    return `<tr><td class="lbl">${a}</td><td style="text-align:center">${b || ''}</td><td class="lbl">${c}</td><td style="text-align:center">${d || ''}</td></tr>`;
-  }
-
-  function clearForm() {
-    inputIds.forEach(id => {
-      const el = $(id);
-      if (el && !el.readOnly) {
-        el.value = defaultValues[id] || '';
-      }
-    });
-    $('logo').value = null;
-    $('before').value = null;
-    $('after').value = null;
-    state.logo = state.before = state.after = "";
+  <script>
+    let currentActiveReportId = null; 
+    const jobFields = ['customerName', 'orderQty','challan','partDesc','coatingSpec','paint','batchNo', 'verifiedBy','approvedBy','notes', 'silverInsp', 'blackInsp', 'baseBatch', 'topBatch'];
     
-    // Set all default and calculated values
-    $('company').value = defaultValues.company;
-    $('title').value = defaultValues.title;
-    $('subtitle').value = defaultValues.subtitle;
-    $('docNo').value = defaultValues.docNo;
-    $('revNo').value = defaultValues.revNo;
-    $('revDate').value = defaultValues.revDate;
+    // --- SPECIFICATIONS (UNCHANGED) ---
+    const SPECIFICATIONS = {
+        "Incoming Inspection": "Dent free, no heavy rust or oil, gauge fitment",
+        "Alkaline Cleaning": "45-65 gms/litre",
+        "Drying": "Temp (100-220°C) & Time(15-30 mins)", 
+        "Shot Blasting": "15 to 30 mins", 
+        "Packing & Dispatch": "Qty (value), Match Check", 
+        "Spare Operation": "N/A",
+        "Final Inspection_Silver": "No uncover coating, no excess paint in thread & socket, Adhesion test should be clean. Silver Thickness range - 6 to 12 microns",
+        "Final Inspection_Black": "No uncover coating, no excess paint in thread & socket, Adhesion test should be clean. Black Thickness range - 8 to 16 microns",
+        "Silver_Base Coat -1 & Curing": "Geopert: Viscosity - 90 to 120 sec, curing temp - 360°C, speed - 5 Hz.",
+        "Silver_Base Coat -2 & Curing": "Geopert: Viscosity - 90 to 120 sec, curing temp - 360°C, speed - 5 Hz.",
+        "Silver_Top Coat -1 & Curing": "Aquazinc: Viscosity - 28 to 38 sec, curing temp - 180°C, time - 30 mins.", 
+        "Silver_Top Coat -2 & Curing": "N/A", 
+        "Black_Base Coat -1 & Curing": "Zintek: Viscosity -42-53 sec, curing temp - 280°C, speed - 3.38 Hz.",
+        "Black_Base Coat -2 & Curing": "Zintek: Viscosity -42-53 sec, curing temp - 280°C, speed - 3.38 Hz.",
+        "Black_Top Coat -1 & Curing": "Techdip: Viscosity -42-50 sec, curing temp - 260°C, speed - 3.38 Hz.",
+        "Black_Top Coat -2 & Curing": "Techdip: Viscosity -42-50 sec, curing temp - 260°C, speed - 3.38 Hz.",
+    };
     
-    const today = new Date();
-    const formattedDateForInput = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
-    const formattedDate = `${String(today.getDate()).padStart(2, '0')}.${String(today.getMonth() + 1).padStart(2, '0')}.${today.getFullYear()}`;
+    // --- PARAMETERS (UNCHANGED) ---
+    const PARAMETERS = {
+        "Incoming Inspection": { labels: ["Observation"], units: [""] }, 
+        "Alkaline Cleaning": { labels: ["Pointage"], units: ["gms/litre"] }, 
+        "Drying": { labels: ["Temp", "Time"], units: ["°C", "min"] }, 
+        "Shot Blasting": { labels: ["Time"], units: ["min"] },
+        "Base Coat -1 & Curing": { labels: ["Viscosity", "Temp", "Curing", "Speed"], units: ["sec", "°C", "", "Hz"], isCoating: true },
+        "Base Coat -2 & Curing": { labels: ["Viscosity", "Temp", "Curing", "Speed"], units: ["sec", "°C", "", "Hz"], isCoating: true },
+        "Top Coat -1 & Curing": { labels: ["Viscosity", "Temp", "Curing", "Time/Speed"], units: ["sec", "°C", "", "min/Hz"], isCoating: true },
+        "Top Coat -2 & Curing": { labels: ["Viscosity", "Temp", "Curing", "Time/Speed"], units: ["sec", "°C", "", "min/Hz"], isCoating: true },
+        "Final Inspection": { labels: ["Thickness", "Adhesion"], units: ["microns", ""] },
+        "Packing & Dispatch": { labels: ["Qty", "Match"], units: [""] },
+        "Spare Operation": { labels: ["N/A"], units: [""] },
+    };
     
-    $('tcDate').value = formattedDate;
-    $('loadDate').value = formattedDateForInput;
-    $('loadTime').value = `${String(today.getHours()).padStart(2, '0')}:${String(today.getMinutes()).padStart(2, '0')}`;
+    const BASE_OPERATIONS = [
+      { op: "Incoming Inspection", color: 'N/A' },
+      { op: "Alkaline Cleaning", color: 'N/A' },
+      { op: "Drying", color: 'N/A' },
+      { op: "Shot Blasting", color: 'N/A' },
+      { op: "Final Inspection", color: 'N/A' },
+      { op: "Packing & Dispatch", color: 'N/A' },
+      { op: "Spare Operation", color: 'N/A' }, 
+    ];
     
-    $('tag').value = defaultValues.tag;
-    $('batch').value = defaultValues.batch;
-    $('part').value = defaultValues.part;
-    $('customer').value = defaultValues.customer;
-    $('customerEmail').value = defaultValues.customerEmail;
-    $('customerWhatsapp').value = defaultValues.customerWhatsapp;
-    $('coatSys').value = defaultValues.coatSys;
-    $('color').value = defaultValues.color;
-    $('process').value = defaultValues.process;
-    $('coats').value = defaultValues.coats;
-    $('thick').value = defaultValues.thick;
-    $('equip').value = defaultValues.equip;
-    $('capacity').value = defaultValues.capacity;
-    $('water').value = defaultValues.water;
-    $('salt').value = defaultValues.salt;
-    $('sstHrs').value = defaultValues.sstHrs;
-    $('obs').value = defaultValues.obs;
-    $('samples').value = defaultValues.samples;
-    $('remark').value = defaultValues.remark;
-    $('checked').value = defaultValues.checked;
-    $('approved').value = defaultValues.approved;
-    // Set default status
-    $('status').value = defaultValues.status;
-    
-    // Important: Remove the ID when clearing the form for a new report
-    delete getFormData().id;
+    // --- Core Logic Functions - getCurrentPredefinedOperations (UNCHANGED) ---
+    function getCurrentPredefinedOperations() {
+        const paintSelect = document.getElementById('paint');
+        const paintType = paintSelect.value;
+        const ops = JSON.parse(JSON.stringify(BASE_OPERATIONS)); 
+        const coatingSteps = [];
 
-    calculateStopDate();
-    render();
-  }
+        const silverDiv = document.getElementById('silverInspDiv');
+        const blackDiv = document.getElementById('blackInspDiv');
+        
+        silverDiv.classList.add('hide-inspection');
+        blackDiv.classList.add('hide-inspection');
+        
+        let requiredLength = 10; 
+        
+        if (paintType === 'Black') {
+            document.getElementById('coatingSpec').value = "2 Base | 2 Top";
+            blackDiv.classList.remove('hide-inspection');
+            coatingSteps.push(
+                { op: "Base Coat -1 & Curing", color: 'Black' },
+                { op: "Base Coat -2 & Curing", color: 'Black' },
+                { op: "Top Coat -1 & Curing", color: 'Black' },
+                { op: "Top Coat -2 & Curing", color: 'Black' }
+            );
+             requiredLength = 10; 
+        } else if (paintType === 'Silver') {
+             document.getElementById('coatingSpec').value = "2 Base | 1 Top";
+             silverDiv.classList.remove('hide-inspection');
+             coatingSteps.push(
+                { op: "Base Coat -1 & Curing", color: 'Silver' },
+                { op: "Base Coat -2 & Curing", color: 'Silver' },
+                { op: "Top Coat -1 & Curing", color: 'Silver' }
+            );
+            requiredLength = 9; 
+        } else {
+             document.getElementById('coatingSpec').value = "2 Base | 2 Top";
+             blackDiv.classList.remove('hide-inspection');
+             coatingSteps.push(
+                { op: "Base Coat -1 & Curing", color: 'Black' },
+                { op: "Base Coat -2 & Curing", color: 'Black' },
+                { op: "Top Coat -1 & Curing", color: 'Black' },
+                { op: "Top Coat -2 & Curing", color: 'Black' }
+            );
+            requiredLength = 10;
+        }
 
-  // --- NEW SHARING FUNCTIONS ---
+        const finalInspectionIndex = ops.findIndex(op => op.op === 'Final Inspection');
+        ops.splice(finalInspectionIndex, 0, ...coatingSteps);
+        
+        while (ops.length > requiredLength) {
+             ops.pop();
+        }
+        
+        while (ops.length < requiredLength) { 
+            ops.push({ op: "Spare Operation", color: 'N/A' }); 
+        }
 
-  function shareViaEmail() {
-      const email = $('customerEmail').value.trim();
-      const customer = $('customer').value.trim() || 'Customer';
-      const part = $('part').value.trim() || 'SST Report';
-
-      if (!email) {
-          alert("Please fill in the 'Customer Email ID' first.");
-          return;
-      }
-      
-      const subject = encodeURIComponent(`SST Report: ${part} for ${customer}`);
-      const body = encodeURIComponent(`Dear ${customer},\n\nPlease find the attached PDF file for your SST Report (${part}). You need to download it first using the 'Download PDF' button and attach it manually to this email.\n\nThank you,\n${$('checked').value}`);
-      
-      // mailto: link will open the default email app
-      const mailtoLink = `mailto:${email}?subject=${subject}&body=${body}`;
-      window.open(mailtoLink, '_blank');
-      
-      alert("✅ Your email app has been opened. Please manually attach the PDF file downloaded using the 'Download PDF' button.");
-  }
-
-  function shareViaWhatsapp() {
-      const whatsappNo = $('customerWhatsapp').value.trim();
-      const customer = $('customer').value.trim() || 'Customer';
-      const part = $('part').value.trim() || 'SST Report';
-
-      // Remove any non-digit characters and check for minimum length
-      const cleanedNo = whatsappNo.replace(/[^0-9]/g, '');
-      
-      if (cleanedNo.length < 10) {
-          alert("Please fill in a valid 'Customer WhatsApp No.' (min 10 digits).");
-          return;
-      }
-      
-      const message = encodeURIComponent(`Hello ${customer},\n\nThis is the PDF file of your SST Report (${part}). Please download and review it.`);
-      
-      // WhatsApp URL for sending message
-      const whatsappLink = `https://wa.me/${cleanedNo}?text=${message}`;
-      window.open(whatsappLink, '_blank');
-      
-      alert("✅ Your WhatsApp chat has been opened. Please manually attach the PDF file downloaded using the 'Download PDF' button.");
-  }
-
-  /**
-   * Generates the PDF blob and attempts to share it using the Web Share API.
-   * This is the function to share the actual file and pass the WhatsApp number in the text for context.
-   */
-  async function sharePdfViaWebShare() {
-      if (!navigator.share || !navigator.canShare || !navigator.canShare({ files: [new File([""], "dummy.pdf", { type: "application/pdf" })] })) {
-          alert("❌ Your device/browser does not support sharing files directly from a webpage. Please use the 'Download PDF' button and share manually.");
-          return;
-      }
-
-      const v = (id) => $(id).value;
-      const customerName = $('customer').value.trim() || 'Customer';
-      const partNo = $('part').value.trim() || 'PartNo';
-      const whatsappNo = $('customerWhatsapp').value.trim().replace(/[^0-9]/g, '');
-      
-      // Filename
-      const filename = `${customerName.replace(/[^a-z0-9]/gi, '_')}_${partNo.replace(/[^a-z0-9]/gi, '_')}.pdf`;
-      
-      // Text for sharing
-      let shareText = `Dear ${customerName},\n\nPlease find the attached PDF file for your SST Report (${partNo}).`;
-      
-      // Include number in the text if available (for context in the sharing app)
-      if (whatsappNo.length >= 10) {
-          shareText += `\n\nReport for number: ${whatsappNo}`;
-          alert("✅ Sharing initiated. Please select the WhatsApp app, and then manually select the chat/contact you want to send the file to.");
-      } else {
-          alert("❌ Customer WhatsApp No. is missing or invalid. Sharing initiated without contact number. Please select the correct recipient.");
-      }
-
-      // 1. Generate PDF (using the same logic as btnPdf, but getting the blob)
-      const pdfBlob = await generatePdfBlob(v, state);
-
-      if (!pdfBlob) {
-          alert("PDF generation failed. Cannot share.");
-          return;
-      }
-
-      // 2. Create the File object from the Blob
-      const file = new File([pdfBlob], filename, { type: 'application/pdf' });
-
-      // 3. Prepare the share data
-      const shareData = {
-          files: [file],
-          title: `SST Report: ${partNo}`,
-          text: shareText,
-          // Note: Web Share API does NOT support pre-filling a specific WhatsApp contact with a file.
-          // It only opens the native share sheet. The user must manually select WhatsApp/contact.
-      };
-
-      try {
-          // 4. Attempt to share
-          await navigator.share(shareData);
-          console.log('PDF shared successfully via Web Share API');
-          // No need for a final alert, as the share dialog handles success/cancel
-      } catch (error) {
-          if (error.name === 'AbortError') {
-              console.log('Share aborted by user.');
-          } else {
-              console.error('Error sharing PDF:', error);
-              alert(`❌ File sharing failed. Please use the 'Download PDF' button and attach manually. Error: ${error.message}`);
-          }
-      }
-  }
-
-  // --- END NEW SHARING FUNCTIONS ---
-
-  $('btnPdf').addEventListener('click', async (e) => {
-    e.preventDefault();
-
-    if (state.logo === 'loading' || state.before === 'loading' || state.after === 'loading') {
-        alert("इमेज कन्वर्जन अभी जारी है। कृपया कुछ सेकंड प्रतीक्षा करें और फिर से PDF डाउनलोड करें।");
-        return;
+        return ops; 
     }
-    
-    // Save report before downloading PDF (This now includes the auto-status check)
-    saveReport();
 
-    const v = (id) => $(id).value;
-    const customerName = $('customer').value.trim() || 'Customer';
-    const partNo = $('part').value.trim() || 'PartNo';
-    const filename = `${customerName.replace(/[^a-z0-9]/gi, '_')}_${partNo.replace(/[^a-z0-9]/gi, '_')}.pdf`;
+    // --- updateRowInputs (UPDATED: QTY field removed) ---
+    function updateRowInputs(savedRows = []) {
+        const predefinedOperations = getCurrentPredefinedOperations();
+        const rowsInputContainer = document.getElementById('rowsInput');
+        rowsInputContainer.innerHTML = ''; 
+        
+        const mapSavedData = (rows) => {
+            const dataMap = {};
+            rows.forEach(r => {
+                const opParams = PARAMETERS[r.operation] || { labels: [], units: [] };
+                const values = (r.observation || '').split(';').map(v => v.trim()); 
+                const obsValues = {};
+                
+                opParams.labels.forEach((label, j) => {
+                    const inputName = label.replace(/[^a-zA-Z0-9]/g, '');
+                    obsValues[inputName] = values[j] || '';
+                });
+                dataMap[r.operation] = { 
+                    ...r, 
+                    obsValues, 
+                    inspectionStatus: r.inspectionStatus || 'N/A',
+                    operatorChecked: r.operatorChecked || '', 
+                    supervisorSign: r.supervisorSign || ''
+                }; 
+            });
+            return dataMap;
+        };
 
-    const pdfBlob = await generatePdfBlob(v, state);
+        const savedDataMap = mapSavedData(savedRows);
+        
+        predefinedOperations.forEach((opConfig, index) => {
+            const srCount = index + 1;
+            const opName = opConfig.op;
+            const opParams = PARAMETERS[opName];
+            
+            const savedData = savedDataMap[opName] || { obsValues: {}, inspectionStatus: 'N/A', operatorChecked: '', supervisorSign: '' };
+            
+            const div = document.createElement('div');
+            div.dataset.sr = srCount;
+            div.dataset.operation = opName;
+            div.className = 'row-group';
+            
+            let obsFieldsHTML = '';
+            
+            const paintType = document.getElementById('paint').value;
+            const specKey = opName.includes('Coat') ? `${paintType}_${opName}` : (opName === 'Final Inspection' ? `${opName}_${paintType}` : opName);
+            const specification = SPECIFICATIONS[specKey] || opName;
 
-    if (pdfBlob) {
-        const url = URL.createObjectURL(pdfBlob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = filename;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-    } else {
-        alert("PDF डाउनलोड विफल रहा।");
-    }
-  });
 
-  // Function to generate the PDF and return a Blob
-  async function generatePdfBlob(v, state) {
-    return new Promise(async (resolve, reject) => {
-        try {
-            const { jsPDF } = window.jspdf;
-            const pdf = new jsPDF({ 
-              unit: 'mm', 
-              format: 'a4',
-              orientation: 'portrait'
+            opParams.labels.forEach((label, j) => {
+                if (label !== "N/A" && label.trim().length > 0) {
+                    const unit = opParams.units[j];
+                    const inputName = label.replace(/[^a-zA-Z0-9]/g, ''); 
+                    const placeholder = `${label} ${unit ? '(' + unit + ')' : ''}`;
+                    const savedValue = savedData.obsValues[inputName] || '';
+                    
+                    obsFieldsHTML += `
+                        <div>
+                            <label>${placeholder}</label>
+                            <input data-field="obsParam" data-param="${inputName}" type="text" placeholder="${placeholder}" value="${savedValue}" />
+                        </div>
+                    `;
+                }
             });
             
-            const margin = 10;
-            const pageWidth = pdf.internal.pageSize.getWidth();
-            const pageHeight = pdf.internal.pageSize.getHeight();
-
-            pdf.rect(margin, margin, pageWidth - 2 * margin, pageHeight - 2 * margin, 'S');
+            obsFieldsHTML += `
+                <div>
+                    <label>Inspection OK/NOK</label>
+                    <select data-field="inspectionStatus">
+                        <option value="N/A" ${savedData.inspectionStatus === 'N/A' ? 'selected' : ''}>N/A</option>
+                        <option value="OK" ${savedData.inspectionStatus === 'OK' ? 'selected' : ''}>OK</option>
+                        <option value="NOK" ${savedData.inspectionStatus === 'NOK' ? 'selected' : ''}>NOK</option>
+                    </select>
+                </div>
+            `;
             
-            const headerStartY = margin + 5;
-            const logoSize = 25;
-            const logoX = margin + 5;
-            const logoY = headerStartY;
-            let currentY = headerStartY;
-            let logoDisplayHeight = 0;
+            div.innerHTML = `
+                <div class="row-header">
+                    <span>${srCount}. ${opName}</span>
+                    <span>Spec: ${specification.substring(0, 40) + (specification.length > 40 ? '...' : '')}</span>
+                </div>
+                <div class="row-detail-grid">
+                    <div>
+                        <label>Date/Shift</label>
+                        <input data-field="dateShift" type="text" placeholder="Date/Shift" value="${savedData.dateShift || ''}" />
+                    </div>
+                    <div>&nbsp;</div>
+                </div>
+                <div class="row-detail-grid">
+                    <div><label>From Time</label><input data-field="fromTime" type="text" placeholder="From T." value="${savedData.fromTime || ''}" /></div>
+                    <div><label>To Time</label><input data-field="toTime" type="text" placeholder="To T." value="${savedData.toTime || ''}" /></div>
+                </div>
 
-            if (state.logo) {
-                const logo = await loadImage(state.logo);
-                const maxLogoSize = 25; 
+                <div class="observation-fields">
+                    ${obsFieldsHTML}
+                </div>
                 
-                let finalLogoWidth = logo.width;
-                let finalLogoHeight = logo.height;
+                <div class="operator-supervisor-grid">
+                    <div>
+                        <label>Signature Input (Operator/Supervisor/QA)</label>
+                        <input data-field="supervisorSign" type="text" placeholder="Operator Name / QA Name / Sign" value="${savedData.supervisorSign || ''}" />
+                    </div>
+                </div>
+            `;
+            
+            div.querySelectorAll('input, select').forEach(inp => { 
+                inp.addEventListener('change', applyPreview);
+                inp.addEventListener('input', applyPreview); 
+            });
+            
+            rowsInputContainer.appendChild(div);
+        });
+        
+        applyPreview(); 
+    }
 
-                if (finalLogoWidth > maxLogoSize || finalLogoHeight > maxLogoSize) {
-                    const ratio = Math.min(maxLogoSize / finalLogoWidth, maxLogoSize / finalLogoHeight);
-                    finalLogoWidth *= ratio;
-                    finalLogoHeight *= ratio;
-                }
-                
-                logoDisplayHeight = finalLogoHeight; 
-                
-                const imageType = state.logo.startsWith('data:image/png') ? 'PNG' : 'JPEG';
+    // --- getFormData (FIXED: ID Generation Logic) ---
+    function getFormData() {
+      const data = {};
+      jobFields.forEach(f=> data[f] = document.getElementById(f).value.trim());
+      
+      data.status = document.getElementById('statusField')?.value || 'Running'; 
+      
+      const cleanCustomer = data.customerName.replace(/[^a-zA-Z0-9]/g, '_').replace(/_{2,}/g, '_').trim();
+      const cleanPart = data.partDesc.replace(/[^a-zA-Z0-9]/g, '_').replace(/_{2,}/g, '_').trim();
+      const cleanChallan = data.challan.replace(/[^a-zA-Z0-9]/g, '_').replace(/_{2,}/g, '_').trim();
+      
+      data.uniqueId = currentActiveReportId; 
+      
+      // FIX: If currentActiveReportId is null or a temporary NEW_ one, generate a stable uniqueId
+      if (!data.uniqueId || data.uniqueId.startsWith('NEW_')) {
+          
+          // Ensure enough characters for a robust ID. Use a default if fields are too short.
+          let idPartCustomer = cleanCustomer.substring(0, 5).toUpperCase() || 'CUST';
+          let idPartPart = cleanPart.substring(0, 8).toUpperCase() || 'PART';
+          let idPartChallan = cleanChallan.substring(0, 10).toUpperCase() || 'CHALLAN';
 
-                pdf.addImage(logo, imageType, logoX, logoY, finalLogoWidth, finalLogoHeight, undefined, 'NONE');
+          // Robust ID Generation logic
+          data.uniqueId = `${idPartCustomer}_${idPartPart}_${idPartChallan}`.replace(/_{2,}/g, '_');
+          
+          // Fallback if the generated ID is still too simple or invalid
+          if(data.uniqueId.length < 5 || data.uniqueId.endsWith('_')) {
+               data.uniqueId = `NEW_${Date.now()}`;
+          }
+      }
+      
+      
+      const rows = [];
+      document.getElementById('rowsInput').querySelectorAll('.row-group').forEach((group, index)=>{
+        const operation = group.dataset.operation || '';
+        const opParams = PARAMETERS[operation];
+        
+        let observationValues = [];
+        
+        opParams.labels.forEach((label) => {
+            if (label !== "N/A" && label.trim().length > 0) {
+                const inputName = label.replace(/[^a-zA-Z0-9]/g, '');
+                const inputElement = group.querySelector(`input[data-field="obsParam"][data-param="${inputName}"]`);
+                observationValues.push(inputElement?.value.trim() || '');
             }
+        });
+        
+        const observation = observationValues.join('; ').trim(); 
 
-            pdf.setFontSize(16);
-            pdf.setTextColor('#1e40af');
-            pdf.text(v('company'), logoX + logoSize + 5, currentY + 5, { maxWidth: pageWidth * 0.5 });
-            
-            pdf.setFontSize(14);
-            pdf.setTextColor('#1f2937');
-            pdf.text(v('title'), logoX + logoSize + 5, currentY + 12, { maxWidth: pageWidth * 0.5 });
-            
-            pdf.setFontSize(10);
-            pdf.setTextColor('#4b5563');
-            pdf.text(v('subtitle'), logoX + logoSize + 5, currentY + 17, { maxWidth: pageWidth * 0.5 });
-            
-            pdf.setFontSize(8);
-            pdf.setTextColor(0);
-            pdf.text(v('docNo'), pageWidth - margin - 5, currentY + 5, { align: 'right' });
-            pdf.text(v('revNo'), pageWidth - margin - 5, currentY + 10, { align: 'right' });
-            pdf.text(`REV.DATE: ${v('revDate')}`, pageWidth - margin - 5, currentY + 15, { align: 'right' });
-
-            currentY = headerStartY + Math.max(logoDisplayHeight, 18) + 5; 
-            pdf.setDrawColor(0);
-            pdf.setLineWidth(0.5);
-            pdf.line(margin, currentY, pageWidth - margin, currentY);
-
-            currentY += 5;
-
-            const tableData = [
-                ['SST Tag No', v('tag'), 'PRODUCTION BATCH', v('batch')],
-                ['TC Date', v('tcDate'), 'Part No/Name', v('part')],
-                ['Customer Name', v('customer'), 'Color', v('color')],
-                ['Coating System', v('coatSys'), 'Coating Process', v('process')],
-                ['No. of Coat', v('coats'), 'Coating Thickness', v('thick')],
-                ['SST Equipment', v('equip'), 'Corrosion Test Apparatus Capacity', v('capacity')],
-                ['Water type', v('water'), 'Type of salt', v('salt')],
-                [`Component loaded for SST on (Date & time)`, `${formatDate(v('loadDate'))} ${formatTime(v('loadTime'))}`, `Customer requirement for SST`, `${v('sstHrs')} Hrs`],
-                [`Test Stop & Observation Date & Time`, `${formatDate(v('stopDate'))} ${formatTime(v('stopTime'))}`, `Observation for Red Rust`, `${v('obs')}`],
-                [`No. of Samples for SST`, { content: v('samples'), colSpan: 3, styles: { halign: 'center' } }]
-            ];
-
-            const tableOptions = {
-              startY: currentY,
-              head: [],
-              body: tableData,
-              theme: 'grid',
-              tableWidth: pageWidth - 2 * margin,
-              margin: { left: margin },
-              styles: {
-                  font: 'Roboto',
-                  fontSize: 8,
-                  cellPadding: 2,
-                  lineColor: 0,
-                  lineWidth: 0.1,
-                  valign: 'middle',
-                  minCellHeight: 14 
-              },
-              headStyles: {
-                  fillColor: [240, 240, 240]
-              },
-              columnStyles: {
-                  0: { fontStyle: 'bold', fillColor: [240, 240, 240], cellWidth: (pageWidth - 2 * margin) * 0.35 },
-                  1: { cellWidth: (pageWidth - 2 * margin) * 0.15, halign: 'center' },
-                  2: { fontStyle: 'bold', fillColor: [240, 240, 240], cellWidth: (pageWidth - 2 * margin) * 0.35 },
-                  3: { cellWidth: (pageWidth - 2 * margin) * 0.15, halign: 'center' }
-              }
-            };
-
-            pdf.autoTable(tableOptions);
-
-            currentY = pdf.autoTable.previous.finalY + 10;
-
-            const photoWidth = (pageWidth - 2 * margin - 5) / 2;
-            const photoHeight = photoWidth / 1.5;
-            
-            const photoBeforeY = currentY + 5;
-            const photoAfterX = margin + photoWidth + 5;
-
-            pdf.setFontSize(10);
-            pdf.text('SAMPLE PHOTO BEFORE SST', margin, currentY);
-            if (state.before) {
-                const photoBefore = await loadImage(state.before);
-                const imageType = state.before.startsWith('data:image/png') ? 'PNG' : 'JPEG';
-                pdf.addImage(photoBefore, imageType, margin, photoBeforeY, photoWidth, photoHeight, undefined, 'FAST');
-            } else {
-                pdf.rect(margin, photoBeforeY, photoWidth, photoHeight, 'S');
-                pdf.setFontSize(8);
-                pdf.setTextColor(150);
-                pdf.text('No Image Available', margin + photoWidth / 2, photoBeforeY + photoHeight / 2, { align: 'center' });
-                pdf.setTextColor(0);
-            }
-            
-            pdf.text('SAMPLE PHOTO AFTER SST', photoAfterX, currentY);
-            if (state.after) {
-                const photoAfter = await loadImage(state.after);
-                const imageType = state.after.startsWith('data:image/png') ? 'PNG' : 'JPEG';
-                pdf.addImage(photoAfter, imageType, photoAfterX, photoBeforeY, photoWidth, photoHeight, undefined, 'FAST');
-            } else {
-                pdf.rect(photoAfterX, photoBeforeY, photoWidth, photoHeight, 'S');
-                pdf.setFontSize(8);
-                pdf.setTextColor(150);
-                pdf.text('No Image Available', photoAfterX + photoWidth / 2, photoBeforeY + photoHeight / 2, { align: 'center' });
-                pdf.setTextColor(0);
-            }
-            
-            currentY += photoHeight + 15;
-
-            const footerHeight = 25; 
-            const remarkText = v('remark');
-            const splitRemark = pdf.splitTextToSize(`Remark: ${remarkText}`, pageWidth - 2 * margin);
-            const remarkLineHeight = 5; 
-            const remarkHeight = splitRemark.length * remarkLineHeight; 
-            
-            let remarkY = currentY + 5; 
-
-            if (remarkY + remarkHeight > (pageHeight - margin - footerHeight)) {
-                remarkY = pageHeight - margin - footerHeight - remarkHeight - 2; 
-                if (remarkY < currentY + 5) {
-                    remarkY = currentY + 5;
-                }
-            }
-
-
-            pdf.setFontSize(10);
-            pdf.text(splitRemark, margin, remarkY);
-
-            const footerY = pageHeight - margin - 20; 
-
-            pdf.line(margin + 5, footerY, margin + 5 + 70, footerY);
-            pdf.setFontSize(10);
-            pdf.text(`Checked by: ${v('checked')}`, margin + 5, footerY + 5);
-            
-            pdf.line(pageWidth - margin - 5 - 70, footerY, pageWidth - margin - 5, footerY);
-            pdf.text(`Approved by: ${v('approved')}`, pageWidth - margin - 5, footerY + 5, { align: 'right' });
-
-            // Resolve with the PDF blob
-            resolve(pdf.output('blob'));
-
-        } catch (error) {
-            console.error("PDF generation error:", error);
-            reject(error);
-        }
-    });
-  }
-  
-  function loadImage(src) {
-      return new Promise((resolve, reject) => {
-          const img = new Image();
-          img.onload = () => resolve(img);
-          img.onerror = reject;
-          img.src = src;
+        const dateShiftValue = group.querySelector('input[data-field="dateShift"]').value.trim();
+        if (operation.includes('Spare Operation') && observation.replace(/; /g, '').length === 0 && dateShiftValue === '') return;
+        
+        rows.push({
+          sr: index + 1,
+          dateShift: group.querySelector('input[data-field="dateShift"]').value.trim(),
+          observation: observation, 
+          fromTime: group.querySelector('input[data-field="fromTime"]').value.trim(),
+          toTime: group.querySelector('input[data-field="toTime"]').value.trim(),
+          qty: '', 
+          inspectionStatus: group.querySelector('select[data-field="inspectionStatus"]').value, 
+          operatorChecked: '', 
+          supervisorSign: group.querySelector('input[data-field="supervisorSign"]').value.trim(), 
+          operation: operation, 
+        });
       });
-  }
-
-  $('btnSave').addEventListener('click', (e) => {
-    e.preventDefault();
-    saveReport();
-    alert('रिपोर्ट सफलतापूर्वक सेव हो गई है और अब होम पेज पर उपलब्ध है।');
-    // After saving, go to the Home Page
-    showPage('home'); 
-  });
-
-  // --- SST ALARM FUNCTION (Placeholder for PWA Notification) ---
-  window.setSSTAlarm = () => {
-      const stopDate = $('stopDate').value;
-      const stopTime = $('stopTime').value;
-      const customer = $('customer').value;
-      const part = $('part').value;
+      data.rows = rows;
       
-      if (!stopDate || !stopTime) {
-          alert("पहले 'Load Date' और 'Customer Requirement (Hrs)' भरें ताकि Test Stop Time कैलकुलेट हो सके।");
-          return;
-      }
-      
-      const [h, m] = stopTime.split(':');
-      const [y, mon, d] = stopDate.split('-');
-      // Note: Month in Date constructor is 0-indexed
-      const alarmDateTime = new Date(y, mon - 1, d, h, m, 0);
-      const now = new Date();
+      return data;
+    }
 
-      if (alarmDateTime < now) {
-          alert("❌ अलार्म सेट नहीं हो सकता, यह समय पहले ही निकल चुका है।");
-          return;
-      }
-      
-      const label = `SST Complete: ${customer} ${part}`;
-      const delay = alarmDateTime.getTime() - now.getTime();
-      
-      alert(`✅ अलार्म सेट हो गया है। (${formatDate(stopDate)} को ${formatTime(stopTime)} बजे) - कृपया ऐप/टैब को खुला रखें ताकि यह बजे।`);
+    // --- Utility Functions ---
 
-      // Simulating the alarm
-      setTimeout(() => {
-          alert(`🔔 ALARM: SST Report (${customer} - ${part}) ${$('sstHrs').value} hours completed!`);
-          console.log(`ALARM FIRED: ${label}`);
-      }, delay);
-  }
-  // --- END SST ALARM FUNCTION ---
-  
-  window.loadReport = loadReport;
-  window.deleteReport = deleteReport;
-  window.showPage = showPage;
-  window.setSSTAlarm = setSSTAlarm; 
-  window.shareViaEmail = shareViaEmail;
-  window.shareViaWhatsapp = shareViaWhatsapp;
-  window.sharePdfViaWebShare = sharePdfViaWebShare; // Expose the new function
+    function setFormData(data) {
+        jobFields.forEach(f => {
+            const el = document.getElementById(f);
+            if (el && data[f] !== undefined) {
+                 el.value = data[f] || ''; 
+            }
+        });
+        
+        const statusEl = document.getElementById('statusField');
+        if (statusEl) {
+            const currentStatus = data.status || 'Running';
+            statusEl.value = currentStatus;
+            document.getElementById('completeReportBtn').textContent = (currentStatus === 'Completed') ? '✅ Job is Completed' : '✅ Mark as Completed';
+        }
 
-  $('customer').addEventListener('input', updateSuggestions);
-  $('part').addEventListener('input', updateSuggestions);
-  
-  $('loadDate').addEventListener('change', calculateStopDate);
-  $('loadTime').addEventListener('change', calculateStopDate);
-  $('sstHrs').addEventListener('input', () => { calculateStopDate(); updateObsText(); updateRemarkText(); });
-  $('color').addEventListener('input', updateCoatInfo);
-</script>
+
+        // FIX: Set currentActiveReportId to the loaded unique ID
+        currentActiveReportId = data.uniqueId || null; 
+        document.getElementById('currentReportId').textContent = `Active ID: ${currentActiveReportId && !currentActiveReportId.startsWith('NEW') ? currentActiveReportId : '-- New --'}`;
+        
+        updateRowInputs(data.rows || []); 
+        window.updateActionButtons(data); 
+    }
+
+    function clearForm() {
+        jobFields.forEach(f => {
+            const el = document.getElementById(f);
+            if (el && (el.type === 'text' || el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.type === 'email')) {
+                 el.value = ''; 
+            } else if (el && el.tagName === 'SELECT') {
+                 el.value = el.options[0].value;
+            }
+        });
+        
+        // Resetting default values
+        document.getElementById('customerName').value = "Star Engineering";
+        document.getElementById('orderQty').value = "1000 Pcs";
+        document.getElementById('challan').value = "CH/2508/01 | 01.09.2025";
+        document.getElementById('batchNo').value = "250819"; 
+        document.getElementById('verifiedBy').value = "SAKSHI CHAVHAN";
+        document.getElementById('approvedBy').value = "ABHIJEET DHOKRAT";
+        document.getElementById('notes').value = "P- Pointage, V- Viscosity, T- Temp, S-speed, A-Adhesion.";
+        document.getElementById('paint').value = 'Black'; 
+        document.getElementById('silverInsp').value = 'Silver Paint';
+        document.getElementById('blackInsp').value = 'Black Paint';
+        document.getElementById('baseBatch').value = 'BCB101';
+        document.getElementById('topBatch').value = 'TCB202';
+        
+        const statusEl = document.getElementById('statusField');
+        if (statusEl) statusEl.value = 'Running';
+        document.getElementById('completeReportBtn').textContent = '✅ Mark as Completed';
+        document.getElementById('completeReportBtn').disabled = true;
+
+        currentActiveReportId = null;
+        document.getElementById('currentReportId').textContent = `Active ID: -- New --`;
+        document.getElementById('saveReport').textContent = '💾 Save New Report';
+        document.getElementById('deleteReport').disabled = true;
+
+        updateRowInputs(); 
+        applyPreview();
+        window.updateActionButtons(null); 
+    }
+    
+    // --- CLOUD LOGIC FUNCTIONS (UNCHANGED) ---
+
+    async function handleSaveReport() {
+        if (!window.auth.currentUser) {
+            alert("❌ कृपया रिपोर्ट सेव करने के लिए साइन इन करें।");
+            return;
+        }
+        
+        const data = getFormData();
+        
+        if (!data.challan || !data.customerName) {
+            alert("❌ चालान नंबर और ग्राहक का नाम आवश्यक है।");
+            return;
+        }
+
+        try {
+            await window.cloudSaveReport(data, data.uniqueId);
+            
+            // FIX: Set currentActiveReportId to the ID that was successfully saved
+            currentActiveReportId = data.uniqueId;
+            document.getElementById('currentReportId').textContent = `Active ID: ${currentActiveReportId}`;
+            
+            // Set the saved data back to the form so updateActionButtons can work correctly
+            setFormData(data); 
+            
+            alert(`✅ रिपोर्ट सफलतापूर्वक क्लाउड पर सेव/अपडेट हो गई है। ID: ${currentActiveReportId}`);
+            
+            // Reload lists to show updated data and grouping
+            window.loadReportsList('', 'Running'); 
+            window.loadReportsList('', 'Completed'); 
+            
+        } catch (e) {
+            console.error(e);
+            alert(`❌ रिपोर्ट सेव करने में त्रुटि: ${e.message}`);
+        }
+    }
+
+    async function handleDeleteReport() {
+        if (!currentActiveReportId || currentActiveReportId.startsWith('NEW')) {
+            alert("❌ यह एक नई रिपोर्ट है, इसे डिलीट नहीं किया जा सकता।");
+            return;
+        }
+        
+        // 🛑 RBAC REMOVED: No more Admin check here, only check for logged in is in cloudDeleteReport
+        if (!confirm(`क्या आप वाकई रिपोर्ट ID ${currentActiveReportId} को डिलीट करना चाहते हैं?`)) {
+            return;
+        }
+        
+        try {
+            await window.cloudDeleteReport(currentActiveReportId);
+            alert(`✅ रिपोर्ट ID ${currentActiveReportId} सफलतापूर्वक डिलीट हो गई है।`);
+            clearForm();
+            window.loadReportsList('', 'Running'); 
+            window.loadReportsList('', 'Completed');
+        } catch (e) {
+            console.error(e);
+            alert(`❌ रिपोर्ट डिलीट करने में त्रुटि: ${e.message}`);
+        }
+    }
+    
+    // --- UPDATED: loadReportsList (FIXED: Default Expansion Logic) ---
+    window.loadReportsList = async (query = '', statusFilter = 'Running') => {
+        try {
+            const reports = await window.cloudLoadReports(query, statusFilter);
+            
+            const containerId = (statusFilter === 'Running') ? 'runningJobsContainer' : 'completedJobsContainer';
+            const container = document.getElementById(containerId);
+            
+            container.innerHTML = '';
+            
+            if (reports.length === 0) {
+                 container.innerHTML = '<div style="padding:10px; text-align:center; color:#666;">कोई रिपोर्ट नहीं मिली।</div>';
+                 return;
+            }
+            
+            // --- 1. Grouping Logic: Customer-wise and then Month-wise ---
+            const groupedReports = {}; // { customerName: { monthYear: [reports] } }
+            const monthNames = ["जनवरी", "फरवरी", "मार्च", "अप्रैल", "मई", "जून", "जुलाई", "अगस्त", "सितम्बर", "अक्टूबर", "नवम्बर", "दिसम्बर"];
+            
+            reports.forEach(report => {
+                const date = new Date(report.updatedAt || report.timestamp);
+                const monthYearKey = `${monthNames[date.getMonth()]} ${date.getFullYear()}`;
+                const customerKey = report.customerName.trim() || 'No Customer Name';
+                
+                if (!groupedReports[customerKey]) {
+                    groupedReports[customerKey] = {};
+                }
+                if (!groupedReports[customerKey][monthYearKey]) {
+                    groupedReports[customerKey][monthYearKey] = [];
+                }
+                groupedReports[customerKey][monthYearKey].push(report);
+            });
+            
+            // --- 2. Rendering the Grouped Structure ---
+            let isFirstCustomer = true;
+            
+            for (const customerName in groupedReports) {
+                const customerGroupDiv = document.createElement('div');
+                customerGroupDiv.className = 'customer-group';
+                
+                const customerHeader = document.createElement('div');
+                customerHeader.className = 'customer-header';
+                
+                let totalJobs = 0;
+                for(const month in groupedReports[customerName]) {
+                    totalJobs += groupedReports[customerName][month].length;
+                }
+                
+                customerHeader.innerHTML = `${customerName} <span style="font-size: 11px; margin-left: 10px; font-weight: normal; color: #4b5563;">(${totalJobs} Jobs Total)</span> <span class="toggle-icon">▶</span>`;
+                customerGroupDiv.appendChild(customerHeader);
+
+                const customerContent = document.createElement('div');
+                customerContent.className = 'folder-content'; 
+                customerGroupDiv.appendChild(customerContent);
+                
+                
+                // Toggle logic for Customer Folder
+                customerHeader.addEventListener('click', () => {
+                    customerContent.classList.toggle('expanded');
+                    customerHeader.querySelector('.toggle-icon').classList.toggle('expanded');
+                });
+                
+                // Sort months from newest to oldest
+                const sortedMonths = Object.keys(groupedReports[customerName]).sort((a, b) => {
+                     const dateA = new Date(a.replace(/(\w+)\s(\d+)/, '$1 1, $2'));
+                     const dateB = new Date(b.replace(/(\w+)\s(\d+)/, '$1 1, $2'));
+                     return dateB - dateA; // Newest first
+                });
+
+                let isFirstMonth = true;
+
+                for (const monthYearKey of sortedMonths) {
+                    const monthGroupDiv = document.createElement('div');
+                    monthGroupDiv.className = 'month-group';
+                    
+                    const monthHeader = document.createElement('div');
+                    monthHeader.className = 'month-header';
+                    monthHeader.innerHTML = `${monthYearKey} (${groupedReports[customerName][monthYearKey].length} Jobs) <span class="toggle-icon">▶</span>`;
+                    customerContent.appendChild(monthHeader);
+                    
+                    const monthContent = document.createElement('div');
+                    monthContent.className = 'folder-content'; 
+                    customerContent.appendChild(monthContent);
+                    
+                    // Toggle logic for Month Folder
+                    monthHeader.addEventListener('click', (e) => {
+                        e.stopPropagation(); // Prevent the parent Customer folder from closing
+                        monthContent.classList.toggle('expanded');
+                        monthHeader.querySelector('.toggle-icon').classList.toggle('expanded');
+                    });
+                    
+                    // Render individual reports 
+                    groupedReports[customerName][monthYearKey].forEach(report => {
+                        const item = document.createElement('div');
+                        item.className = 'report-list-item';
+                        if (report.uniqueId === currentActiveReportId) {
+                             item.classList.add('selected');
+                        }
+                        item.dataset.id = report.uniqueId;
+                        item.innerHTML = `
+                            <span>${report.partDesc} <span style="font-weight: normal; color:#6b7280; margin-left: 8px;">(Batch: ${report.batchNo})</span></span>
+                            <span style="font-size:10px; color:#666;">${report.challan}</span>
+                        `;
+                        item.addEventListener('click', () => {
+                            handleLoadReport(report);
+                            showView('form'); 
+                        });
+                        monthContent.appendChild(item);
+                    });
+
+                    // FIX: Expand the first month folder of the first customer by default, only if not searching
+                    if (isFirstCustomer && isFirstMonth && query.length === 0) {
+                        monthContent.classList.add('expanded');
+                        monthHeader.querySelector('.toggle-icon').classList.add('expanded');
+                        isFirstMonth = false;
+                    }
+
+                }
+                container.appendChild(customerGroupDiv);
+                
+                // FIX: Expand the first customer folder by default, only if not searching
+                if (isFirstCustomer && query.length === 0) {
+                    customerContent.classList.add('expanded');
+                    customerHeader.querySelector('.toggle-icon').classList.add('expanded');
+                    isFirstCustomer = false;
+                }
+            }
+        } catch (e) {
+            console.error(`Error loading ${statusFilter} reports:`, e);
+            const containerId = (statusFilter === 'Running') ? 'runningJobsContainer' : 'completedJobsContainer';
+            const container = document.getElementById(containerId);
+            if(container) container.innerHTML = `<div style="padding:10px; text-align:center; color:red;">रिपोर्ट्स लोड करने में त्रुटि: ${e.message}</div>`;
+        }
+    };
+
+
+    function handleLoadReport(reportData) {
+        setFormData(reportData);
+        
+        // Remove 'selected' class from all report items
+        document.querySelectorAll('.report-list-item').forEach(item => item.classList.remove('selected'));
+        
+        // Add 'selected' class to the newly loaded report item
+        const selectedItem = document.querySelector(`.report-list-item[data-id="${reportData.uniqueId}"]`);
+        if (selectedItem) {
+            selectedItem.classList.add('selected');
+            
+            // Ensure the parent folders are expanded when the item is loaded
+            let currentParent = selectedItem.closest('.folder-content');
+            while(currentParent) {
+                currentParent.classList.add('expanded');
+                const header = currentParent.previousElementSibling;
+                if(header && header.querySelector('.toggle-icon')) {
+                    header.querySelector('.toggle-icon').classList.add('expanded');
+                }
+                // Go up to the next parent folder structure (Month -> Customer)
+                currentParent = currentParent.parentElement.closest('.folder-content');
+            }
+        }
+    }
+    
+    // --- Mark Job as Completed (FIXED: Save data before attempting to mark as completed) ---
+    async function handleCompleteReport() {
+        if (!currentActiveReportId || currentActiveReportId.startsWith('NEW')) {
+            alert("❌ कृपया किसी रिपोर्ट को लोड/सेव करें जिसे आप Completed मार्क करना चाहते हैं।");
+            return;
+        }
+        
+        if (document.getElementById('statusField').value === 'Completed') {
+            alert("❌ यह जॉब पहले से ही Completed मार्क है।");
+            return;
+        }
+        
+        // FIX: Save the current form data first to ensure it's up-to-date and in the database
+        try {
+            const dataToComplete = getFormData();
+            await window.cloudSaveReport(dataToComplete, dataToComplete.uniqueId);
+            
+            if (!confirm(`क्या आप वाकई रिपोर्ट ID ${currentActiveReportId} को 'Completed' मार्क करना चाहते हैं? (यह 'Completed Jobs' फोल्डर में चली जाएगी)`)) {
+                return;
+            }
+            
+            // Now, mark as completed and save again
+            dataToComplete.status = 'Completed'; 
+            
+            await window.cloudSaveReport(dataToComplete, dataToComplete.uniqueId);
+            
+            // Update UI elements
+            document.getElementById('statusField').value = 'Completed';
+            document.getElementById('completeReportBtn').textContent = '✅ Job is Completed';
+            
+            alert(`✅ रिपोर्ट ID ${currentActiveReportId} सफलतापूर्वक 'Completed' मार्क हो गई है।`);
+            
+            // Reload lists and update buttons with the completed status data
+            window.loadReportsList('', 'Running'); 
+            window.loadReportsList('', 'Completed'); 
+            window.updateActionButtons(dataToComplete); 
+            
+        } catch (e) {
+            console.error(e);
+            alert(`❌ रिपोर्ट को 'Completed' मार्क करने या सेव करने में त्रुटि: ${e.message}`);
+        }
+    }
+
+    // --- REMOVED: Dummy Function for Send Report ---
+
+    // ------------------------------------------------------------------
+    // --- applyPreview (UNCHANGED) ---
+    // ------------------------------------------------------------------
+    function applyPreview() {
+        const data = getFormData();
+        const v = (id) => document.getElementById(id)?.value || '';
+        const paintType = v('paint'); 
+        
+        document.getElementById('pvCustomer').textContent = v('customerName');
+        document.getElementById('pvQty').textContent = v('orderQty');
+        document.getElementById('pvChallan').textContent = v('challan');
+        document.getElementById('pvPart').textContent = v('partDesc');
+        document.getElementById('pvBatchNo').textContent = v('batchNo');
+        
+        document.getElementById('pvCoating').textContent = v('coatingSpec');
+        
+        const pvInspHeader = document.getElementById('pvInspHeader');
+        const pvInspValue = document.getElementById('pvInspValue');
+        pvInspHeader.textContent = 'Paint'; 
+        
+        if (paintType === 'Black') {
+            pvInspValue.textContent = v('blackInsp'); 
+        } else if (paintType === 'Silver') {
+            pvInspValue.textContent = v('silverInsp'); 
+        } else {
+            pvInspValue.textContent = 'N/A';
+        }
+
+        document.getElementById('pvBaseBatch').textContent = v('baseBatch'); 
+        document.getElementById('pvTopBatch').textContent = v('topBatch'); 
+        
+        document.getElementById('pvVerified').textContent = v('verifiedBy');
+        document.getElementById('pvApproved').textContent = v('approvedBy');
+        document.getElementById('pvNotes').innerHTML = v('notes'); 
+
+        const tbody = document.getElementById('pvRows');
+        tbody.innerHTML = '';
+        
+        const allRows = data.rows;
+        let globalSr = 1; 
+        const requiredLength = (paintType === 'Silver' ? 9 : 10);
+
+        allRows.forEach(r => {
+            const values = (r.observation || '').split(';').map(v => v.trim()); 
+            const structure = PARAMETERS[r.operation]; 
+            let singleObservationString = '';
+            
+            if(structure && structure.labels) {
+                 for (let j = 0; j < structure.labels.length; j++) {
+                    const label = structure.labels[j];
+                    const unit = structure.units[j] || '';
+                    const value = values[j] || ''; 
+                    
+                    if (label !== "N/A" && label.trim().length > 0 && value.length > 0) {
+                        const unitDisplay = (unit && unit.length > 0) ? `${unit}` : '';
+                        let obsPrefix = '';
+                        
+                        if (r.operation === "Incoming Inspection") { obsPrefix = ''; }
+                        else if (label.includes('Pointage')) obsPrefix = 'P-';
+                        else if (label.includes('Viscosity')) obsPrefix = 'V-';
+                        else if (label.includes('Temp') || label.includes('Time')) obsPrefix = 'T-';
+                        else if (label.includes('Speed')) obsPrefix = 'S-';
+                        else if (label.includes('Adhesion')) obsPrefix = 'A-';
+                        else if (label.includes('Thickness')) obsPrefix = 'T-'; 
+                        else if (label.includes('Qty')) obsPrefix = 'Q-'; // Qty is saved in row data but not shown in a dedicated column now
+                        
+                        singleObservationString += `${obsPrefix}${value}${unitDisplay} `; 
+                    }
+                }
+            } else {
+                 singleObservationString = r.observation;
+            }
+           
+            const specKey = r.operation.includes('Coat') ? `${paintType}_${r.operation}` : (r.operation === 'Final Inspection' ? `${r.operation}_${paintType}` : r.operation);
+            const specification = SPECIFICATIONS[specKey] || r.operation;
+            
+            const tr = document.createElement('tr');
+            const finalObservation = singleObservationString.trim();
+
+            const rowContent = `
+                <td style="text-align:center">${globalSr}</td>
+                <td>${r.dateShift || ''}</td>
+                <td>${r.operation || ''}</td>
+                <td>${specification || ''}</td> 
+                <td style="font-size: 9px; line-height: 1.2;">${finalObservation}</td>
+                <td style="text-align:center">${r.fromTime || ''}</td>
+                <td style="text-align:center">${r.toTime || ''}</td>
+                <td style="text-align:center; font-weight: bold;">${r.inspectionStatus || ''}</td> 
+                <td>${r.supervisorSign || ''}</td> `; // Qty column removed
+
+            tr.innerHTML = rowContent;
+            tbody.appendChild(tr);
+            
+            const rowHeight = (globalSr === 1) ? '5mm' : '18mm';
+            tr.style.height = rowHeight; 
+            tr.querySelectorAll('td').forEach(td => td.style.height = rowHeight);
+            
+            globalSr++;
+        });
+        
+        let currentOutputRows = tbody.querySelectorAll('tr').length;
+        
+        if (currentOutputRows < requiredLength) {
+            for (let i = 0; i < requiredLength - currentOutputRows; i++) {
+                const tr = document.createElement('tr');
+                // Qty column removed, total 9 columns now
+                tr.innerHTML = `<td style="text-align:center">${globalSr + i}</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>`; 
+                tbody.appendChild(tr);
+                
+                const blankSr = globalSr + i;
+                const rowHeight = (blankSr === 1) ? '5mm' : '18mm';
+                tr.style.height = rowHeight; 
+                tr.querySelectorAll('td').forEach(td => td.style.height = rowHeight);
+            }
+        }
+    }
+    
+    // ------------------------------------------------------------------
+    // --- generatePdfWithAutoTable (UNCHANGED) ---
+    // ------------------------------------------------------------------
+    async function generatePdfWithAutoTable() {
+        const data = getFormData();
+        const v = (id) => document.getElementById(id)?.value || '';
+        const paintType = v('paint'); 
+        
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF('p', 'mm', 'a4');
+        const pageHeight = pdf.internal.pageSize.getHeight(); 
+        const bottomMargin = 10;
+        const availablePageEnd = pageHeight - bottomMargin; 
+        let yOffset = 15; 
+
+        // --- Header and Format No. ---
+        pdf.setFontSize(14);
+        pdf.text("JOB CARD / ROUTE CARD", 105, yOffset, null, null, "center");
+        yOffset += 7;
+
+        pdf.setFontSize(6.5); 
+        pdf.text(`Format No: WT/PDR/11  |  REV. NO: 01  |  REV. DATE: 01.09.2025`, 105, yOffset, null, null, "center");
+        yOffset += 5;
+        
+        // --- General Info Table ---
+        const generalInfo = [
+            ["Customer Name", v('customerName'), "Order/Challan Qty", v('orderQty')],
+            ["Customer Challan No/Date", v('challan'), "Batch No.", v('batchNo')],
+            ["Part Desc/No", v('partDesc'), "Coating Spec", v('coatingSpec')]
+        ];
+
+        pdf.autoTable({
+            startY: yOffset,
+            head: [],
+            body: generalInfo,
+            theme: 'grid',
+            styles: { fontSize: 6.5, cellPadding: 0.8, lineColor: 0, lineWidth: 0.2 },
+            columnStyles: { 0: { cellWidth: 30, fontStyle: 'bold' }, 2: { cellWidth: 30, fontStyle: 'bold' } },
+            didDrawPage: (data) => { yOffset = data.cursor.y + 3; }
+        });
+
+        // --- Coating Batch Table ---
+        const coatingInfo = [
+            [v('coatingSpec'), paintType === 'Black' ? v('blackInsp') : v('silverInsp'), v('baseBatch'), v('topBatch')]
+        ];
+        
+        pdf.autoTable({
+            startY: yOffset,
+            head: [['COATING SPECIFICATION', 'Paint', 'BASE COAT BATCH NO.', 'TOP COAT BATCH NO.']],
+            body: coatingInfo,
+            theme: 'grid',
+            styles: { fontSize: 6.5, cellPadding: 0.8, lineColor: 0, lineWidth: 0.2, halign: 'center' },
+            headStyles: { fillColor: [200, 200, 200], fontStyle: 'bold', fontSize: 6.5 },
+            didDrawPage: (data) => { yOffset = data.cursor.y + 3; }
+        });
+        
+        // --- Main Operations Table ---
+        
+        const mainHeader = [
+            'Sr No', 'Date/Shift', 'Operation', 'Specifications', 'Observation', 
+            'From Time', 'To Time', 'Inspection OK/NOK', 'Operator/Supervisor/QA Signature'
+        ];
+        
+        const mainBody = [];
+        const allRows = data.rows;
+        let globalSr = 1;
+        const requiredLength = (paintType === 'Silver' ? 9 : 10);
+
+        allRows.forEach(r => {
+            const values = (r.observation || '').split(';').map(v => v.trim()); 
+            const structure = PARAMETERS[r.operation]; 
+            let finalObservation = ''; 
+
+            if(structure && structure.labels) {
+                 for (let j = 0; j < structure.labels.length; j++) {
+                    const label = structure.labels[j];
+                    const unit = structure.units[j] || '';
+                    const value = values[j] || ''; 
+                    
+                    if (label !== "N/A" && label.trim().length > 0 && value.length > 0) {
+                        const unitDisplay = (unit && unit.length > 0) ? `${unit}` : '';
+                        let obsPrefix = '';
+                        if (r.operation === "Incoming Inspection") { obsPrefix = ''; }
+                        else if (label.includes('Pointage')) obsPrefix = 'P-';
+                        else if (label.includes('Viscosity')) obsPrefix = 'V-';
+                        else if (label.includes('Temp') || label.includes('Time')) obsPrefix = 'T-';
+                        else if (label.includes('Speed')) obsPrefix = 'S-';
+                        else if (label.includes('Adhesion')) obsPrefix = 'A-';
+                        else if (label.includes('Thickness')) obsPrefix = 'T-'; 
+                        else if (label.includes('Qty')) obsPrefix = 'Q-';
+                        
+                        finalObservation += `${obsPrefix}${value}${unitDisplay} `; 
+                    }
+                }
+            } else {
+                 finalObservation = r.observation;
+            }
+            
+            const specKey = r.operation.includes('Coat') ? `${paintType}_${r.operation}` : (r.operation === 'Final Inspection' ? `${r.operation}_${paintType}` : r.operation);
+            const specification = SPECIFICATIONS[specKey] || r.operation;
+            
+            mainBody.push([
+                globalSr,
+                r.dateShift || '',
+                r.operation || '',
+                specification || '', 
+                finalObservation.trim(),
+                r.fromTime || '',
+                r.toTime || '',
+                r.inspectionStatus || '', 
+                r.supervisorSign || '' 
+            ]);
+            globalSr++;
+        });
+        
+        while (mainBody.length < requiredLength) {
+            mainBody.push([globalSr++, '', '', '', '', '', '', '', '']); 
+        }
+        
+        pdf.autoTable({
+            startY: yOffset,
+            head: [mainHeader],
+            body: mainBody,
+            theme: 'grid',
+            styles: { 
+                fontSize: 6.5, 
+                cellPadding: 0.8, 
+                lineColor: 0, 
+                lineWidth: 0.2, 
+                valign: 'middle', 
+                minCellHeight: 18.0 
+            },
+            headStyles: { 
+                fillColor: [200, 200, 200], 
+                fontStyle: 'bold', 
+                valign: 'middle', 
+                lineWidth: 0.2, 
+                lineColor: 0,
+                fontSize: 6.5 
+            },
+            columnStyles: {
+                0: { cellWidth: 8, halign: 'center' }, 
+                1: { cellWidth: 15 }, 
+                2: { cellWidth: 18 }, 
+                3: { cellWidth: 45 }, 
+                4: { cellWidth: 32 }, 
+                5: { cellWidth: 12, halign: 'center' }, 
+                6: { cellWidth: 12, halign: 'center' }, 
+                7: { cellWidth: 15, halign: 'center' }, 
+                8: { cellWidth: 33 } 
+            },
+            didParseCell: (data) => {
+                if (data.section === 'body' && data.row.index === 0) {
+                     data.cell.styles.minCellHeight = 5.0; 
+                } else if (data.section === 'body') {
+                     data.cell.styles.minCellHeight = 18.0; 
+                }
+                
+                if (data.section === 'body' && data.column.dataKey === 4 && data.cell.text.length > 1) {
+                    data.cell.styles.fontSize = 5.5; 
+                }
+            },
+            didDrawPage: (data) => { yOffset = data.cursor.y + 3; }
+        });
+        
+        // --- Footer ---
+        let footerY = Math.max(pdf.autoTable.previous.finalY + 3, availablePageEnd - 10);
+        
+        pdf.setFontSize(6.5); 
+        pdf.text(`Verified By: ${v('verifiedBy')}`, 10, footerY);
+        pdf.text(`Approved By: ${v('approvedBy')}`, 200, footerY, null, null, 'right');
+        footerY += 4;
+        pdf.text(`Note - ${v('notes')}`, 10, footerY);
+        
+        // Custom Filename Logic
+        const custNameClean = v('customerName').replace(/[^a-zA-Z0-9]/g, '_').substring(0, 15);
+        const partNoClean = v('partDesc').replace(/[^a-zA-Z0-9]/g, '_').substring(0, 10);
+        const challanClean = v('challan').replace(/[^a-zA-Z0-9]/g, '_').substring(0, 15);
+        
+        const fileName = `JobCard_${custNameClean}_${partNoClean}_${challanClean}.pdf`;
+        pdf.save(fileName);
+    }
+
+    // --- Event Listeners (UNCHANGED) ---
+    document.getElementById('downloadPdfBtn').addEventListener('click', generatePdfWithAutoTable); 
+    document.getElementById('printBtn').addEventListener('click', () => {
+        applyPreview(); 
+        window.print();
+    });
+    
+    document.getElementById('applyBtn').addEventListener('click', applyPreview);
+    document.getElementById('clearBtn').addEventListener('click', clearForm);
+    document.getElementById('updateOpsBtn').addEventListener('click', () => updateRowInputs(getFormData().rows)); 
+    document.getElementById('paint').addEventListener('change', () => updateRowInputs(getFormData().rows)); 
+
+    document.getElementById('saveReport').addEventListener('click', handleSaveReport);
+    document.getElementById('deleteReport').addEventListener('click', handleDeleteReport);
+    
+    document.getElementById('homeViewBtn').addEventListener('click', () => showView('home'));
+    document.getElementById('formViewBtn').addEventListener('click', () => showView('form'));
+    document.getElementById('newJobFromHome').addEventListener('click', () => {
+        clearForm();
+        showView('form');
+    });
+    document.getElementById('completeReportBtn').addEventListener('click', handleCompleteReport); 
+    
+    document.getElementById('newReportBtn').addEventListener('click', () => {
+        clearForm();
+        showView('form');
+    });
+    
+    document.addEventListener('DOMContentLoaded', () => {
+        clearForm(); 
+    });
+  </script>
 </body>
 </html>
