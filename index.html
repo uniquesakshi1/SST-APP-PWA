@@ -10,36 +10,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
   
   <script>
-    // --- HEIC Worker Script Code (Must be inlined for local file access) ---
-    // This is the content of heic2any-worker.js
-    const heicWorkerCode = `
-      self.onmessage = function(a) {
-        var b = a.data.heif;
-        var c = a.data.toType || "image/png";
-        var d = a.data.encoderOptions || .9;
-        var e = a.data.orientation;
-        var f = a.data.canvas;
-
-        // Ensure to handle the toBlob callback properly
-        b.toBlob(function(b) {
-          self.postMessage({
-            heic2any: {
-              success: true,
-              result: b
-            }
-          }, [b]);
-        }, c, d);
-      };
-    `;
-    
-    // Create a Blob URL for the worker script
-    const heicWorkerBlob = new Blob([heicWorkerCode], { type: 'application/javascript' });
-    const HEIC_WORKER_URL = URL.createObjectURL(heicWorkerBlob);
-
-    // --- Main heic2any Library Code (Modified to use the Blob URL) ---
-    /*! heic2any v0.0.15 | MIT License | github.com/alexcorvi/heic2any */
-    (function(){'use strict';function g(a,c,d,b){a=a.target;a.removeEventListener("load",g);a.removeEventListener("error",b);try{a.crossOrigin?c.canvas(a,d,b):c.image(a,d,b)}catch(e){b(e)}}function h(a,c,d,b){a=a.target;a.removeEventListener("load",h);a.removeEventListener("error",b);try{c.video(a,d,b)}catch(e){b(e)}}function k(a){return a.split(";")[0].split("/")[0]}function l(a,c,d, workerUrl){var b=a.getByteCount();if(b>10485760){var e=document.createElement("p");e.innerHTML="\u003cb\u003eHEIC\u003c/b\u003e files with size \u003cb\u003e\u003e 10MB\u003c/b\u003e will take some time to convert and may crash on mobile. Please use a smaller image.";document.body.prepend(e)}var f=document.createElement("canvas");f.width=a.getDisplayWidth();f.height=a.getDisplayHeight();(new Worker(workerUrl,{name:"heic2any"})).postMessage({heif:a,toType:c.toType,encoderOptions:c.encoderOptions||.9,orientation:c.orientation,canvas:f},{transfer:[f.getContext("bitmaprenderer").canvas]})}var m;m=m||function(a,c){function d(e){try{if(e=e.target,e.removeEventListener("error",d),e.result instanceof ArrayBuffer)for(var a=new Uint8Array(e.result),c=[],b=0;b<a.length;b++)c.push(String.fromCharCode(a[b]));var f=a.slice(0,12),g=(new DataView(f.buffer.slice(f.byteOffset))).getUint32(0);if(1185122605===g)return void m(e.result,function(a){if(a.length)for(var d=0;d<a.length;d++){var e=a[d];if(e.getMimeType().match(/^image\/avif/)&&(b=document.createElement("video"),b.src=URL.createObjectURL(e.getBlob(),!1),b.addEventListener("load",h),b.addEventListener("error",c),void 0===b.load().catch(c)))return}c("No AVIF image found")},c,b);if(1212879940===g)return void n(e.result,function(a){if(a.length)for(var d=0;d<a.length;d++){var e=a[d];if(e.getMimeType().match(/^image\/heif/)){b=document.createElement("video");b.src=URL.createObjectURL(e.getBlob(),!1);b.addEventListener("loadedmetadata",function(){var a=e.getPrimaryItem();a=a&&a.getMetadata&&a.getMetadata().getOrientation();b.addEventListener("load",h);b.addEventListener("error",c);if(void 0===b.load().catch(c))return},!1);return}}c("No HEIF image found")},c,b);if(1414441029===g)return void n(e.result,function(a){if(a.length)for(var d=0;d<a.length;d++){var e=a[d];if(e.getMimeType().match(/^image\/heic/)){b=document.createElement("video");b.src=URL.createObjectURL(e.getBlob(),!1);b.addEventListener("loadedmetadata",function(){var a=e.getPrimaryItem();a=a&&a.getMetadata&&a.getMetadata().getOrientation();b.addEventListener("load",h);b.addEventListener("error",c);if(void 0===b.load().catch(c))return},!1);return}}c("No HEIC image found")},c,b);if(1314332263===g)return void o(e.result,function(a){if(a.length)for(var d=0;d<a.length;d++){var e=a[d];if(e.getMimeType().match(/^image\/(heif|heic|avif)/))return b=document.createElement("img"),b.src=URL.createObjectURL(e.getBlob(),!1),b.addEventListener("load",g),b.addEventListener("error",c),void 0===b.load().catch(c)}c("No image found")},c,b);c("Unrecognized file type")}catch(f){c(f)}}var b=a.getMetadata&&a.getMetadata().getOrientation();var e=new FileReader;e.addEventListener("load",d,!1);e.addEventListener("error",c,!1);e.readAsArrayBuffer(a)};function p(a){return new Promise(function(c,d){try{m(a,function(b){c(Array.isArray(b)?b:[b])},d,a)}catch(b){d(b)}})}var q;q=function(a,c,d,b){a.width=a.videoWidth;a.height=a.videoHeight;var e=document.createElement("canvas");e.width=a.videoWidth;e.height=a.videoHeight;e.getContext("2d").drawImage(a,0,0,a.videoWidth,a.videoHeight);a=e.toDataURL(c,d);e=a.split(",")[0].split(":")[1].split(";")[0];a=a.split(",")[1];b(new Blob([Uint8Array.from(atob(a),function(a){return a.charCodeAt(0)})],{type:e}))};function r(a,c,d){return new Promise(function(b,e){try{if(k(a.type).match(/^(heic|heif|avif)/)){var f=a.getPrimaryItem();f&&f.getMetadata&&f.getMetadata().getOrientation();l(a,c,d,d)}else{var h=document.createElement("img");h.src=URL.createObjectURL(a.getBlob(),!1);h.addEventListener("load",g);h.addEventListener("error",e);h.crossOrigin=c.crossOrigin||!1;if(void 0===h.load().catch(e))return}window.addEventListener("message",function(a){try{if(a.data.heic2any){var c=a.data.heic2any;c.success?b(c.result):e(c.error)}}catch(d){e(d)}},!1)}catch(f){e(f)}})}window.heic2any=function(a){return Array.isArray(a.blob)?Promise.all(a.blob.map(function(c){return p(c).then(function(c){return Promise.all(c.map(function(c){return r(c,a,HEIC_WORKER_URL)}))})})).then(function(a){return a.flat(Infinity)}):p(a.blob).then(function(c){return Promise.all(c.map(function(c){return r(c,a,HEIC_WORKER_URL)}))})};})();
-    
     // Fallback for jspdf-autotable's missing font warning
     if (typeof jspdf !== 'undefined' && jspdf.jsPDF && !jspdf.jsPDF.existsFile) {
         jspdf.jsPDF.existsFile = function() { return false; }; 
@@ -565,7 +535,7 @@
                         </div>
                         <div>
                             <label>Logo (optional)</label>
-                            <input id="logo" type="file" accept="image/*"/>
+                            <input id="logo" type="file" accept="image/jpeg, image/png"/>
                         </div>
                     </div>
 
@@ -669,11 +639,11 @@
                     <label>Remark</label>
                     <textarea id="remark">Sample SST passed 480 Hrs. No red rust found.</textarea>
                     
-                    <label>Sample Photo (Before) - **कैमरा/फ़ाइल चुनें**</label>
-                    <input id="before" type="file" accept="image/*"/>
+                    <label>Sample Photo (Before) - **केवल JPG/PNG फ़ाइल चुनें**</label>
+                    <input id="before" type="file" accept="image/jpeg, image/png"/>
                     
-                    <label>Sample Photo (After) - **कैमरा/फ़ाइल चुनें**</label>
-                    <input id="after" type="file" accept="image/*"/>
+                    <label>Sample Photo (After) - **केवल JPG/PNG फ़ाइल चुनें**</label>
+                    <input id="after" type="file" accept="image/jpeg, image/png"/>
                     
                     <br>
                     <div class="btn-group">
@@ -710,7 +680,7 @@
     </div>
 
 <script>
-  // --- JavaScript Code (Updated for Web Share API and WhatsApp Number) ---
+  // --- JavaScript Code (Updated for HEIC removal and PDF fix) ---
   
   // Right-click and keyboard shortcuts are disabled
   document.addEventListener('contextmenu', event => event.preventDefault());
@@ -723,6 +693,7 @@
   });
 
   const $ = (id) => document.getElementById(id);
+  // Removed 'loading' from possible states
   const state = { logo: "", before: "", after: "" }; 
   const inputIds = ['company', 'title', 'subtitle', 'docNo', 'revNo', 'revDate', 'tcDate', 'tag', 'batch', 'part', 'customer', 'customerEmail', 'customerWhatsapp', 'coatSys', 'color', 'process', 'coats', 'thick', 'equip', 'capacity', 'water', 'salt', 'sstHrs', 'loadDate', 'loadTime', 'stopDate', 'stopTime', 'obs', 'samples', 'remark', 'checked', 'approved', 'status'];
 
@@ -784,7 +755,11 @@
   function formatDate(dateStr) {
     if (!dateStr) return '';
     const [year, month, day] = dateStr.split('-');
-    return `${day}.${month}.${year}`;
+    // Handles case where dateStr might already be in DD.MM.YYYY format
+    if (day && month && year && day.length === 2) {
+        return `${day}.${month}.${year}`;
+    }
+    return dateStr;
   }
   
   function formatTime(timeStr) {
@@ -799,6 +774,7 @@
   document.addEventListener('DOMContentLoaded', () => {
     const today = new Date();
     const formattedDateForInput = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+    const formattedDate = `${String(today.getDate()).padStart(2, '0')}.${String(today.getMonth() + 1).padStart(2, '0')}.${today.getFullYear()}`;
     
     inputIds.forEach(id => {
       const el = $(id);
@@ -807,7 +783,7 @@
       }
     });
 
-    $('tcDate').value = formatDate(formattedDateForInput);
+    $('tcDate').value = formattedDate;
     $('loadDate').value = formattedDateForInput;
     $('loadTime').value = `${String(today.getHours()).padStart(2, '0')}:${String(today.getMinutes()).padStart(2, '0')}`;
 
@@ -864,15 +840,9 @@
       return;
     }
     
-    // Only automatically calculate/overwrite if the fields are empty or if we are loading defaults
-    // Note: The fields are no longer read-only, so a change in loadDate/sstHrs will always
-    // overwrite the stop date, which is the desired automatic behavior for a generator tool.
-    
-    // The previous logic was sufficient once 'readonly' was removed, as the 'change' 
-    // event listener on loadDate/sstHrs will force the recalculation.
-    
     const [year, month, day] = loadDateStr.split('-').map(Number);
     const [hours, minutes] = loadTimeStr.split(':').map(Number);
+    // Month is 0-indexed in Date constructor, so month - 1
     const startDate = new Date(year, month - 1, day, hours, minutes);
 
     const endDate = new Date(startDate.getTime() + sstHours * 60 * 60 * 1000);
@@ -926,45 +896,20 @@
       render();
   }
 
-  // Function to handle file conversion (especially HEIC)
+  // Function to handle file conversion (Only for standard images now)
   async function fileToDataURL(file) {
-      if (file.type === "image/heic" || file.type === "image/heif" || file.name.toLowerCase().endsWith('.heic') || file.name.toLowerCase().endsWith('.heif')) {
-          
-          try {
-              if (typeof heic2any === 'undefined') {
-                   // This should now be caught by the inlined library, but keeping this check for safety.
-                   throw new Error("heic2any library is not loaded. Internal Error.");
-              }
-
-              const convertedBlob = await heic2any({
-                  blob: file,
-                  toType: "image/jpeg",
-                  quality: 0.9,
-              });
-              
-              const finalBlob = Array.isArray(convertedBlob) ? convertedBlob[0] : convertedBlob;
-              
-              return new Promise((res, rej) => {
-                  const reader = new FileReader();
-                  reader.onload = (e) => res(e.target.result);
-                  reader.onerror = rej;
-                  reader.readAsDataURL(finalBlob);
-              });
-              
-          } catch (error) {
-              console.error("HEIC to JPEG conversion failed:", error);
-              alert("❌ HEIC फ़ाइल को बदलने (Convert) में समस्या हुई। कृपया JPG/PNG फ़ाइल का उपयोग करें। Error: " + error.message);
-              return ""; // Return empty string on failure
-          }
-      } else {
-          // For non-HEIC files
-          return new Promise((res, rej) => {
-              const reader = new FileReader();
-              reader.onload = (e) => res(e.target.result);
-              reader.onerror = rej;
-              reader.readAsDataURL(file);
-          });
+      if (file.type !== "image/jpeg" && file.type !== "image/png") {
+          alert("❌ केवल JPG या PNG फ़ाइलें ही समर्थित हैं।");
+          return "";
       }
+      
+      // For non-HEIC files
+      return new Promise((res, rej) => {
+          const reader = new FileReader();
+          reader.onload = (e) => res(e.target.result);
+          reader.onerror = rej;
+          reader.readAsDataURL(file);
+      });
   }
   
   function getFormData() {
@@ -1012,11 +957,6 @@
     
     if (!reportData.customer || !reportData.part) {
         alert("ग्राहक का नाम (Customer Name) और पार्ट नंबर/नाम (Part No/Name) आवश्यक है।");
-        return;
-    }
-
-    if (reportData.logo === 'loading' || reportData.before === 'loading' || reportData.after === 'loading') {
-        alert("इमेज कन्वर्जन अभी जारी है। कृपया कुछ सेकंड प्रतीक्षा करें और फिर से सेव करें।");
         return;
     }
 
@@ -1212,20 +1152,19 @@
   $('stopTime').addEventListener('change', render);
 
 
-  // Setup File Input Listeners (Same as before)
+  // Setup File Input Listeners (Modified)
   const setupFileListener = (inputId, stateKey) => {
     $(inputId).addEventListener('change', async e => {
       const f = e.target.files?.[0];
       if (f) {
-        state[stateKey] = "loading"; 
-        render(); 
+        // No 'loading' state needed now
         try {
             const dataUrl = await fileToDataURL(f); 
             state[stateKey] = dataUrl;
         } catch(error) {
             console.error("File processing failed:", error);
             state[stateKey] = ""; 
-            alert("❌ फ़ाइल लोड या कन्वर्ट नहीं हो पाई।");
+            alert("❌ फ़ाइल लोड या कन्वर्ट नहीं हो पाई। केवल JPG/PNG फ़ाइलें ही समर्थित हैं।");
         }
         render(); 
       } else {
@@ -1244,16 +1183,14 @@
     const v = (id) => $(id).value;
     
     const renderImage = (src, alt) => {
-        if (src === "loading") {
-             return `<div style="width:100%;height:100%;display:flex;justify-content:center;align-items:center;color:#4b5563;font-size:14px;">🔄 HEIC Convert हो रहा है...</div>`;
-        }
+        // Removed 'loading' check
         return src ? `<img src="${src}" alt="${alt}">` : 'No image';
     };
 
     P.innerHTML = `
       <div class="hdr">
         <div style="display:flex;gap:15px;align-items:center;">
-          ${state.logo && state.logo !== 'loading' ? `<img class="logo" src="${state.logo}" alt="Company Logo">` : `<div class="logo" style="display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--text-light);background-color:var(--bg-light);">${state.logo === 'loading' ? 'LOADING...' : 'LOGO'}</div>`}
+          ${state.logo ? `<img class="logo" src="${state.logo}" alt="Company Logo">` : `<div class="logo" style="display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--text-light);background-color:var(--bg-light);">LOGO</div>`}
           <div class="hdr-text">
             <div style="font-size:22px;font-weight:700;color:var(--primary);">${v('company')}</div>
             <div class="title">${v('title')}</div>
@@ -1475,11 +1412,9 @@
   $('btnPdf').addEventListener('click', async (e) => {
     e.preventDefault();
 
-    if (state.logo === 'loading' || state.before === 'loading' || state.after === 'loading') {
-        alert("इमेज कन्वर्जन अभी जारी है। कृपया कुछ सेकंड प्रतीक्षा करें और फिर से PDF डाउनलोड करें।");
-        return;
-    }
-    
+    // Check if images are present but invalid (not 'loading' state anymore, but good practice)
+    // Removed redundant check
+
     // Save report before downloading PDF (This now includes the auto-status check)
     saveReport();
 
@@ -1543,6 +1478,7 @@
                 
                 logoDisplayHeight = finalLogoHeight; 
                 
+                // Determine image type dynamically (assuming data URL format)
                 const imageType = state.logo.startsWith('data:image/png') ? 'PNG' : 'JPEG';
 
                 pdf.addImage(logo, imageType, logoX, logoY, finalLogoWidth, finalLogoHeight, undefined, 'NONE');
@@ -1627,6 +1563,7 @@
             pdf.text('SAMPLE PHOTO BEFORE SST', margin, currentY);
             if (state.before) {
                 const photoBefore = await loadImage(state.before);
+                // Determine image type dynamically (assuming data URL format)
                 const imageType = state.before.startsWith('data:image/png') ? 'PNG' : 'JPEG';
                 pdf.addImage(photoBefore, imageType, margin, photoBeforeY, photoWidth, photoHeight, undefined, 'FAST');
             } else {
@@ -1640,6 +1577,7 @@
             pdf.text('SAMPLE PHOTO AFTER SST', photoAfterX, currentY);
             if (state.after) {
                 const photoAfter = await loadImage(state.after);
+                // Determine image type dynamically (assuming data URL format)
                 const imageType = state.after.startsWith('data:image/png') ? 'PNG' : 'JPEG';
                 pdf.addImage(photoAfter, imageType, photoAfterX, photoBeforeY, photoWidth, photoHeight, undefined, 'FAST');
             } else {
@@ -1654,29 +1592,36 @@
 
             const footerHeight = 25; 
             const remarkText = v('remark');
+            // Use splitTextToSize to handle multi-line text
             const splitRemark = pdf.splitTextToSize(`Remark: ${remarkText}`, pageWidth - 2 * margin);
             const remarkLineHeight = 5; 
             const remarkHeight = splitRemark.length * remarkLineHeight; 
             
             let remarkY = currentY + 5; 
 
+            // Calculate position for remark, ensuring it doesn't overlap with the footer
             if (remarkY + remarkHeight > (pageHeight - margin - footerHeight)) {
-                remarkY = pageHeight - margin - footerHeight - remarkHeight - 2; 
+                 // Try to push remark higher up if there's overlap
+                remarkY = (pageHeight - margin - footerHeight) - remarkHeight - 2; 
+                 // If that still overlaps with content above, keep it where it was and let the text flow/clip (or add new page, but we'll try to fit it)
                 if (remarkY < currentY + 5) {
-                    remarkY = currentY + 5;
+                    remarkY = currentY + 5; 
                 }
             }
 
 
             pdf.setFontSize(10);
+            // Draw the remark text
             pdf.text(splitRemark, margin, remarkY);
 
             const footerY = pageHeight - margin - 20; 
 
+            // Checked by signature line
             pdf.line(margin + 5, footerY, margin + 5 + 70, footerY);
             pdf.setFontSize(10);
             pdf.text(`Checked by: ${v('checked')}`, margin + 5, footerY + 5);
             
+            // Approved by signature line
             pdf.line(pageWidth - margin - 5 - 70, footerY, pageWidth - margin - 5, footerY);
             pdf.text(`Approved by: ${v('approved')}`, pageWidth - margin - 5, footerY + 5, { align: 'right' });
 
@@ -1685,6 +1630,8 @@
 
         } catch (error) {
             console.error("PDF generation error:", error);
+            // Show a specific error to the user
+            alert("❌ PDF बनाने में गंभीर समस्या आई। कृपया इमेज साइज़ (filesize) छोटा करें या JPG/PNG फ़ाइल का उपयोग करें।");
             reject(error);
         }
     });
@@ -1693,8 +1640,13 @@
   function loadImage(src) {
       return new Promise((resolve, reject) => {
           const img = new Image();
+          // Ensure cross-origin attribute is set for security, though typically not needed for data URLs
+          // img.crossOrigin = 'Anonymous'; 
           img.onload = () => resolve(img);
-          img.onerror = reject;
+          img.onerror = (e) => {
+              console.error("Image loading failed:", e);
+              reject(new Error("Image failed to load for PDF."));
+          };
           img.src = src;
       });
   }
