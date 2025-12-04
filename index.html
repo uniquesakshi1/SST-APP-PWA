@@ -658,8 +658,8 @@
                         <div><label>Loaded Time</label><input id="loadTime" value="11:06" type="time"/></div>
                     </div>
                     <div class="row">
-                        <div><label>Test Stop Date</label><input id="stopDate" value="2025-09-09" type="date" readonly/></div>
-                        <div><label>Test Stop Time</label><input id="stopTime" value="11:10" type="time" readonly/></div>
+                        <div><label>Test Stop Date</label><input id="stopDate" value="2025-09-09" type="date"/></div> 
+                         <div><label>Test Stop Time</label><input id="stopTime" value="11:10" type="time"/></div> 
                     </div>
                     
                     <div class="row">
@@ -851,14 +851,26 @@
     const loadDateStr = $('loadDate').value;
     const loadTimeStr = $('loadTime').value;
     const sstHours = parseInt($('sstHrs').value, 10);
+    
+    // Check if the stopDate/stopTime fields have existing manual values
+    const stopDateManual = $('stopDate').value;
+    const stopTimeManual = $('stopTime').value;
 
     if (!loadDateStr || !loadTimeStr || isNaN(sstHours)) {
+      // Clear values if inputs are missing, even if they were manually set
       $('stopDate').value = '';
       $('stopTime').value = '';
       $('tcDate').value = formatDate(loadDateStr) || '';
       return;
     }
-
+    
+    // Only automatically calculate/overwrite if the fields are empty or if we are loading defaults
+    // Note: The fields are no longer read-only, so a change in loadDate/sstHrs will always
+    // overwrite the stop date, which is the desired automatic behavior for a generator tool.
+    
+    // The previous logic was sufficient once 'readonly' was removed, as the 'change' 
+    // event listener on loadDate/sstHrs will force the recalculation.
+    
     const [year, month, day] = loadDateStr.split('-').map(Number);
     const [hours, minutes] = loadTimeStr.split(':').map(Number);
     const startDate = new Date(year, month - 1, day, hours, minutes);
@@ -874,6 +886,7 @@
     const endMinutes = String(endDate.getMinutes()).padStart(2, '0');
     const newStopTime = `${endHours}:${endMinutes}`;
 
+    // Overwrite the values since the function is called on loadDate/sstHrs change
     $('stopDate').value = newStopDate;
     $('stopTime').value = newStopTime;
     $('tcDate').value = formatDate(newStopDate);
@@ -989,7 +1002,7 @@
     $('before').value = null;
     $('after').value = null;
 
-    calculateStopDate();
+    calculateStopDate(); // This will recalculate, but the user can still overwrite
     render();
     showPage('generator');
   }
@@ -1193,6 +1206,11 @@
       el.addEventListener('input', render);
     }
   });
+  
+  // ADD LISTENERS for manual changes to stop date/time
+  $('stopDate').addEventListener('change', render);
+  $('stopTime').addEventListener('change', render);
+
 
   // Setup File Input Listeners (Same as before)
   const setupFileListener = (inputId, stateKey) => {
@@ -1697,7 +1715,7 @@
       const part = $('part').value;
       
       if (!stopDate || !stopTime) {
-          alert("पहले 'Load Date' और 'Customer Requirement (Hrs)' भरें ताकि Test Stop Time कैलकुलेट हो सके।");
+          alert("पहले 'Load Date' और 'Customer Requirement (Hrs)' भरें ताकि Test Stop Time कैलकुलेट हो सके, या मैन्युअल रूप से दर्ज करें।");
           return;
       }
       
@@ -1736,9 +1754,20 @@
   $('customer').addEventListener('input', updateSuggestions);
   $('part').addEventListener('input', updateSuggestions);
   
+  // These events now trigger calculation, which overwrites the stop date/time, 
+  // but the user can then manually re-edit it.
   $('loadDate').addEventListener('change', calculateStopDate);
   $('loadTime').addEventListener('change', calculateStopDate);
-  $('sstHrs').addEventListener('input', () => { calculateStopDate(); updateObsText(); updateRemarkText(); });
+  $('sstHrs').addEventListener('input', () => { 
+      calculateStopDate(); 
+      updateObsText(); 
+      updateRemarkText(); 
+  });
+  
+  // Add listeners for stop date/time to update the PDF preview when manually changed
+  $('stopDate').addEventListener('change', render);
+  $('stopTime').addEventListener('change', render);
+  
   $('color').addEventListener('input', updateCoatInfo);
 </script>
 </body>
