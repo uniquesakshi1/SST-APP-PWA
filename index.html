@@ -550,8 +550,7 @@
                     </div>
                     <div class="row">
                         <div><label>REV DATE</label><input id="revDate" value="01.09.2024" readonly/></div>
-                        <div><label>TC Date</label><input id="tcDate" readonly/></div>
-                    </div>
+                        <div><label>TC Date</label><input id="tcDate" /></div> </div>
                     
                     <div class="row">
                         <div>
@@ -680,7 +679,7 @@
     </div>
 
 <script>
-  // --- JavaScript Code (Updated for HEIC removal and PDF fix) ---
+  // --- JavaScript Code (Updated for Manual TC Date) ---
   
   // Right-click and keyboard shortcuts are disabled
   document.addEventListener('contextmenu', event => event.preventDefault());
@@ -756,7 +755,11 @@
     if (!dateStr) return '';
     const [year, month, day] = dateStr.split('-');
     // Handles case where dateStr might already be in DD.MM.YYYY format
-    if (day && month && year && day.length === 2) {
+    if (day && month && year && day.length === 2 && month.length === 2) {
+        return `${day}.${month}.${year}`;
+    }
+    // Reformat YYYY-MM-DD to DD.MM.YYYY
+    if (year && month && day && year.length === 4) {
         return `${day}.${month}.${year}`;
     }
     return dateStr;
@@ -765,9 +768,10 @@
   function formatTime(timeStr) {
     if (!timeStr) return '';
     const [hours, minutes] = timeStr.split(':');
+    if (!hours || !minutes) return timeStr;
     const hour = parseInt(hours, 10);
     const ampm = hour >= 12 ? 'pm' : 'am';
-    const formattedHour = hour % 12 === 0 ? 12 : hour % 12;
+    // const formattedHour = hour % 12 === 0 ? 12 : hour % 12; // Keeping 24hr format for clarity in report, but showing AM/PM
     return `${hours}:${minutes} ${ampm}`;
   }
 
@@ -783,7 +787,8 @@
       }
     });
 
-    $('tcDate').value = formattedDate;
+    // Set TC Date to today by default, but now it is fully editable
+    $('tcDate').value = formattedDate; 
     $('loadDate').value = formattedDateForInput;
     $('loadTime').value = `${String(today.getHours()).padStart(2, '0')}:${String(today.getMinutes()).padStart(2, '0')}`;
 
@@ -836,7 +841,7 @@
       // Clear values if inputs are missing, even if they were manually set
       $('stopDate').value = '';
       $('stopTime').value = '';
-      $('tcDate').value = formatDate(loadDateStr) || '';
+      // TC Date is now manually controlled, so do not touch it here
       return;
     }
     
@@ -859,7 +864,10 @@
     // Overwrite the values since the function is called on loadDate/sstHrs change
     $('stopDate').value = newStopDate;
     $('stopTime').value = newStopTime;
-    $('tcDate').value = formatDate(newStopDate);
+    
+    // **IMPORTANT CHANGE:** Removed the line that automatically set tcDate based on stopDate.
+    // $('tcDate').value = formatDate(newStopDate); 
+    
     render();
   }
 
@@ -947,7 +955,7 @@
     $('before').value = null;
     $('after').value = null;
 
-    calculateStopDate(); // This will recalculate, but the user can still overwrite
+    calculateStopDate(); // This will recalculate stop date/time, but the user can still overwrite
     render();
     showPage('generator');
   }
@@ -1147,7 +1155,8 @@
     }
   });
   
-  // ADD LISTENERS for manual changes to stop date/time
+  // ADD LISTENERS for manual changes to tcDate, stop date/time
+  $('tcDate').addEventListener('change', render); // New listener for manual TC Date
   $('stopDate').addEventListener('change', render);
   $('stopTime').addEventListener('change', render);
 
@@ -1264,7 +1273,8 @@
     const formattedDateForInput = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
     const formattedDate = `${String(today.getDate()).padStart(2, '0')}.${String(today.getMonth() + 1).padStart(2, '0')}.${today.getFullYear()}`;
     
-    $('tcDate').value = formattedDate;
+    // TC Date set to today by default, but remains fully editable.
+    $('tcDate').value = formattedDate; 
     $('loadDate').value = formattedDateForInput;
     $('loadTime').value = `${String(today.getHours()).padStart(2, '0')}:${String(today.getMinutes()).padStart(2, '0')}`;
     
@@ -1411,9 +1421,6 @@
 
   $('btnPdf').addEventListener('click', async (e) => {
     e.preventDefault();
-
-    // Check if images are present but invalid (not 'loading' state anymore, but good practice)
-    // Removed redundant check
 
     // Save report before downloading PDF (This now includes the auto-status check)
     saveReport();
@@ -1706,8 +1713,7 @@
   $('customer').addEventListener('input', updateSuggestions);
   $('part').addEventListener('input', updateSuggestions);
   
-  // These events now trigger calculation, which overwrites the stop date/time, 
-  // but the user can then manually re-edit it.
+  // These events now trigger calculation, which overwrites the stop date/time.
   $('loadDate').addEventListener('change', calculateStopDate);
   $('loadTime').addEventListener('change', calculateStopDate);
   $('sstHrs').addEventListener('input', () => { 
@@ -1716,9 +1722,10 @@
       updateRemarkText(); 
   });
   
-  // Add listeners for stop date/time to update the PDF preview when manually changed
+  // Add listeners for stop date/time and TC Date to update the PDF preview when manually changed
   $('stopDate').addEventListener('change', render);
   $('stopTime').addEventListener('change', render);
+  $('tcDate').addEventListener('input', render); // Ensure any input on TC Date updates the preview
   
   $('color').addEventListener('input', updateCoatInfo);
 </script>
