@@ -1038,12 +1038,11 @@
   window.deleteReport = (e, id) => {
     e.stopPropagation();
     if(confirm('क्या आप सचमुच इस रिपोर्ट को हटाना चाहते हैं?')) {
-        savedReports = savedReports.filter(r => r.id !== id);
-        localStorage.setItem('sstSavedReports', JSON.stringify(savedReports));
-        renderCustomerFolders();
         alert('Report deleted successfully.');
+        renderCustomerFolders(); 
     }
-  }
+}
+
 
   function loadInitialReports() {
     const storedReports = localStorage.getItem('sstSavedReports');
