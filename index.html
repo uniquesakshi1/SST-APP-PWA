@@ -1356,93 +1356,19 @@
    * Generates the PDF blob and attempts to share it using the Web Share API.
    * This is the function to share the actual file and pass the WhatsApp number in the text for context.
    */
+     
   async function sharePdfViaWebShare() {
-      if (!navigator.share || !navigator.canShare || !navigator.canShare({ files: [new File([""], "dummy.pdf", { type: "application/pdf" })] })) {
-          alert("❌ Your device/browser does not support sharing files directly from a webpage. Please use the 'Download PDF' button and share manually.");
-          return;
-      }
-
-      const v = (id) => $(id).value;
-      const customerName = $('customer').value.trim() || 'Customer';
-      const partNo = $('part').value.trim() || 'PartNo';
-      const whatsappNo = $('customerWhatsapp').value.trim().replace(/[^0-9]/g, '');
-      
-      // Filename
-      const filename = `${customerName.replace(/[^a-z0-9]/gi, '_')}_${partNo.replace(/[^a-z0-9]/gi, '_')}.pdf`;
-      
-      // Text for sharing
-      let shareText = `Dear ${customerName},\n\nPlease find the attached PDF file for your SST Report (${partNo}).`;
-      
-      // Include number in the text if available (for context in the sharing app)
-      if (whatsappNo.length >= 10) {
-          shareText += `\n\nReport for number: ${whatsappNo}`;
-          alert("✅ Sharing initiated. Please select the WhatsApp app, and then manually select the chat/contact you want to send the file to.");
-      } else {
-          alert("❌ Customer WhatsApp No. is missing or invalid. Sharing initiated without contact number. Please select the correct recipient.");
-      }
-
-      // 1. Generate PDF (using the same logic as btnPdf, but getting the blob)
-      const pdfBlob = await generatePdfBlob(v, state);
-
-      if (!pdfBlob) {
-          alert("PDF generation failed. Cannot share.");
-          return;
-      }
-
-      // 2. Create the File object from the Blob
-      const file = new File([pdfBlob], filename, { type: 'application/pdf' });
-
-      // 3. Prepare the share data
-      const shareData = {
-          files: [file],
-          title: `SST Report: ${partNo}`,
-          text: shareText,
-          // Note: Web Share API does NOT support pre-filling a specific WhatsApp contact with a file.
-          // It only opens the native share sheet. The user must manually select WhatsApp/contact.
-      };
-
-      try {
-          // 4. Attempt to share
-          await navigator.share(shareData);
-          console.log('PDF shared successfully via Web Share API');
-          // No need for a final alert, as the share dialog handles success/cancel
-      } catch (error) {
-          if (error.name === 'AbortError') {
-              console.log('Share aborted by user.');
-          } else {
-              console.error('Error sharing PDF:', error);
-              alert(`❌ File sharing failed. Please use the 'Download PDF' button and attach manually. Error: ${error.message}`);
-          }
-      }
+      // फंक्शन को खाली कर दिया गया है ताकि कुछ न हो
+      return;
   }
 
   // --- END NEW SHARING FUNCTIONS ---
 
-  $('btnPdf').addEventListener('click', async (e) => {
+    // पुराना कोड हटाकर इसे लिखें
+$('btnPdf').addEventListener('click', (e) => {
     e.preventDefault();
+    saveReport(); // रिपोर्ट ऐप के अंदर सेव होगी पर डाउनलोड नहीं होगी
 
-    // Save report before downloading PDF (This now includes the auto-status check)
-    saveReport();
-
-    const v = (id) => $(id).value;
-    const customerName = $('customer').value.trim() || 'Customer';
-    const partNo = $('part').value.trim() || 'PartNo';
-    const filename = `${customerName.replace(/[^a-z0-9]/gi, '_')}_${partNo.replace(/[^a-z0-9]/gi, '_')}.pdf`;
-
-    const pdfBlob = await generatePdfBlob(v, state);
-
-    if (pdfBlob) {
-        const url = URL.createObjectURL(pdfBlob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = filename;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-    } else {
-        alert("PDF डाउनलोड विफल रहा।");
-    }
   });
 
   // Function to generate the PDF and return a Blob
